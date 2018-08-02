@@ -20,10 +20,10 @@ import SparseArrays: SparseMatrixCSC
 
 # APIs that we will overload for
 ## standard array interface
-import Base: getindex, size, similar, copy, show, copyto!
+import Base: getindex, size, similar, copy, show, copyto!, inv, mul!
 
 ## linear algebra
-import LinearAlgebra: ishermitian, issymmetric
+import LinearAlgebra: ishermitian, issymmetric, diag, logdet
 export ishermitian, issymmetric
 
 ## sparse arrays
