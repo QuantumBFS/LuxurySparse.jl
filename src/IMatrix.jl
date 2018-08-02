@@ -5,7 +5,7 @@
 
 IMatrix matrix, with size N as label, use `Int64` as its default type, both `*` and `kron` are optimized.
 """
-struct IMatrix{N, Tv} <: AbstractSparseMatrix{Tv, Int} end
+struct IMatrix{N, Tv} <: AbstractLuxurySparseMatrix{Tv, Int} end
 IMatrix{N}() where N = IMatrix{N, Bool}()
 IMatrix(N::Int) = IMatrix{N}()
 

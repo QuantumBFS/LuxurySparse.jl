@@ -9,7 +9,7 @@ NOTE: this library may be a pirate for the following builtin array types:
 """
 module LuxurySparse
 
-using Random
+using Random, LinearAlgebra, SparseArrays
 
 # types that we will inherit from
 import SparseArrays: AbstractSparseArray, AbstractSparseMatrix
@@ -54,6 +54,8 @@ isdense(::AbstractSparseArray) = false
 isdense(::Diagonal) = false
 issparse(::Diagonal) = true
 
+abstract type AbstractLuxurySparseMatrix{Tv, Ti} <: AbstractSparseMatrix{Tv, Ti} end
+
 # IMatrix
 export IMatrix
 include("IMatrix.jl")
@@ -61,6 +63,8 @@ include("IMatrix.jl")
 # PermMatrix
 export PermMatrix
 include("PermMatrix.jl")
+
+include("conversions.jl")
 
 export pmrand
 include("random.jl")

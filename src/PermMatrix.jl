@@ -12,7 +12,7 @@ Optimizations are used to make it much faster than `SparseMatrixCSC`.
 
 [Generalized Permutation Matrix](https://en.wikipedia.org/wiki/Generalized_permutation_matrix)
 """
-struct PermMatrix{Tv, Ti<:Integer, Vv<:AbstractVector{Tv}, Vi<:AbstractVector{Ti}} <: AbstractSparseMatrix{Tv, Ti}
+struct PermMatrix{Tv, Ti<:Integer, Vv<:AbstractVector{Tv}, Vi<:AbstractVector{Ti}} <: AbstractLuxurySparseMatrix{Tv, Ti}
     perm::Vi   # new orders
     vals::Vv   # multiplied values.
 
