@@ -1,5 +1,5 @@
 module LuxurySparse
 
-# package code goes here
+using StaticArrays
 
 end # module
