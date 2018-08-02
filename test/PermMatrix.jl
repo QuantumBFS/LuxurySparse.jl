@@ -1,4 +1,4 @@
-using Test
+using Test, SparseArrays
 using LuxurySparse
 
 p1 = PermMatrix([1, 4, 2, 3], ComplexF64[0.1, 0.2, 0.4im, 0.5])
