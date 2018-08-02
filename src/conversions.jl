@@ -2,8 +2,8 @@
 ## TODO: document this
 IMatrix{N, T}(::AbstractMatrix) where {N, T} = IMatrix{N, T}()
 IMatrix{N}(A::AbstractMatrix{T}) where {N, T} = IMatrix{N, T}()
-IMatrix(A::AbstractMatrix{T}) where T = IMatrix{size(A, 1) == size(A,2) ? size(A, 2) : throw(DimensionMismatch()), T}()
-
+IMatrix(A::AbstractMatrix{T}) where T = IMatrix{size(A, 1) == size(A,2) ? size(A, 2) :
+    throw(DimensionMismatch("Identity Matrix is a square matrix")), T}()
 
 
 # PermMatrix
@@ -30,7 +30,6 @@ end
 PermMatrix{Tv, Ti}(A::AbstractMatrix) where {Tv, Ti} = PermMatrix{Tv, Ti, Vector{Tv}, Vector{Ti}}(A)
 
 
-
 # Matrix
 Matrix{T}(::IMatrix{N}) where {T, N} = Matrix{T}(I, N, N)
 Matrix(::IMatrix{N, T}) where {N, T} = Matrix{T}(I, N, N)
@@ -46,21 +45,22 @@ end
 Matrix(X::PermMatrix{T}) where T = Matrix{T}(X)
 
 
-
 # SparseMatrixCSC
 SparseMatrixCSC{Tv, Ti}(A::IMatrix{N}) where {Tv, Ti <: Integer, N} = SparseMatrixCSC{Tv, Ti}(I, N, N)
 SparseMatrixCSC{Tv}(A::IMatrix) where Tv = SparseMatrixCSC{Tv, Int}(A)
 SparseMatrixCSC(A::IMatrix{N, T}) where {N, T} = SparseMatrixCSC{T, Int}(I, N, N)
-function SparseMatrixCSC(M::PermMatrix)
-    n = size(M, 1)
-    #SparseMatrixCSC(n, n, collect(1:n+1), M.perm, M.vals)
-    order = invperm(M.perm)
-    SparseMatrixCSC(n, n, collect(1:n+1), order, M.vals[order])
-end
-SparseMatrixCSC{Tv, Ti}(M::PermMatrix{Tv, Ti}) where {Tv, Ti} = SparseMatrixCSC(M)
 
-function SparseMatrixCSC(M::Diagonal)
+function SparseMatrixCSC{Tv, Ti}(M::PermMatrix{Tv, Ti}) where {Tv, Ti}
     n = size(M, 1)
-    SparseMatrixCSC(n, n, collect(1:n+1), collect(1:n), M.diag)
+    order = invperm(M.perm)
+    SparseMatrixCSC{Tv, Ti}(n, n, collect(1:n+1), order, M.vals[order])
 end
-SparseMatrixCSC{Tv, Ti}(M::Diagonal{Tv}) where {Tv, Ti} = SparseMatrixCSC(M)
+
+SparseMatrixCSC(M::PermMatrix{Tv, Ti}) where {Tv, Ti} = SparseMatrixCSC{Tv, Ti}(M)
+
+function SparseMatrixCSC{Tv, Ti}(M::Diagonal{Tv}) where {Tv, Ti}
+    n = size(M, 1)
+    SparseMatrixCSC{Tv, Ti}(n, n, Vector{Ti}(1:n+1), Vector{Ti}(1:n), M.diag)
+end
+
+SparseMatrixCSC(M::Diagonal{Tv}) where Tv = SparseMatrixCSC{Tv, Int}(M)

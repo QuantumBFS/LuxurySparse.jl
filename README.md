@@ -11,4 +11,4 @@ with high performance `type convertion`, `kron` and `multiplication` operations.
 
 `LuxurySparse.jl` is still a part of [Yao.jl](https://github.com/QuantumBFS/Yao.jl) (a quantum circuit simulation package).
 Its document is maintained [here](https://quantumbfs.github.io/Yao.jl/latest/man/luxurysparse/).
-It will be moved out from `Yao.jl` completely and start to accept PR soon.
+It will be moved out of `Yao.jl` completely and start to accept PR soon.
