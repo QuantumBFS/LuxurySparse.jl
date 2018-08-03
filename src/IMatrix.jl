@@ -24,6 +24,8 @@ ishermitian(::IMatrix) = true
 issymmetric(::Type{<:IMatrix}) = true
 issymmetric(::IMatrix) = true
 
+transpose(A::IMatrix) = A
+
 ## move
 similar(::IMatrix{N, Tv}, ::Type{T}) where {N, Tv, T} = IMatrix{N, T}()
 copyto!(A::IMatrix{N}, ::IMatrix{N}) where N = A
