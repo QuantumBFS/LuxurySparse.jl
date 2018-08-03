@@ -15,15 +15,15 @@ using Random, LinearAlgebra, SparseArrays
 import SparseArrays: AbstractSparseArray, AbstractSparseMatrix
 
 # types will be overloaded by some pirate methods
-import LinearAlgebra: Diagonal
+import LinearAlgebra: Diagonal, Transpose
 import SparseArrays: SparseMatrixCSC
 
 # APIs that we will overload for
 ## standard array interface
-import Base: getindex, size, similar, copy, show, copyto!, inv, mul!
+import Base: getindex, size, similar, copy, show, copyto!, inv, *, transpose
 
 ## linear algebra
-import LinearAlgebra: ishermitian, issymmetric, diag, logdet
+import LinearAlgebra: ishermitian, issymmetric, diag, logdet, mul!
 export ishermitian, issymmetric
 
 ## sparse arrays
@@ -68,5 +68,9 @@ include("conversions.jl")
 
 export pmrand
 include("random.jl")
+
+include("linalg.jl")
+include("matmul.jl")
+include("adjtrans.jl")
 
 end # module

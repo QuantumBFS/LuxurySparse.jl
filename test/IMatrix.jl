@@ -1,4 +1,4 @@
-using Test
+using Test, LinearAlgebra
 using LuxurySparse
 
 @testset "constructors & properties" begin
@@ -22,5 +22,32 @@ using LuxurySparse
 @test nonzeros(IMatrix(3)) == [1, 1, 1]
 
 @test eltype(IMatrix(3)) == Bool
+
+end
+
+@testset "matmul" begin
+
+IdA = IMatrix(3)
+B = rand(3)
+
+for each in [B, transpose(B), adjoint(B), Diagonal(B), Hermitian(B), Symmetric(B), Tridiagonal(B)]
+    @test IdA * each == each
+    @test IdA * each === each
+    @test each * IdA == each
+    @test IdA * each === each
+end
+
+IdB = IMatrix{3, Float64}()
+
+@test IdA * IdB == IdB
+@test IdA * IdB === IdB
+
+@test IdA * IdA == IdA
+@test IdA * IdA === IdA
+
+v = rand(3)
+
+@test IdA * v == v
+@test IdA * v === v
 
 end
