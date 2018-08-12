@@ -26,7 +26,7 @@ for MATTYPE in [:AbstractMatrix, :StridedMatrix, :Diagonal, :SparseMatrixCSC, :M
 end
 
 # TODO: use Adjoint to fix this in v0.7
-*(A::RowVector, B::IMatrix) = size(A, 1) == size(B, 1) ? B :
+*(A::Adjoint{T, Vector{T}}, B::IMatrix) where T = size(A, 2) == size(B, 1) ? A :
     throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
 
 *(A::IMatrix, B::IMatrix) = size(A, 2) == size(B, 1) ? A :
@@ -47,7 +47,7 @@ function *(A::PermMatrix{Ta}, X::AbstractVector{Tx}) where {Ta, Tx}
     v
 end
 
-function *(X::RowVector{Tx}, A::PermMatrix{Ta}) where {Tx, Ta}
+function *(X::Adjoint{Tx, Vector{Tx}}, A::PermMatrix{Ta}) where {Tx, Ta}
     nX = length(X)
     nX == size(A, 1) || throw(DimensionMismatch())
     v = similar(X, promote_type(Tx, Ta))
