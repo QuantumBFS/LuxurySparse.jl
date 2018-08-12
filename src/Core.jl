@@ -1,47 +1,4 @@
 """
-    swaprows!(v::VecOrMat, i::Int, j::Int[, f1, f2]) -> VecOrMat
-
-swap row i and row j of v inplace, with f1, f2 factors applied on i and j (before swap).
-"""
-function swaprows! end
-
-"""
-    swapcols!(v::VecOrMat, i::Int, j::Int[, f1, f2]) -> VecOrMat
-
-swap col i and col j of v inplace, with f1, f2 factors applied on i and j (before swap).
-"""
-function swapcols! end
-
-"""
-    u1rows!(state::VecOrMat, i::Int, j::Int, a, b, c, d) -> VecOrMat
-
-apply u1 on row i and row j of state inplace.
-"""
-function u1rows! end
-
-"""
-    mulcol!(v::Vector, i::Int, f) -> VecOrMat
-
-multiply col i of v by f inplace.
-"""
-function mulcol! end
-
-"""
-    mulrow!(v::Vector, i::Int, f) -> VecOrMat
-
-multiply row i of v by f inplace.
-"""
-function mulrow! end
-
-
-"""
-    matvec(x::VecOrMat) -> MatOrVec
-
-Return vector if a matrix is a column vector, else untouched.
-"""
-function matvec end
-
-"""
     notdense(M) -> Bool
 
 Return true if a matrix is not dense.

@@ -6,6 +6,7 @@ This package contains
 
 * General Permutation Matrix,
 * Identity Matrix,
+* Coordinate Format Matrix,
 
 with high performance `type convertion`, `kron` and `multiplication` operations.
 
