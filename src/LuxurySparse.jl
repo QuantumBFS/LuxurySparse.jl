@@ -8,12 +8,13 @@ import LinearAlgebra: ishermitian
 import SparseArrays: SparseMatrixCSC, nnz, nonzeros, dropzeros!, findnz
 import Base: getindex, size, similar, copy, show
 
-export PermMatrix, pmrand, IMatrix, I, fast_invperm, notdense
+export PermMatrix, pmrand, IMatrix, I, fast_invperm, notdense, SparseMatrixCOO, allocated_coo
 export staticize, SSparseMatrixCSC, SDiagonal
 
 include("Core.jl")
 include("IMatrix.jl")
 include("PermMatrix.jl")
+include("SparseMatrixCOO.jl")
 
 include("conversions.jl")
 include("promotions.jl")

@@ -1,5 +1,5 @@
 import Base: inv
-import Compat.LinearAlgebra: det, diag, logdet
+import Compat.LinearAlgebra: det, diag, logdet, mul!, lmul!, rmul!,rdiv!
 
 ####### linear algebra  ######
 inv(M::IMatrix) = M
@@ -160,3 +160,11 @@ function *(X::SparseMatrixCSC, A::PermMatrix)
     end
     SparseMatrixCSC(mX, nX, colptr, rowval, nzval)
 end
+
+rmul!(A::SparseMatrixCOO, B::Int) = (A.vs*=B; A)
+lmul!(B::Int, A::SparseMatrixCOO) = (A.vs*=B; A)
+rdiv!(A::SparseMatrixCOO, B::Int) = (A.vs/=B; A)
+
+*(A::SparseMatrixCOO, B::Int) = rmul!(copy(A), B)
+*(B::Int, A::SparseMatrixCOO) = lmul!(B, copy(A))
+/(A::SparseMatrixCOO, B::Int) = rdiv!(copy(A), B)
