@@ -28,7 +28,7 @@ struct SPermMatrix{N, Tv, Ti<:Integer} <: AbstractMatrix{Tv}
     perm::SVector{N, Ti}   # new orders
     vals::SVector{N, Tv}   # multiplied values.
 
-    function PermMatrix(perm::SVector{N, Ti}, vals::SVector{N, Tv}) where {N, Tv, Ti<:Integer}
+    function SPermMatrix(perm::SVector{N, Ti}, vals::SVector{N, Tv}) where {N, Tv, Ti<:Integer}
         if length(perm) != length(vals)
             throw(DimensionMismatch("permutation ($N) and multiply ($N) length mismatch."))
         end
@@ -48,7 +48,6 @@ staticize(A::AbstractMatrix) = SMatrix{size(A,1), size(A,2)}(A)
 staticize(A::AbstractVector) = SVector{length(A)}(A)
 staticize(A::Diagonal) = SDiagonal(SVector{size(A,1)}(A.diag))
 staticize(A::PermMatrix) = SPermMatrix(SVector{size(A,1)}(A.perm), SVector{size(A, 1)}(A.vals))
-
 function staticize(A::SparseMatrixCSC)
     SSparseMatrixCSC(A.m, A.n, SVector{length(A.colptr)}(A.colptr), SVector{length(A.rowval)}(A.rowval), SVector{length(A.nzval)}(A.nzval))
 end
