@@ -50,6 +50,10 @@ function copyto!(A::SparseMatrixCOO{Tv, Ti}, B::SparseMatrixCOO{Tv, Ti}) where {
 end
 
 SparseMatrixCSC(coo::SparseMatrixCOO) = sparse(coo.is, coo.js, coo.vs, coo.m, coo.n)
+function Matrix(coo::SparseMatrixCOO{T}) where T
+    mat = zeros(T, coo.m, coo.n)
+    sparse(coo.is, coo.js, coo.vs, coo.m, coo.n)
+end
 
 """
     allocated_coo(::Type, N::Int, nnz::Int) -> SparseMatrixCOO
