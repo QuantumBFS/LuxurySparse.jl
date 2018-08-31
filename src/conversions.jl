@@ -85,6 +85,24 @@ function PermMatrix{Tv, Ti, Vv, Vi}(A::AbstractMatrix) where {Tv, Ti<:Integer, V
     PermMatrix(Vi(pm.perm), Vv(pm.vals))
 end
 
+############## To SparseMatrixCOO ##############
+function SparseMatrixCOO(A::Matrix{Tv}; atol=1e-12) where Tv
+    m, n = size(A)
+    is = Int[]
+    js = Int[]
+    vs = Tv[]
+    for j = 1:n
+        for i = 1:m
+            if abs(A[i,j]) > atol
+                push!(is, i)
+                push!(js, j)
+                push!(vs, A[i,j])
+            end
+        end
+    end
+    SparseMatrixCOO(is, js, vs, m, n)
+end
+
 import Base: convert
 convert(T::Type{<:PermMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
 convert(T::Type{<:IMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
