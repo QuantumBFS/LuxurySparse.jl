@@ -1,7 +1,7 @@
 module LuxurySparse
 
 using LinearAlgebra, SparseArrays, Random
-using StaticArrays: SVector, SMatrix
+using StaticArrays: SVector, SMatrix, SDiagonal
 
 import Base: copyto!
 import LinearAlgebra: ishermitian
@@ -9,7 +9,7 @@ import SparseArrays: SparseMatrixCSC, nnz, nonzeros, dropzeros!, findnz
 import Base: getindex, size, similar, copy, show
 
 export PermMatrix, pmrand, IMatrix, I, fast_invperm, notdense, SparseMatrixCOO, allocated_coo
-export staticize, SSparseMatrixCSC, SDiagonal, SPermMatrix
+export staticize, SSparseMatrixCSC, SPermMatrix
 
 include("Core.jl")
 include("IMatrix.jl")

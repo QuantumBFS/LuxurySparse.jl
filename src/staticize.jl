@@ -19,10 +19,11 @@ function SSparseMatrixCSC(m::Integer, n::Integer, colptr::SVector, rowval::SVect
     SSparseMatrixCSC{Tv,Ti,length(nzval),n+1}(m, n, colptr, rowval, nzval)
 end
 
-struct SDiagonal{T, N} <: AbstractMatrix{T}
-    diag::SVector{N, T}
+function size(spm::SSparseMatrixCSC{Tv, Ti, NNZ, NP}, i::Integer) where {Tv, Ti, NNZ, NP}
+    i == 1 ? spm.m : (i == 2 ? NP-1 : throw(ArgumentError("dimension out of bound!")))
 end
-SDiagonal(V::AbstractVector{T}) where T = SDiagonal{T, length(V)}(SVector{length{V}}(V))
+size(spm::SSparseMatrixCSC{Tv, Ti, NNZ, NP}) where {Tv, Ti, NNZ, NP} = (spm.m, NP-1)
+SparseArrays.nnz(spm::SSparseMatrixCSC{Tv, Ti, NNZ}) where {Tv, Ti, NNZ} = NNZ
 
 struct SPermMatrix{N, Tv, Ti<:Integer} <: AbstractMatrix{Tv}
     perm::SVector{N, Ti}   # new orders
@@ -36,6 +37,9 @@ struct SPermMatrix{N, Tv, Ti<:Integer} <: AbstractMatrix{Tv}
     end
 end
 
+size(spm::SPermMatrix{N}, i::Integer) where N = N
+size(spm::SPermMatrix{N}) where N = (N, N)
+
 ######### staticize ##########
 """
     staticize(A::AbstractMatrix) -> AbastractMatrix
@@ -46,7 +50,7 @@ function staticize end
 
 staticize(A::AbstractMatrix) = SMatrix{size(A,1), size(A,2)}(A)
 staticize(A::AbstractVector) = SVector{length(A)}(A)
-staticize(A::Diagonal) = SDiagonal(SVector{size(A,1)}(A.diag))
+staticize(A::Diagonal) = SDiagonal{size(A,1)}(A.diag)
 staticize(A::PermMatrix) = SPermMatrix(SVector{size(A,1)}(A.perm), SVector{size(A, 1)}(A.vals))
 function staticize(A::SparseMatrixCSC)
     SSparseMatrixCSC(A.m, A.n, SVector{length(A.colptr)}(A.colptr), SVector{length(A.rowval)}(A.rowval), SVector{length(A.nzval)}(A.nzval))
