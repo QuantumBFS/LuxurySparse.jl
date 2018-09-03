@@ -1,11 +1,11 @@
 module LuxurySparse
 
 using LinearAlgebra, SparseArrays, Random
-using StaticArrays: SVector, SMatrix, SDiagonal
+using StaticArrays: SVector, SMatrix, SDiagonal, SArray
 
 import Base: copyto!
 import LinearAlgebra: ishermitian
-import SparseArrays: SparseMatrixCSC, nnz, nonzeros, dropzeros!, findnz
+import SparseArrays: SparseMatrixCSC, nnz, nonzeros, dropzeros!, findnz, issparse
 import Base: getindex, size, similar, copy, show
 
 export PermMatrix, pmrand, IMatrix, I, fast_invperm, notdense, SparseMatrixCOO, allocated_coo

@@ -71,3 +71,14 @@ using Compat.Test
     @test dm isa Matrix
     @test dm == m
 end
+
+@testset "SSparseMatrixCSC" begin
+    m = sprand(ComplexF64, 4,4, 0.5)
+    sm = m |> staticize
+    @test nnz(sm) == nnz(m)
+    @test nonzeros(sm) == nonzeros(m)
+    @test notdense(sm)
+    @test issparse(sm)
+    @test dropzeros!(sm) == sm
+    @test sm == m
+end

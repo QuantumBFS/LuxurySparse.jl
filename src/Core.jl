@@ -9,6 +9,7 @@ It is not exactly same as isparse, e.g. Diagonal, IMatrix and PermMatrix are bot
 function notdense end
 
 notdense(M)::Bool = issparse(M)
+notdense(::Diagonal) = true
 @static if VERSION >= v"0.7-"
 notdense(x::Transpose) = notdense(parent(x))
 notdense(x::Adjoint) = notdense(parent(x))

@@ -73,4 +73,3 @@ nnz(M::PermMatrix) = length(M.vals)
 nonzeros(M::PermMatrix) = M.vals
 dropzeros!(M::PermMatrix) = M
 notdense(::PermMatrix) = true
-notdense(::Diagonal) = true
