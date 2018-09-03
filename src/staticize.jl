@@ -55,3 +55,10 @@ staticize(A::PermMatrix) = SPermMatrix(SVector{size(A,1)}(A.perm), SVector{size(
 function staticize(A::SparseMatrixCSC)
     SSparseMatrixCSC(A.m, A.n, SVector{length(A.colptr)}(A.colptr), SVector{length(A.rowval)}(A.rowval), SVector{length(A.nzval)}(A.nzval))
 end
+
+######### Union of static and dynamic matrices ##########
+const SDPermMatrix = Union{PermMatrix, SPermMatrix}
+const SDSparseMatrixCSC = Union{SparseMatrixCSC, SSparseMatrixCSC}
+const SDMatrix = Union{Matrix, SMatrix}
+const SDDiagonal = Union{Diagonal, SDiagonal}
+const SDVector = Union{Vector, SVector}
