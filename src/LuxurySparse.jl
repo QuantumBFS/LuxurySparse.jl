@@ -9,7 +9,7 @@ import SparseArrays: SparseMatrixCSC, nnz, nonzeros, dropzeros!, findnz
 import Base: getindex, size, similar, copy, show
 
 export PermMatrix, pmrand, IMatrix, I, fast_invperm, notdense, SparseMatrixCOO, allocated_coo
-export staticize, SSparseMatrixCSC, SPermMatrix, SDPermMatrix, SDSparseMatrixCSC
+export staticize, SSparseMatrixCSC, SPermMatrix, SDPermMatrix, SDSparseMatrixCSC, dynamicize
 export SDMatrix, SDDiagonal, SDVector
 
 include("Core.jl")

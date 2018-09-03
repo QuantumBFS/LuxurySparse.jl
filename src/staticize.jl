@@ -56,6 +56,22 @@ function staticize(A::SparseMatrixCSC)
     SSparseMatrixCSC(A.m, A.n, SVector{length(A.colptr)}(A.colptr), SVector{length(A.rowval)}(A.rowval), SVector{length(A.nzval)}(A.nzval))
 end
 
+"""
+    dynamicize(A::AbstractMatrix) -> AbastractMatrix
+
+transform a matrix to a dynamic form.
+"""
+function dynamicize end
+
+dynamicize(A::SMatrix) = Matrix(A)
+dynamicize(A::SVector) = Vector(A)
+dynamicize(A::SDiagonal) = Diagonal(Vector(A.diag))
+dynamicize(A::SPermMatrix) = PermMatrix(Vector(A.perm), Vector(A.vals))
+function dynamicize(A::SSparseMatrixCSC)
+    SparseMatrixCSC(A.m, A.n, Vector(A.colptr), Vector(A.rowval), Vector(A.nzval))
+end
+
+
 ######### Union of static and dynamic matrices ##########
 const SDPermMatrix = Union{PermMatrix, SPermMatrix}
 const SDSparseMatrixCSC = Union{SparseMatrixCSC, SSparseMatrixCSC}
