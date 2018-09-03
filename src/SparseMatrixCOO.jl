@@ -49,18 +49,16 @@ function copyto!(A::SparseMatrixCOO{Tv, Ti}, B::SparseMatrixCOO{Tv, Ti}) where {
     A
 end
 
-SparseMatrixCSC(coo::SparseMatrixCOO) = sparse(coo.is, coo.js, coo.vs, coo.m, coo.n)
-
 """
-    allocated_coo(::Type, N::Int, nnz::Int) -> SparseMatrixCOO
+    allocated_coo(::Type, M::Int, N::Int, nnz::Int) -> SparseMatrixCOO
 
 Construct a preallocated `SparseMatrixCOO` instance.
 """
-function allocated_coo(::Type{T}, N::Int, nnz::Int) where T
+function allocated_coo(::Type{T}, M::Int, N::Int, nnz::Int) where T
     is = Vector{Int}(undef, nnz)
     js = Vector{Int}(undef, nnz)
     vs = Vector{T}(undef, nnz)
-    SparseMatrixCOO(is, js, vs, N, N)
+    SparseMatrixCOO(is, js, vs, M, N)
 end
 
 function getindex(coo::SparseMatrixCOO{Tv, Ti}, i::Ti, j::Ti) where {Tv, Ti}

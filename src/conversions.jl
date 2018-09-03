@@ -31,6 +31,7 @@ function SparseMatrixCSC(M::Diagonal)
     SparseMatrixCSC(n, n, collect(1:n+1), collect(1:n), M.diag)
 end
 SparseMatrixCSC{Tv, Ti}(M::Diagonal{Tv}) where {Tv, Ti} = SparseMatrixCSC(M)
+SparseMatrixCSC(coo::SparseMatrixCOO) = sparse(coo.is, coo.js, coo.vs, coo.m, coo.n)
 
 ################## To Dense ######################
 Matrix{T}(::IMatrix{N}) where {T, N} = Matrix{T}(I, N, N)
@@ -45,6 +46,14 @@ function Matrix{T}(X::PermMatrix) where T
     return Mf
 end
 Matrix(X::PermMatrix{T}) where T = Matrix{T}(X)
+
+function Matrix(coo::SparseMatrixCOO{T}) where T
+    mat = zeros(T, coo.m, coo.n)
+    for (i,j,v) in zip(coo.is, coo.js, coo.vs)
+        mat[i,j] += v
+    end
+    mat
+end
 
 ################## To PermMatrix ######################
 PermMatrix{Tv, Ti}(::IMatrix{N}) where {Tv, Ti, N} = PermMatrix{Tv, Ti}(Vector{Ti}(1:N), ones(Tv, N))
@@ -74,6 +83,24 @@ PermMatrix{Tv, Ti}(A::Diagonal{Tv}) where {Tv, Ti} = PermMatrix(Vector{Ti}(1:siz
 function PermMatrix{Tv, Ti, Vv, Vi}(A::AbstractMatrix) where {Tv, Ti<:Integer, Vv<:AbstractVector{Tv}, Vi<:AbstractVector{Ti}}
     pm = PermMatrix(PermMatrix{Tv, Ti}(A))
     PermMatrix(Vi(pm.perm), Vv(pm.vals))
+end
+
+############## To SparseMatrixCOO ##############
+function SparseMatrixCOO(A::Matrix{Tv}; atol=1e-12) where Tv
+    m, n = size(A)
+    is = Int[]
+    js = Int[]
+    vs = Tv[]
+    for j = 1:n
+        for i = 1:m
+            if abs(A[i,j]) > atol
+                push!(is, i)
+                push!(js, j)
+                push!(vs, A[i,j])
+            end
+        end
+    end
+    SparseMatrixCOO(is, js, vs, m, n)
 end
 
 import Base: convert
