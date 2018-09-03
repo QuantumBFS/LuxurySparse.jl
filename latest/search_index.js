@@ -97,11 +97,19 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "luxurysparse/#LuxurySparse.allocated_coo-Union{Tuple{T}, Tuple{Type{T},Int64,Int64}} where T",
+    "location": "luxurysparse/#LuxurySparse.allocated_coo-Union{Tuple{T}, Tuple{Type{T},Int64,Int64,Int64}} where T",
     "page": "Manual",
     "title": "LuxurySparse.allocated_coo",
     "category": "method",
-    "text": "allocated_coo(::Type, N::Int, nnz::Int) -> SparseMatrixCOO\n\nConstruct a preallocated SparseMatrixCOO instance.\n\n\n\n\n\n"
+    "text": "allocated_coo(::Type, M::Int, N::Int, nnz::Int) -> SparseMatrixCOO\n\nConstruct a preallocated SparseMatrixCOO instance.\n\n\n\n\n\n"
+},
+
+{
+    "location": "luxurysparse/#LuxurySparse.dynamicize",
+    "page": "Manual",
+    "title": "LuxurySparse.dynamicize",
+    "category": "function",
+    "text": "dynamicize(A::AbstractMatrix) -> AbastractMatrix\n\ntransform a matrix to a dynamic form.\n\n\n\n\n\n"
 },
 
 {
