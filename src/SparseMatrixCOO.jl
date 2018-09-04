@@ -84,4 +84,4 @@ function dropzeros!(coo::SparseMatrixCOO{Tv, Ti}) where {Tv, Ti}
 end
 
 findnz(coo::SparseMatrixCOO) = (coo.is, coo.js, coo.vs)
-notdense(::SparseMatrixCOO) = true
+isdense(::SparseMatrixCOO) = false

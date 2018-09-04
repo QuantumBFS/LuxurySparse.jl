@@ -1,17 +1,18 @@
 """
-    notdense(M) -> Bool
+    isdense(M) -> Bool
 
-Return true if a matrix is not dense.
+Return true if a matrix is dense.
 
 Note:
-It is not exactly same as isparse, e.g. Diagonal, IMatrix and PermMatrix are both notdense but not isparse.
+It is not exactly same as !isparse, e.g. Diagonal, IMatrix and PermMatrix are both not isdense and not isparse.
 """
-function notdense end
+function isdense end
 
-notdense(M)::Bool = issparse(M)
+isdense(M)::Bool = !issparse(M)
+isdense(::Diagonal) = false
 @static if VERSION >= v"0.7-"
-notdense(x::Transpose) = notdense(parent(x))
-notdense(x::Adjoint) = notdense(parent(x))
+isdense(x::Transpose) = isdense(parent(x))
+isdense(x::Adjoint) = isdense(parent(x))
 end
 
 """faster invperm"""
