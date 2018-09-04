@@ -16,7 +16,7 @@ with high performance `type convertion`, `kron` and `multiplication` operations.
 Install with the package manager, `pkg> add LuxurySparse`.
 
 ## How to use
-Here is an example
+Here is a simple example
 
 ```julia
 using SparseArrays
@@ -36,6 +36,7 @@ spm = pm |> staticize        # convertion to static matrices, notice `id` is alr
 @benchmark kron(pm, pm)    # compare the performance.
 ```
 
+For more information, please refer the latest [document](https://quantumbfs.github.io/LuxurySparse.jl/latest/).
 
 ## Planned features
 * Change `PermMatrix` to column major
