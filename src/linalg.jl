@@ -25,7 +25,6 @@ for MATTYPE in [:AbstractMatrix, :StridedMatrix, :Diagonal, :SparseMatrixCSC, :M
         throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
 end
 
-# TODO: use Adjoint to fix this in v0.7
 *(A::Adjoint{T, Vector{T}}, B::IMatrix) where T = size(A, 2) == size(B, 1) ? A :
     throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
 

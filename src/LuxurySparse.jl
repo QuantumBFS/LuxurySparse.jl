@@ -2,6 +2,7 @@ module LuxurySparse
 
 using LinearAlgebra, SparseArrays, Random
 using StaticArrays: SVector, SMatrix, SDiagonal, SArray
+using Base: @propagate_inbounds
 
 import Base: copyto!
 import LinearAlgebra: ishermitian

@@ -12,5 +12,6 @@ docs/site/
 _*.dat
 *.swp
 __pycache__/
+_deprecated/
 
 Manifest.toml
