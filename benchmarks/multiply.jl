@@ -19,7 +19,7 @@ for A in mats
     bg = BenchmarkGroup()
     for B in mats
         if !(A===B===Ds)
-            println("=================== $(typeof(A))-$(typeof(B)) ====================")
+            println("============ $(typeof(A))-$(typeof(B)) =============")
             display(@benchmark $A * $B)
             println()
         end

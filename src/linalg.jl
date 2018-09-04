@@ -160,6 +160,34 @@ function *(X::SparseMatrixCSC, A::PermMatrix)
     SparseMatrixCSC(mX, nX, colptr, rowval, nzval)
 end
 
+############ SparseMatrixCSC and Diagonal #############
+function mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal)
+    nA = size(A, 1)
+    mX, nX = size(X)
+    nX == nA || throw(DimensionMismatch())
+    j = 1
+    va = A.diag[1]
+    @inbounds for k = 1:nnz(X)
+        if k == X.colptr[j]
+            va = A.diag[j]
+            j = j + 1
+        end
+        Y.nzval[k] *= va
+    end
+    Y
+end
+
+function mul!(Y::SparseMatrixCSC, A::Diagonal, X::SparseMatrixCSC)
+    nA = size(A, 2)
+    mX, nX = size(X)
+    mX == nA || throw(DimensionMismatch())
+    @inbounds @simd for i = 1:nnz(X)
+        Y.nzval[i] *= A.diag[X.rowval[i]]
+    end
+    Y
+end
+
+
 rmul!(A::SparseMatrixCOO, B::Int) = (A.vs*=B; A)
 lmul!(B::Int, A::SparseMatrixCOO) = (A.vs*=B; A)
 rdiv!(A::SparseMatrixCOO, B::Int) = (A.vs/=B; A)
