@@ -89,6 +89,14 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
+    "location": "luxurysparse/#LuxurySparse.SSparseMatrixCSC",
+    "page": "Manual",
+    "title": "LuxurySparse.SSparseMatrixCSC",
+    "category": "type",
+    "text": "SSparseMatrixCSC{Tv,Ti<:Integer, NNZ, NP} <: AbstractSparseMatrix{Tv,Ti}\n\nstatic version of SparseMatrixCSC\n\n\n\n\n\n"
+},
+
+{
     "location": "luxurysparse/#LuxurySparse.SparseMatrixCOO",
     "page": "Manual",
     "title": "LuxurySparse.SparseMatrixCOO",
@@ -121,11 +129,11 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "luxurysparse/#LuxurySparse.notdense",
+    "location": "luxurysparse/#LuxurySparse.isdense",
     "page": "Manual",
-    "title": "LuxurySparse.notdense",
+    "title": "LuxurySparse.isdense",
     "category": "function",
-    "text": "notdense(M) -> Bool\n\nReturn true if a matrix is not dense.\n\nNote: It is not exactly same as isparse, e.g. Diagonal, IMatrix and PermMatrix are both notdense but not isparse.\n\n\n\n\n\n"
+    "text": "isdense(M) -> Bool\n\nReturn true if a matrix is dense.\n\nNote: It is not exactly same as !isparse, e.g. Diagonal, IMatrix and PermMatrix are both not isdense and not isparse.\n\n\n\n\n\n"
 },
 
 {
