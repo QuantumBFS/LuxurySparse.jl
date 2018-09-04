@@ -1,6 +1,6 @@
 using Test
 using SparseArrays
-import LuxurySparse: SparseMatrixCOO, allocated_coo, notdense
+import LuxurySparse: SparseMatrixCOO, allocated_coo, isdense
 
 coo1 = SparseMatrixCOO([1,4,2,3,3,3], [1,1,2,4,3,4], [0.1, 0.2, 0.4im, 0.5, 0.3, 0.5im], 4, 4)
 
@@ -19,7 +19,7 @@ coo1 = SparseMatrixCOO([1,4,2,3,3,3], [1,1,2,4,3,4], [0.1, 0.2, 0.4im, 0.5, 0.3,
 
     @test Matrix(coo1) == [0.1 0 0 0; 0 0.4im 0 0; 0 0 0.3 0.5+0.5im; 0.2 0 0 0]
     @test sparse(coo1) == sparse(findnz(coo1)...)
-    @test notdense(coo1)
+    @test isdense(coo1) == false
 
     A = sprand(50,50, 0.2) |> Matrix
     @test SparseMatrixCOO(A) == A

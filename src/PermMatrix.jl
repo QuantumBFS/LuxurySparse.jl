@@ -72,4 +72,4 @@ similar(x::PermMatrix{Tv, Ti}, ::Type{T}) where {Tv, Ti, T} = PermMatrix{T, Ti}(
 nnz(M::PermMatrix) = length(M.vals)
 nonzeros(M::PermMatrix) = M.vals
 dropzeros!(M::PermMatrix) = M
-notdense(::PermMatrix) = true
+isdense(::PermMatrix) = false

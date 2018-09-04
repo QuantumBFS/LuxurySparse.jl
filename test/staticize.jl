@@ -77,7 +77,7 @@ end
     sm = m |> staticize
     @test nnz(sm) == nnz(m)
     @test nonzeros(sm) == nonzeros(m)
-    @test notdense(sm)
+    @test isdense(sm) == false
     @test issparse(sm)
     @test dropzeros!(sm) == sm
     @test sm == m

@@ -1,6 +1,6 @@
 using Test
 using LinearAlgebra
-import LuxurySparse: IMatrix, PermMatrix, notdense
+import LuxurySparse: IMatrix, PermMatrix, isdense
 
 Random.seed!(2)
 
@@ -20,14 +20,14 @@ dv = Diagonal(v)
     @test inv(pm) == inv(Matrix(pm))
 
     for m in [pm, sp, p1, dv]
-        @test m |> notdense
-        @test m' |> notdense
-        @test transpose(m) |> notdense
+        @test !(m |> isdense)
+        @test !(m' |> isdense)
+        @test !(transpose(m) |> isdense)
     end
     for m in [ds, v]
-        @test m |> notdense == false
-        @test m' |> notdense == false
-        @test transpose(m) |> notdense == false
+        @test m |> isdense
+        @test m' |> isdense
+        @test transpose(m) |> isdense
     end
 end
 
@@ -45,9 +45,9 @@ end
                     @test eltype(lres) == eltype(flres)
                     @test eltype(rres) == eltype(frres)
                 end
-                if (target |> notdense) && (parent(source) |> notdense)
-                    @test lres |> notdense
-                    @test lres |> notdense
+                if !(target |> isdense) && !(parent(source) |> isdense)
+                    @test lres |> isdense == false
+                    @test lres |> isdense == false
                 end
             end
         end
