@@ -32,7 +32,8 @@ Sid = id |> SparseMatrixCSC
 @benchmark kron(Spm, Sid)    # compare the performance.
 
 spm = pm |> staticize        # convertion to static matrices, notice `id` is already static.
-@benchmark kron(spm, id)    # compare the performance.
+@benchmark kron(spm, spm)    # compare the performance.
+@benchmark kron(pm, pm)    # compare the performance.
 ```
 
 
