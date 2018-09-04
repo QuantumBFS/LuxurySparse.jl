@@ -2,8 +2,9 @@ module LuxurySparse
 
 using LinearAlgebra, SparseArrays, Random
 using StaticArrays: SVector, SMatrix, SDiagonal, SArray
+using Base: @propagate_inbounds
 
-import Base: copyto!
+import Base: copyto!, *, kron
 import LinearAlgebra: ishermitian
 import SparseArrays: SparseMatrixCSC, nnz, nonzeros, dropzeros!, findnz, issparse
 import Base: getindex, size, similar, copy, show

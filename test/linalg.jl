@@ -1,5 +1,6 @@
 using Test
-using LinearAlgebra
+using LinearAlgebra, SparseArrays
+using Random
 import LuxurySparse: IMatrix, PermMatrix, isdense
 
 Random.seed!(2)
@@ -69,3 +70,12 @@ end
     @test v'*p1 == v'
     @test p1*v == v
 end
+
+@testset "sparse-diag" begin
+    N = 100
+    dg = Diagonal(randn(ComplexF64, 1000))
+    sp = SparseMatrixCSC(dg)
+    @test sp *dg == sp * sp
+    @test dg * sp == sp * sp
+end
+

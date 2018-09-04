@@ -26,7 +26,6 @@ end
 
 # TODO: since 0.7 transpose is different, we don't take transpose serious here.
 ####### kronecker product ###########
-import Base: kron
 # TODO: if IMatrix{1}, do nothing
 kron(A::IMatrix{Na, Ta}, B::IMatrix{Nb, Tb}) where {Na, Nb, Ta, Tb}= IMatrix{Na*Nb, promote_type(Ta, Tb)}()
 kron(A::IMatrix{Na}, B::Diagonal) where Na = Diagonal(orepeat(B.diag, Na))
@@ -51,9 +50,9 @@ function kron(A::AbstractMatrix{Tv}, B::IMatrix{Nb}) where {Nb, Tv}
     rowval = Vector{Int}(undef, Nb*mA*nA)
     colptr = collect(1:mA:Nb*mA*nA+1)
     @inbounds for j = 1:nA
-        source = A[:,j]
+        source = view(A,:,j)
         startbase = (j-1)*Nb*mA - mA
-        @inbounds for j2 = 1:Nb
+        for j2 = 1:Nb
             start = startbase + j2*mA
             row = j2-Nb
             @inbounds @simd for i = 1:mA
@@ -71,7 +70,7 @@ function kron(A::IMatrix{Na}, B::AbstractMatrix{Tv}) where {Na, Tv}
     nzval = Vector{Tv}(undef, nB*mB*Na)
     @inbounds for j in 1:Na
         r0 = (j-1)*mB
-        @inbounds for j2 in 1:nB
+        for j2 in 1:nB
             start = ((j-1)*nB+j2-1)*mB
             @inbounds @simd for i in 1:mB
                 rowval[start+i] = r0+i
@@ -91,7 +90,7 @@ function kron(A::IMatrix{Na}, B::SparseMatrixCSC{T}) where {Na, T}
     colptr = Vector{Int}(undef, nB*Na+1)
     nzval = Vector{T}(undef, Na*nV)
     colptr[1] = 1
-    @inbounds for i = 1:Na
+    for i = 1:Na
         r0 = (i-1)*mB
         start = nV*(i-1)
         @inbounds @simd for k = 1:nV
@@ -195,18 +194,18 @@ function kron(A::PermMatrix{Ta}, B::StridedMatrix{Tb}) where {Tb, Ta}
     nzval = Vector{promote_type(Ta, Tb)}(undef, mB*nA*nB)
     rowval = Vector{Int}(undef, mB*nA*nB)
     colptr = collect(1:mB:nA*nB*mB+1)
-    z = 1
+    z = 0
     @inbounds for j = 1:nA
         colbase = (j-1)*nB
         p1 = perm[j]
         val2 = A.vals[p1]
         ir = (p1-1)*mB
-        @inbounds for j2 = 1:nB
+        for j2 = 1:nB
             @inbounds @simd for i2 = 1:mB
-                nzval[z] = B[i2, j2]*val2  # merge
-                rowval[z] = ir+i2
-                z += 1
+                nzval[z+i2] = B[i2, j2]*val2
+                rowval[z+i2] = ir+i2
             end
+            z += mB
         end
     end
     SparseMatrixCSC(nA*mB, nA*nB, colptr, rowval, nzval)
