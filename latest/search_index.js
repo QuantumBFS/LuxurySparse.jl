@@ -85,7 +85,7 @@ var documenterSearchIndex = {"docs": [
     "page": "Manual",
     "title": "LuxurySparse.PermMatrix",
     "category": "type",
-    "text": "PermMatrix{Tv, Ti}(perm::Vector{Ti}, vals::Vector{Tv}) where {Tv, Ti<:Integer}\nPermMatrix(perm::Vector{Ti}, vals::Vector{Tv}) where {Tv, Ti}\nPermMatrix(ds::AbstractMatrix)\n\nPermMatrix represents a special kind linear operator: Permute and Multiply, which means M * v = v[perm] * val Optimizations are used to make it much faster than SparseMatrixCSC.\n\nperm is the permutation order,\nvals is the multiplication factor.\n\nGeneralized Permutation Matrix\n\n\n\n\n\n"
+    "text": "PermMatrix{Tv, Ti}(perm::AbstractVector{Ti}, vals::AbstractVector{Tv}) where {Tv, Ti<:Integer}\nPermMatrix(perm::Vector{Ti}, vals::Vector{Tv}) where {Tv, Ti}\nPermMatrix(ds::AbstractMatrix)\n\nPermMatrix represents a special kind linear operator: Permute and Multiply, which means M * v = v[perm] * val Optimizations are used to make it much faster than SparseMatrixCSC.\n\nperm is the permutation order,\nvals is the multiplication factor.\n\nGeneralized Permutation Matrix\n\n\n\n\n\n"
 },
 
 {
