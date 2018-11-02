@@ -25,7 +25,7 @@ for MATTYPE in [:AbstractMatrix, :StridedMatrix, :Diagonal, :SparseMatrixCSC, :M
         throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
 end
 
-*(A::Adjoint{T, Vector{T}}, B::IMatrix) where T = size(A, 2) == size(B, 1) ? A :
+*(A::Adjoint{T, <:AbstractVector{T}}, B::IMatrix) where T = size(A, 2) == size(B, 1) ? A :
     throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
 
 *(A::IMatrix, B::IMatrix) = size(A, 2) == size(B, 1) ? A :
@@ -46,7 +46,7 @@ function *(A::PermMatrix{Ta}, X::AbstractVector{Tx}) where {Ta, Tx}
     v
 end
 
-function *(X::Adjoint{Tx, Vector{Tx}}, A::PermMatrix{Ta}) where {Tx, Ta}
+function *(X::Adjoint{Tx, <:AbstractVector{Tx}}, A::PermMatrix{Ta}) where {Tx, Ta}
     nX = length(X)
     nX == size(A, 1) || throw(DimensionMismatch())
     v = similar(X, promote_type(Tx, Ta))
@@ -195,3 +195,6 @@ rdiv!(A::SparseMatrixCOO, B::Int) = (A.vs/=B; A)
 *(A::SparseMatrixCOO, B::Int) = rmul!(copy(A), B)
 *(B::Int, A::SparseMatrixCOO) = lmul!(B, copy(A))
 /(A::SparseMatrixCOO, B::Int) = rdiv!(copy(A), B)
+
+-(ii::IMatrix) = (-1)*ii
+-(pm::PermMatrix) = (-1)*pm

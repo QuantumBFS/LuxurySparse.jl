@@ -1,5 +1,5 @@
 """
-    PermMatrix{Tv, Ti}(perm::Vector{Ti}, vals::Vector{Tv}) where {Tv, Ti<:Integer}
+    PermMatrix{Tv, Ti}(perm::AbstractVector{Ti}, vals::AbstractVector{Tv}) where {Tv, Ti<:Integer}
     PermMatrix(perm::Vector{Ti}, vals::Vector{Tv}) where {Tv, Ti}
     PermMatrix(ds::AbstractMatrix)
 
