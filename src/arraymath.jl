@@ -70,5 +70,5 @@ for op in [:+, :-, :(==), :≈]
     end
 
 end
-+(d1::IMatrix{Na, Ta}, d2::IMatrix{Nb, Tb}) where {Na, Nb, Ta, Tb} = d1==d2 ? Diagonal(fill(promote_types(Ta, Tb)(2), Na)) : throw(DimensionMismatch())
--(d1::IMatrix{Na, Ta}, d2::IMatrix{Nb, Tb}) where {Na, Ta, Nb, Tb} = d1==d2 ? spzeros(promote_types(Ta, Tb), Na, Na) : throw(DimensionMismatch())
++(d1::IMatrix{Na, Ta}, d2::IMatrix{Nb, Tb}) where {Na, Nb, Ta, Tb} = d1==d2 ? Diagonal(fill(promote_type(Ta, Tb)(2), Na)) : throw(DimensionMismatch())
+-(d1::IMatrix{Na, Ta}, d2::IMatrix{Nb, Tb}) where {Na, Ta, Nb, Tb} = d1==d2 ? spzeros(promote_type(Ta, Tb), Na, Na) : throw(DimensionMismatch())
