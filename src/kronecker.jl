@@ -32,7 +32,7 @@ kron(A::IMatrix{Na}, B::Diagonal) where Na = Diagonal(orepeat(B.diag, Na))
 kron(B::Diagonal, A::IMatrix{Na}) where Na = Diagonal(irepeat(B.diag, Na))
 kron(A::IMatrix{1}, B::AbstractMatrix) = B
 kron(A::IMatrix{1}, B::PermMatrix) = B
-kron(A::IMatrix{1}, B::Diagonal) = B
+kron(A::IMatrix{1}, B::Diagonal{<:Number}) = B
 kron(A::IMatrix{1}, B::SparseMatrixCSC) = B
 kron(A::IMatrix{1}, B::IMatrix) = B
 
