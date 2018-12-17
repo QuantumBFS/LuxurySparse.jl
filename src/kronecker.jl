@@ -28,7 +28,7 @@ end
 ####### kronecker product ###########
 # TODO: if IMatrix{1}, do nothing
 kron(A::IMatrix{Na, Ta}, B::IMatrix{Nb, Tb}) where {Na, Nb, Ta, Tb}= IMatrix{Na*Nb, promote_type(Ta, Tb)}()
-kron(A::IMatrix{Na}, B::Diagonal) where Na = Diagonal(orepeat(B.diag, Na))
+kron(A::IMatrix{Na}, B::Diagonal{<:Number}) where Na = Diagonal(orepeat(B.diag, Na))
 kron(B::Diagonal, A::IMatrix{Na}) where Na = Diagonal(irepeat(B.diag, Na))
 kron(A::IMatrix{1}, B::AbstractMatrix) = B
 kron(A::IMatrix{1}, B::PermMatrix) = B
