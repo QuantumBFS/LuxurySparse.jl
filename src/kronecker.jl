@@ -30,9 +30,9 @@ end
 kron(A::IMatrix{Na, Ta}, B::IMatrix{Nb, Tb}) where {Na, Nb, Ta, Tb}= IMatrix{Na*Nb, promote_type(Ta, Tb)}()
 kron(A::IMatrix{Na}, B::Diagonal{<:Number}) where Na = Diagonal(orepeat(B.diag, Na))
 kron(B::Diagonal{<:Number}, A::IMatrix{Na}) where Na = Diagonal(irepeat(B.diag, Na))
-for MT in [:AbstractMatrix, :PermMatrix, :SparseMatrixCSC, :IMatrix, :(Diagonal{<:Number})]
-    @eval kron(A::IMatrix{1}, B::$MT) = B
-    @eval kron(B::$MT, A::IMatrix{1}) = B
+for MT in [:AbstractMatrix, :PermMatrix, :SparseMatrixCSC, :Diagonal]
+    @eval kron(A::IMatrix{1}, B::$MT{<:Number}) = B
+    @eval kron(B::$MT{<:Number}, A::IMatrix{1}) = B
 end
 
 ####### diagonal kron ########
