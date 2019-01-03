@@ -1,6 +1,4 @@
-using Test, Random
-using SparseArrays
-using LinearAlgebra
+using Test, Random, SparseArrays, LinearAlgebra
 import LuxurySparse: IMatrix, PermMatrix
 
 Random.seed!(2)

@@ -4,9 +4,7 @@ IMatrix{N}(A::AbstractMatrix{T}) where {N, T} = IMatrix{N, T}()
 IMatrix(A::AbstractMatrix{T}) where T = IMatrix{size(A, 1) == size(A,2) ? size(A, 2) : throw(DimensionMismatch()), T}()
 
 ################## To Diagonal ######################
-@static if VERSION >= v"0.7-"
-    Diagonal{T, V}(A::AbstractMatrix{T}) where {T, V <: AbstractVector{T}, N} = Diagonal{T, V}(convert(V, diag(A)))
-end
+Diagonal{T, V}(A::AbstractMatrix{T}) where {T, V <: AbstractVector{T}, N} = Diagonal{T, V}(convert(V, diag(A)))
 
 for MAT in [:PermMatrix, :IMatrix]
     @eval Diagonal(A::$MAT) = Diagonal(diag(A))

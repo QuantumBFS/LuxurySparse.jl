@@ -1,5 +1,5 @@
 import Base: inv
-import Compat.LinearAlgebra: det, diag, logdet, mul!, lmul!, rmul!,rdiv!
+import LinearAlgebra: det, diag, logdet, mul!, lmul!, rmul!,rdiv!
 
 ####### linear algebra  ######
 inv(M::IMatrix) = M
@@ -85,7 +85,6 @@ function *(X::AbstractMatrix, A::PermMatrix)
     return @views (A.vals' .* X)[:, fast_invperm(A.perm)]
 end
 
-@static if VERSION >= v"0.7-"
 # NOTE: this is just a temperory fix for v0.7. We should overload mul! in
 # the future (when we start to drop v0.6) to enable buildin lazy evaluation.
 
@@ -115,8 +114,6 @@ for MAT in [:AbstractArray, :AbstractVector, :Matrix, :SparseMatrixCSC, :PermMat
         @eval *(A::IMatrix, D::Transpose{<:Any, <:$MAT}) = Transpose(parent(D)*A)
         @eval *(A::IMatrix, D::Adjoint{<:Any, <:$MAT}) = Adjoint(parent(D)*A)
     end
-end
-
 end
 
 # to sparse

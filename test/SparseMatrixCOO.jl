@@ -1,5 +1,4 @@
-using Test
-using SparseArrays
+using Test, SparseArrays
 import LuxurySparse: SparseMatrixCOO, allocated_coo, isdense
 
 coo1 = SparseMatrixCOO([1,4,2,3,3,3], [1,1,2,4,3,4], [0.1, 0.2, 0.4im, 0.5, 0.3, 0.5im], 4, 4)

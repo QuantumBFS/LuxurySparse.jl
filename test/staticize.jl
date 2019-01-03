@@ -1,7 +1,5 @@
 using Test
-using LinearAlgebra
-using SparseArrays
-using Random
+using LinearAlgebra, SparseArrays, Random
 
 using LuxurySparse
 import LuxurySparse: staticize
@@ -9,7 +7,6 @@ using StaticArrays: SVector, SMatrix
 
 Random.seed!(2)
 
-using Compat.Test
 @testset "staticize" begin
     # permmatrix
     m = pmrand(ComplexF64, 4)

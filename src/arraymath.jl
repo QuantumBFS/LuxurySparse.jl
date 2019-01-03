@@ -1,10 +1,5 @@
 import Base: conj, copy, real, imag
-import Compat.LinearAlgebra: transpose, transpose!
-
-@static if VERSION >= v"0.7-"
-    import LinearAlgebra: adjoint!, adjoint
-end
-
+import LinearAlgebra: transpose, transpose!, adjoint!, adjoint
 
 # IMatrix
 for func in (:conj, :real, :transpose, :adjoint, :copy)

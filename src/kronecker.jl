@@ -36,7 +36,6 @@ for MT in [:AbstractMatrix, :PermMatrix, :SparseMatrixCSC, :Diagonal]
 end
 
 ####### diagonal kron ########
-kron(A::Diagonal{<:Number}, B::Diagonal{<:Number}) = Diagonal(kron(A.diag, B.diag))
 kron(A::StridedMatrix{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
 kron(A::Diagonal{<:Number}, B::StridedMatrix{<:Number}) = kron(PermMatrix(A), B)
 kron(A::Diagonal{<:Number}, B::SparseMatrixCSC{<:Number}) = kron(PermMatrix(A), B)

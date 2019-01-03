@@ -10,10 +10,8 @@ function isdense end
 
 isdense(M)::Bool = !issparse(M)
 isdense(::Diagonal) = false
-@static if VERSION >= v"0.7-"
 isdense(x::Transpose) = isdense(parent(x))
 isdense(x::Adjoint) = isdense(parent(x))
-end
 
 """faster invperm"""
 function fast_invperm(order)
