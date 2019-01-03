@@ -1,7 +1,7 @@
 name = "LuxurySparse"
 uuid = "72cad168-9621-11e8-1b1e-73228c0c6ca7"
 authors = ["GiggleLiu <cacate0129@gmail.com>", "Roger-luo <hiroger@qq.com>"]
-version = "0.2.2"
+version = "0.3.0"
 
 [deps]
 LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
