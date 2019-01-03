@@ -1,6 +1,6 @@
 name = "LuxurySparse"
 uuid = "72cad168-9621-11e8-1b1e-73228c0c6ca7"
-authors = ["Roger-luo <hiroger@qq.com>"]
+authors = ["GiggleLiu <cacate0129@gmail.com>", "Roger-luo <hiroger@qq.com>"]
 version = "0.2.2"
 
 [deps]
