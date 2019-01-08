@@ -28,11 +28,13 @@ end
 ####### kronecker product ###########
 # TODO: if IMatrix{1}, do nothing
 kron(A::IMatrix{Na, Ta}, B::IMatrix{Nb, Tb}) where {Na, Nb, Ta<:Number, Tb<:Number}= IMatrix{Na*Nb, promote_type(Ta, Tb)}()
-kron(A::IMatrix{Na}, B::Diagonal{<:Number}) where Na = Diagonal(orepeat(B.diag, Na))
+kron(A::IMatrix{Na, Ta}, B::IMatrix{1, Tb}) where {Na, Ta<:Number, Tb<:Number}= IMatrix{Na, promote_type(Ta, Tb)}()
+kron(A::IMatrix{1, Ta}, B::IMatrix{Nb, Tb}) where {Nb, Ta<:Number, Tb<:Number}= IMatrix{Nb, promote_type(Ta, Tb)}()
+kron(A::IMatrix{Na, <:Number}, B::Diagonal{<:Number}) where Na = Diagonal(orepeat(B.diag, Na))
 kron(B::Diagonal{<:Number}, A::IMatrix{Na}) where Na = Diagonal(irepeat(B.diag, Na))
 for MT in [:AbstractMatrix, :PermMatrix, :SparseMatrixCSC, :Diagonal]
-    @eval kron(A::IMatrix{1}, B::$MT{<:Number}) = B
-    @eval kron(B::$MT{<:Number}, A::IMatrix{1}) = B
+    @eval kron(A::IMatrix{1,<:Number}, B::$MT{<:Number}) = B
+    @eval kron(B::$MT{<:Number}, A::IMatrix{1,<:Number}) = B
 end
 
 ####### diagonal kron ########
