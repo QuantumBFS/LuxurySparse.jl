@@ -27,7 +27,7 @@ end
 # TODO: since 0.7 transpose is different, we don't take transpose serious here.
 ####### kronecker product ###########
 # TODO: if IMatrix{1}, do nothing
-kron(A::IMatrix{Na, Ta}, B::IMatrix{Nb, Tb}) where {Na, Nb, Ta, Tb}= IMatrix{Na*Nb, promote_type(Ta, Tb)}()
+kron(A::IMatrix{Na, Ta}, B::IMatrix{Nb, Tb}) where {Na, Nb, Ta<:Number, Tb<:Number}= IMatrix{Na*Nb, promote_type(Ta, Tb)}()
 kron(A::IMatrix{Na}, B::Diagonal{<:Number}) where Na = Diagonal(orepeat(B.diag, Na))
 kron(B::Diagonal{<:Number}, A::IMatrix{Na}) where Na = Diagonal(irepeat(B.diag, Na))
 for MT in [:AbstractMatrix, :PermMatrix, :SparseMatrixCSC, :Diagonal]
