@@ -22,4 +22,4 @@ function fast_invperm(order)
     v
 end
 
-dropzeros!(A::Diagonal) = A
+dropzeros!(A::Diagonal; trim::Bool=false) = A

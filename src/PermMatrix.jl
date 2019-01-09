@@ -71,5 +71,5 @@ similar(x::PermMatrix{Tv, Ti}, ::Type{T}) where {Tv, Ti, T} = PermMatrix{T, Ti}(
 ######### sparse array interfaces  #########
 nnz(M::PermMatrix) = length(M.vals)
 nonzeros(M::PermMatrix) = M.vals
-dropzeros!(M::PermMatrix) = M
+dropzeros!(M::PermMatrix; trim::Bool=false) = M
 isdense(::PermMatrix) = false
