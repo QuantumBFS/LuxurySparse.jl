@@ -89,14 +89,6 @@ var documenterSearchIndex = {"docs": [
 },
 
 {
-    "location": "luxurysparse/#LuxurySparse.SSparseMatrixCSC",
-    "page": "Manual",
-    "title": "LuxurySparse.SSparseMatrixCSC",
-    "category": "type",
-    "text": "SSparseMatrixCSC{Tv,Ti<:Integer, NNZ, NP} <: AbstractSparseMatrix{Tv,Ti}\n\nstatic version of SparseMatrixCSC\n\n\n\n\n\n"
-},
-
-{
     "location": "luxurysparse/#LuxurySparse.SparseMatrixCOO",
     "page": "Manual",
     "title": "LuxurySparse.SparseMatrixCOO",
@@ -150,6 +142,14 @@ var documenterSearchIndex = {"docs": [
     "title": "LuxurySparse.staticize",
     "category": "function",
     "text": "staticize(A::AbstractMatrix) -> AbastractMatrix\n\ntransform a matrix to a static form.\n\n\n\n\n\n"
+},
+
+{
+    "location": "luxurysparse/#LuxurySparse.SSparseMatrixCSC",
+    "page": "Manual",
+    "title": "LuxurySparse.SSparseMatrixCSC",
+    "category": "type",
+    "text": "SSparseMatrixCSC{Tv,Ti<:Integer, NNZ, NP} <: AbstractSparseMatrix{Tv,Ti}\n\nstatic version of SparseMatrixCSC\n\n\n\n\n\n"
 },
 
 {
