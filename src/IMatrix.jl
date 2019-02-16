@@ -1,3 +1,5 @@
+export IMatrix
+
 """
     IMatrix{N, Tv}()
     IMatrix{N}() where N = IMatrix{N, Int64}()

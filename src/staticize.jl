@@ -1,3 +1,12 @@
+export SDPermMatrix,
+    SPermMatrix,
+    SDSparseMatrixCSC,
+    SDMatrix,
+    SDDiagonal,
+    SDVector,
+    staticize,
+    dynamicize
+
 ######### Union of static and dynamic matrices ##########
 const SDPermMatrix = PermMatrix
 const SPermMatrix{N, Tv, Ti} = PermMatrix{Tv, Ti, <:SVector{N, Tv}, <:SVector{N, Ti}}
