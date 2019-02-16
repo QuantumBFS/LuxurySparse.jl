@@ -9,7 +9,7 @@ import LinearAlgebra: ishermitian
 import SparseArrays: SparseMatrixCSC, nnz, nonzeros, dropzeros!, findnz, issparse
 import Base: getindex, size, similar, copy, show
 
-export pmrand, I, fast_invperm, isdense, allocated_coo
+export I, fast_invperm, isdense, allocated_coo
 
 include("Core.jl")
 include("IMatrix.jl")

@@ -1,3 +1,5 @@
+export SSparseMatrixCSC
+
 """
     SSparseMatrixCSC{Tv,Ti<:Integer, NNZ, NP} <: AbstractSparseMatrix{Tv,Ti}
 

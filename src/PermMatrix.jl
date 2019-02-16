@@ -1,4 +1,4 @@
-export PermMatrix
+export PermMatrix, pmrand
 
 """
     PermMatrix{Tv, Ti}(perm::AbstractVector{Ti}, vals::AbstractVector{Tv}) where {Tv, Ti<:Integer}
