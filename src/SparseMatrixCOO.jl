@@ -80,7 +80,7 @@ size(coo::SparseMatrixCOO, axis::Int) = axis == 1 ? coo.m : (axis == 2 ? coo.n :
 nnz(coo::SparseMatrixCOO) = coo.is |> length
 nonzeros(coo::SparseMatrixCOO) = coo.vs
 
-function dropzeros!(coo::SparseMatrixCOO{Tv, Ti}) where {Tv, Ti}
+function dropzeros!(coo::SparseMatrixCOO{Tv, Ti}; trim::Bool=false) where {Tv, Ti}
     mask = abs.(coo.vs) .> 1e-15
     SparseMatrixCOO{Tv, Ti}(coo.is[mask], coo.js[mask], coo.vs[mask], coo.m, coo.n)
 end

@@ -43,6 +43,6 @@ end
 issparse(::SSparseMatrixCSC) = true
 nonzeros(M::SSparseMatrixCSC) = M.nzval
 nnz(spm::SSparseMatrixCSC{Tv, Ti, NNZ}) where {Tv, Ti, NNZ} = NNZ
-dropzeros!(M::SSparseMatrixCSC) = M
+dropzeros!(M::SSparseMatrixCSC; trim::Bool=false) = M
 
 isdense(::SSparseMatrixCSC) = false
