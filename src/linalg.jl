@@ -6,6 +6,8 @@ inv(M::IMatrix) = M
 det(M::IMatrix) = 1
 diag(M::IMatrix{N, T}) where {N, T} = ones(T, N)
 logdet(M::IMatrix) = 0
+Base.sqrt(x::PermMatrix) = sqrt(Matrix(x))
+Base.sqrt(x::IMatrix) = x
 
 #det(M::PermMatrix) = parity(M.perm)*prod(M.vals)
 function inv(M::PermMatrix)
