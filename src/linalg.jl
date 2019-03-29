@@ -8,6 +8,8 @@ diag(M::IMatrix{N, T}) where {N, T} = ones(T, N)
 logdet(M::IMatrix) = 0
 Base.sqrt(x::PermMatrix) = sqrt(Matrix(x))
 Base.sqrt(x::IMatrix) = x
+Base.exp(x::PermMatrix) = exp(Matrix(x))
+Base.exp(x::IMatrix) = ℯ * x
 
 #det(M::PermMatrix) = parity(M.perm)*prod(M.vals)
 function inv(M::PermMatrix)
