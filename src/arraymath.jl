@@ -1,5 +1,6 @@
 import Base: conj, copy, real, imag
 import LinearAlgebra: transpose, transpose!, adjoint!, adjoint
+using FillArrays
 
 # IMatrix
 for func in (:conj, :real, :transpose, :adjoint, :copy)
@@ -26,9 +27,9 @@ adjoint(S::PermMatrix{<:Complex}) = conj(transpose(S))
 
 # scalar
 import Base: *, /, ==, +, -, ≈
-*(A::IMatrix{N, T}, B::Number) where {N, T} = Diagonal(fill(promote_type(T, eltype(B))(B), N))
-*(B::Number, A::IMatrix{N, T}) where {N, T} = Diagonal(fill(promote_type(T, eltype(B))(B), N))
-/(A::IMatrix{N, T}, B::Number) where {N, T} = Diagonal(fill(promote_type(T, eltype(B))(1/B), N))
+*(A::IMatrix{N, T}, B::Number) where {N, T} = Diagonal(Fill(promote_type(T, eltype(B))(B), N))
+*(B::Number, A::IMatrix{N, T}) where {N, T} = Diagonal(Fill(promote_type(T, eltype(B))(B), N))
+/(A::IMatrix{N, T}, B::Number) where {N, T} = Diagonal(Fill(promote_type(T, eltype(B))(1/B), N))
 
 *(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals*B)
 *(B::Number, A::PermMatrix) = A*B
@@ -38,6 +39,7 @@ import Base: *, /, ==, +, -, ≈
 
 
 const IDP = Union{Diagonal, PermMatrix, IMatrix}
+
 for op in [:+, :-, :(==), :≈]
 
     @eval begin
@@ -67,5 +69,5 @@ for op in [:+, :-, :(==), :≈]
 end
 
 # NOTE: promote 2 at least as an integer
-+(d1::IMatrix{Na, Ta}, d2::IMatrix{Nb, Tb}) where {Na, Nb, Ta, Tb} = d1==d2 ? Diagonal(fill(promote_type(Ta, Tb, Int)(2), Na)) : throw(DimensionMismatch())
++(d1::IMatrix{Na, Ta}, d2::IMatrix{Nb, Tb}) where {Na, Nb, Ta, Tb} = d1==d2 ? Diagonal(Fill(promote_type(Ta, Tb, Int)(2), Na)) : throw(DimensionMismatch())
 -(d1::IMatrix{Na, Ta}, d2::IMatrix{Nb, Tb}) where {Na, Ta, Nb, Tb} = d1==d2 ? spzeros(promote_type(Ta, Tb), Na, Na) : throw(DimensionMismatch())

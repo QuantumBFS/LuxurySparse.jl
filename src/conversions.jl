@@ -4,12 +4,8 @@ IMatrix{N}(A::AbstractMatrix{T}) where {N, T} = IMatrix{N, T}()
 IMatrix(A::AbstractMatrix{T}) where T = IMatrix{size(A, 1) == size(A,2) ? size(A, 2) : throw(DimensionMismatch()), T}()
 
 ################## To Diagonal ######################
-Diagonal{T, V}(A::AbstractMatrix{T}) where {T, V <: AbstractVector{T}, N} = Diagonal{T, V}(convert(V, diag(A)))
-
-for MAT in [:PermMatrix, :IMatrix]
-    @eval Diagonal(A::$MAT) = Diagonal(diag(A))
-end
-Diagonal{T}(A::AbstractMatrix{T}) where T = Diagonal(A)
+Diagonal(A::PermMatrix) = Diagonal(diag(A))
+Diagonal(A::IMatrix) = Eye(size(A, 1))
 Diagonal{T}(::IMatrix{N}) where {T, N} = Diagonal{T}(ones(T, N))
 
 ################## To SparseMatrixCSC ######################
@@ -22,13 +18,8 @@ function SparseMatrixCSC(M::PermMatrix)
     order = invperm(M.perm)
     SparseMatrixCSC(n, n, collect(1:n+1), order, M.vals[order])
 end
-SparseMatrixCSC{Tv, Ti}(M::PermMatrix{Tv, Ti}) where {Tv, Ti} = SparseMatrixCSC(M)
 
-function SparseMatrixCSC(M::Diagonal)
-    n = size(M, 1)
-    SparseMatrixCSC(n, n, collect(1:n+1), collect(1:n), M.diag)
-end
-SparseMatrixCSC{Tv, Ti}(M::Diagonal{Tv}) where {Tv, Ti} = SparseMatrixCSC(M)
+SparseMatrixCSC{Tv, Ti}(M::PermMatrix{Tv, Ti}) where {Tv, Ti} = SparseMatrixCSC(M)
 SparseMatrixCSC(coo::SparseMatrixCOO) = sparse(coo.is, coo.js, coo.vs, coo.m, coo.n)
 
 ################## To Dense ######################

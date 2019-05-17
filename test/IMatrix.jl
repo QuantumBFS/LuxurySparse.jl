@@ -1,4 +1,4 @@
-using Test, Random
+using Test, Random, FillArrays
 import LuxurySparse: IMatrix, PermMatrix
 
 Random.seed!(2)
@@ -22,15 +22,13 @@ end
     for mat in [p1, pm, dv]
         @test mat == SparseMatrixCSC(mat)
         @test mat == Matrix(mat)
-        @test mat == typeof(mat)(Matrix(mat))
-        @test mat == typeof(mat)(SparseMatrixCSC(mat))
     end
     for mat in [p1, pm, dv]
         @test mat == PermMatrix(mat)
-        @test mat == typeof(mat)(PermMatrix(mat))
     end
     @test Diagonal(p1) == p1
-    @test p1 == typeof(p1)(Diagonal(p1))
+
+    @test SparseMatrixCSC(Diagonal(Fill(2, 4))) ≈ Diagonal(Fill(2, 4))
 end
 
 @testset "sparse" begin
