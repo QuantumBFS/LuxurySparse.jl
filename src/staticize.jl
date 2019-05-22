@@ -28,7 +28,7 @@ staticize(A::AbstractVector) = SVector{length(A)}(A)
 staticize(A::Diagonal) = SDiagonal{size(A,1)}((A.diag...,))
 staticize(A::PermMatrix) = PermMatrix(SVector{size(A,1)}(A.perm), SVector{size(A, 1)}(A.vals))
 function staticize(A::SparseMatrixCSC)
-    iszero(A) && return SSparseMatrixCSC(A.m, A.n, SVector{0, eltype(A)}(), SVector{0, eltype(A)}(), SVector{0, eltype(A)}())
+    iszero(A) && return SSparseMatrixCSC(A.m, A.n, SVector{length(A.colptr)}(A.colptr), SVector{0, eltype(A.rowval)}(), SVector{0, eltype(A.nzval)}())
     SSparseMatrixCSC(A.m, A.n, SVector{length(A.colptr)}(A.colptr), SVector{length(A.rowval)}(A.rowval), SVector{length(A.nzval)}(A.nzval))
 end
 
