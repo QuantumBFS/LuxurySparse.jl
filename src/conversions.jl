@@ -19,6 +19,11 @@ function SparseMatrixCSC(M::PermMatrix)
     SparseMatrixCSC(n, n, collect(1:n+1), order, M.vals[order])
 end
 
+function SparseMatrixCSC(M::Diagonal)
+    n = size(M, 1)
+    SparseMatrixCSC(n, n, collect(1:n+1), collect(1:n), M.diag)
+end
+
 SparseMatrixCSC{Tv, Ti}(M::PermMatrix{Tv, Ti}) where {Tv, Ti} = SparseMatrixCSC(M)
 SparseMatrixCSC(coo::SparseMatrixCOO) = sparse(coo.is, coo.js, coo.vs, coo.m, coo.n)
 
