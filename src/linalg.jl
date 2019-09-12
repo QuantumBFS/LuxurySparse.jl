@@ -163,7 +163,7 @@ function *(X::SparseMatrixCSC, A::PermMatrix)
 end
 
 ############ SparseMatrixCSC and Diagonal #############
-function mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal)
+function mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal{T,Vector{T}}) where T
     nA = size(A, 1)
     mX, nX = size(X)
     nX == nA || throw(DimensionMismatch())
@@ -179,7 +179,7 @@ function mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal)
     Y
 end
 
-function mul!(Y::SparseMatrixCSC, A::Diagonal, X::SparseMatrixCSC)
+function mul!(Y::SparseMatrixCSC, A::Diagonal{T,Vector{T}}, X::SparseMatrixCSC) where T
     nA = size(A, 2)
     mX, nX = size(X)
     mX == nA || throw(DimensionMismatch())
