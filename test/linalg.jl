@@ -1,6 +1,6 @@
 using Test
 using LinearAlgebra, SparseArrays, Random
-import LuxurySparse: IMatrix, PermMatrix, isdense
+import LuxurySparse: IMatrix, PermMatrix, isdense, pmrand
 
 Random.seed!(2)
 
@@ -78,3 +78,17 @@ end
     @test dg * sp == sp * sp
 end
 
+
+@testset "randn" begin
+    Random.seed!(2)
+    T = ComplexF64
+    for m in [sprand(T,5,5, 0.5), pmrand(T,5), Diagonal(randn(T,5))]
+        zm = zero(m)
+        @test zm ≈ zeros(T,5,5)
+        rand!(zm)
+        @test !(zm ≈ zeros(T,5,5))
+        zm = zero(m)
+        randn!(zm)
+        @test !(zm ≈ zeros(T,5,5))
+    end
+end

@@ -200,3 +200,20 @@ rdiv!(A::SparseMatrixCOO, B::Int) = (A.vs/=B; A)
 
 -(ii::IMatrix) = (-1)*ii
 -(pm::PermMatrix) = (-1)*pm
+
+for FUNC in [:randn!, :rand!]
+    @eval function Random.$FUNC(m::Diagonal)
+        $FUNC(m.diag)
+        return m
+    end
+
+    @eval function Random.$FUNC(m::SparseMatrixCSC)
+        $FUNC(m.nzval)
+        return m
+    end
+
+    @eval function Random.$FUNC(m::PermMatrix)
+        $FUNC(m.vals)
+        return m
+    end
+end
