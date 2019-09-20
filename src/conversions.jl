@@ -19,9 +19,13 @@ function SparseMatrixCSC(M::PermMatrix)
     SparseMatrixCSC(n, n, collect(1:n+1), order, M.vals[order])
 end
 
+if VERSION > v"1.2"
+
 function SparseMatrixCSC(D::Diagonal{T}) where T
     m = length(D.diag)
     return SparseMatrixCSC(m, m, Vector(1:(m+1)), Vector(1:m), Vector{T}(D.diag))
+end
+
 end
 
 SparseMatrixCSC{Tv, Ti}(M::PermMatrix{Tv, Ti}) where {Tv, Ti} = SparseMatrixCSC(M)
