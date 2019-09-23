@@ -22,7 +22,7 @@ const SDSparseMatrixCSC{Tv, Ti} = Union{SparseMatrixCSC{Tv, Ti}, SSparseMatrixCS
 transform a matrix to a static form.
 """
 function staticize end
-
+staticize(x) = x # do nothing if it is not defined
 staticize(A::AbstractMatrix) = SMatrix{size(A,1), size(A,2)}(A)
 staticize(A::AbstractVector) = SVector{length(A)}(A)
 staticize(A::Diagonal) = SDiagonal{size(A,1)}((A.diag...,))
@@ -38,7 +38,7 @@ end
 transform a matrix to a dynamic form.
 """
 function dynamicize end
-
+dynamicize(x) = x # do nothing if it is not defined
 dynamicize(A::SMatrix) = Matrix(A)
 dynamicize(A::SVector) = Vector(A)
 dynamicize(A::SDiagonal) = Diagonal(Vector(A.diag))
