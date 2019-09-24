@@ -1,9 +1,10 @@
 using Test
 using LinearAlgebra, SparseArrays, Random
 
-using LuxurySparse
+using LuxurySparse, StaticArrays
 import LuxurySparse: staticize
 using StaticArrays: SVector, SMatrix
+
 
 Random.seed!(2)
 
