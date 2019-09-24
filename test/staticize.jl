@@ -1,9 +1,10 @@
 using Test
 using LinearAlgebra, SparseArrays, Random
 
-using LuxurySparse
+using LuxurySparse, StaticArrays
 import LuxurySparse: staticize
 using StaticArrays: SVector, SMatrix
+
 
 Random.seed!(2)
 
@@ -67,6 +68,11 @@ Random.seed!(2)
     dm = sm |> dynamicize
     @test dm isa Matrix
     @test dm == m
+
+    m = @SMatrix rand(2, 2)
+    @test staticize(m) === m
+    m = rand(2, 2)
+    @test dynamicize(m) === m
 end
 
 @testset "SSparseMatrixCSC" begin
