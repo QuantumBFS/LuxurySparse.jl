@@ -19,7 +19,7 @@ function SparseMatrixCSC(M::PermMatrix)
     SparseMatrixCSC(n, n, collect(1:n+1), order, M.vals[order])
 end
 
-if VERSION < v"1.3"
+@static if VERSION < v"1.3-"
 
 function SparseMatrixCSC(D::Diagonal{T}) where T
     m = length(D.diag)
