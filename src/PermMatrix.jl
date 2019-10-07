@@ -75,3 +75,5 @@ nnz(M::PermMatrix) = length(M.vals)
 nonzeros(M::PermMatrix) = M.vals
 dropzeros!(M::PermMatrix; trim::Bool=false) = M
 isdense(::PermMatrix) = false
+
+Base.zero(pm::PermMatrix) = PermMatrix(pm.perm, zero(pm.vals))
