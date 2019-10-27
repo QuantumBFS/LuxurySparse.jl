@@ -129,8 +129,8 @@ function *(A::PermMatrix, X::SparseMatrixCSC)
     perm = fast_invperm(A.perm)
     nzval = similar(X.nzval)
     rowval = similar(X.rowval)
-    @inbounds for j = 1:nA
-        @inbounds @simd for k = X.colptr[j]:X.colptr[j+1]-1
+    @inbounds for j = 1:nX
+        @inbounds for k = X.colptr[j]:X.colptr[j+1]-1
             r = perm[X.rowval[k]]
             nzval[k] = X.nzval[k]*A.vals[r]
             rowval[k] = r
