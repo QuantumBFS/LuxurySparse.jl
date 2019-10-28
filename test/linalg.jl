@@ -93,7 +93,7 @@ end
     end
 end
 
-@testset "multiply rectanular matrix" begin
+@testset "multiply rectangular matrix" begin
     pm = pmrand(4)
     sp = sparse(reshape([1.0 2 3 4], 4, 1))
     res = pm * sp
