@@ -4,14 +4,14 @@ import LuxurySparse: IMatrix, PermMatrix
 Random.seed!(2)
 
 p1 = IMatrix{4}()
-sp = sprand(ComplexF64, 4,4, 0.5)
-ds = rand(ComplexF64, 4,4)
-pm = PermMatrix([2,3,4,1], randn(4))
+sp = sprand(ComplexF64, 4, 4, 0.5)
+ds = rand(ComplexF64, 4, 4)
+pm = PermMatrix([2, 3, 4, 1], randn(4))
 v = [0.5, 0.3im, 0.2, 1.0]
 dv = Diagonal(v)
 
 @testset "basic" begin
-    @test p1==copy(p1)
+    @test p1 == copy(p1)
     @test eltype(p1) == Bool
     @test size(p1) == (4, 4)
     @test size(p1, 1) == size(p1, 2) == 4
@@ -59,6 +59,6 @@ end
 end
 
 @testset "basicmath" begin
-    @test p1*2im == Matrix(p1)*2im
-    @test p1/2.0 == Matrix(p1)/2.0
+    @test p1 * 2im == Matrix(p1) * 2im
+    @test p1 / 2.0 == Matrix(p1) / 2.0
 end

@@ -16,10 +16,10 @@ isdense(x::Adjoint) = isdense(parent(x))
 """faster invperm"""
 function fast_invperm(order)
     v = similar(order)
-    @inbounds @simd for i=1:length(order)
+    @inbounds @simd for i in 1:length(order)
         v[order[i]] = i
     end
     v
 end
 
-dropzeros!(A::Diagonal; trim::Bool=false) = A
+dropzeros!(A::Diagonal; trim::Bool = false) = A

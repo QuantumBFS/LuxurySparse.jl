@@ -4,12 +4,12 @@ using FillArrays
 
 # IMatrix
 for func in (:conj, :real, :transpose, :adjoint, :copy)
-    @eval ($func)(M::IMatrix{N, T}) where {N, T} = IMatrix{N, T}()
+    @eval ($func)(M::IMatrix{N,T}) where {N,T} = IMatrix{N,T}()
 end
 for func in (:adjoint!, :transpose!)
     @eval ($func)(M::IMatrix) = M
 end
-imag(M::IMatrix{N, T}) where {N, T} = Diagonal(zeros(T,N))
+imag(M::IMatrix{N,T}) where {N,T} = Diagonal(zeros(T, N))
 
 # PermMatrix
 for func in (:conj, :real, :imag)
@@ -27,21 +27,20 @@ adjoint(S::PermMatrix{<:Complex}) = conj(transpose(S))
 
 # scalar
 import Base: *, /, ==, +, -, ≈
-*(A::IMatrix{N, T}, B::Number) where {N, T} = Diagonal(Fill(promote_type(T, eltype(B))(B), N))
-*(B::Number, A::IMatrix{N, T}) where {N, T} = Diagonal(Fill(promote_type(T, eltype(B))(B), N))
-/(A::IMatrix{N, T}, B::Number) where {N, T} = Diagonal(Fill(promote_type(T, eltype(B))(1/B), N))
+*(A::IMatrix{N,T}, B::Number) where {N,T} = Diagonal(Fill(promote_type(T, eltype(B))(B), N))
+*(B::Number, A::IMatrix{N,T}) where {N,T} = Diagonal(Fill(promote_type(T, eltype(B))(B), N))
+/(A::IMatrix{N,T}, B::Number) where {N,T} = Diagonal(Fill(promote_type(T, eltype(B))(1 / B), N))
 
-*(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals*B)
-*(B::Number, A::PermMatrix) = A*B
-/(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals/B)
+*(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals * B)
+*(B::Number, A::PermMatrix) = A * B
+/(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals / B)
 #+(A::PermMatrix, B::PermMatrix) = PermMatrix(A.dv+B.dv, A.ev+B.ev)
 #-(A::PermMatrix, B::PermMatrix) = PermMatrix(A.dv-B.dv, A.ev-B.ev)
 
 
-const IDP = Union{Diagonal, PermMatrix, IMatrix}
+const IDP = Union{Diagonal,PermMatrix,IMatrix}
 
 for op in [:+, :-, :(==), :≈]
-
     @eval begin
         $op(A::IDP, B::SparseMatrixCSC) = $op(SparseMatrixCSC(A), B)
         $op(B::SparseMatrixCSC, A::IDP) = $op(B, SparseMatrixCSC(A))
@@ -62,12 +61,14 @@ for op in [:+, :-, :(==), :≈]
         @eval begin
             $op(d1::IMatrix, d2::Diagonal) = $op(diag(d1), d2.diag)
             $op(d1::Diagonal, d2::IMatrix) = $op(d1.diag, diag(d2))
-            $op(d1::IMatrix{Na}, d2::IMatrix{Nb}) where {Na, Nb} = $op(Na, Nb)
+            $op(d1::IMatrix{Na}, d2::IMatrix{Nb}) where {Na,Nb} = $op(Na, Nb)
         end
     end
 
 end
 
 # NOTE: promote 2 at least as an integer
-+(d1::IMatrix{Na, Ta}, d2::IMatrix{Nb, Tb}) where {Na, Nb, Ta, Tb} = d1==d2 ? Diagonal(Fill(promote_type(Ta, Tb, Int)(2), Na)) : throw(DimensionMismatch())
--(d1::IMatrix{Na, Ta}, d2::IMatrix{Nb, Tb}) where {Na, Ta, Nb, Tb} = d1==d2 ? spzeros(promote_type(Ta, Tb), Na, Na) : throw(DimensionMismatch())
++(d1::IMatrix{Na,Ta}, d2::IMatrix{Nb,Tb}) where {Na,Nb,Ta,Tb} =
+    d1 == d2 ? Diagonal(Fill(promote_type(Ta, Tb, Int)(2), Na)) : throw(DimensionMismatch())
+-(d1::IMatrix{Na,Ta}, d2::IMatrix{Nb,Tb}) where {Na,Ta,Nb,Tb} =
+    d1 == d2 ? spzeros(promote_type(Ta, Tb), Na, Na) : throw(DimensionMismatch())

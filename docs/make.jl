@@ -12,11 +12,7 @@ makedocs(
     sitename = "LuxurySparse.jl",
     linkcheck = !("skiplinks" in ARGS),
     analytics = "UA-89508993-1",
-    pages = [
-        "Home" => "index.md",
-        "Tutorial" => "tutorial.md",
-        "Manual" => "luxurysparse.md",
-    ],
+    pages = ["Home" => "index.md", "Tutorial" => "tutorial.md", "Manual" => "luxurysparse.md"],
     html_prettyurls = !("local" in ARGS),
     html_canonical = "https://quantumbfs.github.io/LuxurySparse.jl/latest/",
 )

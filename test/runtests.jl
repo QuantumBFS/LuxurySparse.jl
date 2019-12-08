@@ -18,5 +18,5 @@ end
 end
 
 @testset "staticize" begin
-include("staticize.jl")
+    include("staticize.jl")
 end

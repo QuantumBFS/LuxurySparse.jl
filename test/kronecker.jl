@@ -4,9 +4,9 @@ import LuxurySparse: IMatrix, PermMatrix
 Random.seed!(2)
 
 p1 = IMatrix{4}()
-sp = sprand(ComplexF64, 4,4, 0.5)
-ds = rand(ComplexF64, 4,4)
-pm = PermMatrix([2,3,4,1], randn(4))
+sp = sprand(ComplexF64, 4, 4, 0.5)
+ds = rand(ComplexF64, 4, 4)
+pm = PermMatrix([2, 3, 4, 1], randn(4))
 v = [0.5, 0.3im, 0.2, 1.0]
 dv = Diagonal(v)
 
