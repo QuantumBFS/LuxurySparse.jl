@@ -5,9 +5,9 @@ import LuxurySparse: IMatrix, PermMatrix, isdense, pmrand
 Random.seed!(2)
 
 p1 = IMatrix{4}()
-sp = sprand(ComplexF64, 4,4, 0.5)
-ds = rand(ComplexF64, 4,4)
-pm = PermMatrix([2,3,4,1], randn(4))
+sp = sprand(ComplexF64, 4, 4, 0.5)
+ds = rand(ComplexF64, 4, 4)
+pm = PermMatrix([2, 3, 4, 1], randn(4))
 v = [0.5, 0.3im, 0.2, 1.0]
 dv = Diagonal(v)
 
@@ -56,8 +56,8 @@ end
 
 @testset "mul-vector" begin
     # permutation multiply
-    lres = transpose(conj(v))*pm  #! v' not realized!
-    rres = pm*v
+    lres = transpose(conj(v)) * pm  #! v' not realized!
+    rres = pm * v
     flres = v' * Matrix(pm)
     frres = Matrix(pm) * v
     @test lres == flres
@@ -66,15 +66,15 @@ end
     @test eltype(rres) == eltype(frres)
 
     # IMatrix
-    @test v'*p1 == v'
-    @test p1*v == v
+    @test v' * p1 == v'
+    @test p1 * v == v
 end
 
 @testset "sparse-diag" begin
     N = 100
     dg = Diagonal(randn(ComplexF64, 1000))
     sp = SparseMatrixCSC(dg)
-    @test sp *dg == sp * sp
+    @test sp * dg == sp * sp
     @test dg * sp == sp * sp
 end
 
@@ -82,14 +82,14 @@ end
 @testset "randn" begin
     Random.seed!(2)
     T = ComplexF64
-    for m in [sprand(T,5,5, 0.5), pmrand(T,5), Diagonal(randn(T,5))]
+    for m in [sprand(T, 5, 5, 0.5), pmrand(T, 5), Diagonal(randn(T, 5))]
         zm = zero(m)
-        @test zm ≈ zeros(T,5,5)
+        @test zm ≈ zeros(T, 5, 5)
         rand!(zm)
-        @test !(zm ≈ zeros(T,5,5))
+        @test !(zm ≈ zeros(T, 5, 5))
         zm = zero(m)
         randn!(zm)
-        @test !(zm ≈ zeros(T,5,5))
+        @test !(zm ≈ zeros(T, 5, 5))
     end
 end
 

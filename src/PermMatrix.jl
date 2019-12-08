@@ -13,24 +13,30 @@ Optimizations are used to make it much faster than `SparseMatrixCSC`.
 
 [Generalized Permutation Matrix](https://en.wikipedia.org/wiki/Generalized_permutation_matrix)
 """
-struct PermMatrix{Tv, Ti<:Integer, Vv<:AbstractVector{Tv}, Vi<:AbstractVector{Ti}} <: AbstractMatrix{Tv}
+struct PermMatrix{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} <: AbstractMatrix{Tv}
     perm::Vi   # new orders
     vals::Vv   # multiplied values.
 
-    function PermMatrix{Tv, Ti, Vv, Vi}(perm::Vi, vals::Vv) where {Tv, Ti<:Integer, Vv<:AbstractVector{Tv}, Vi<:AbstractVector{Ti}}
+    function PermMatrix{Tv,Ti,Vv,Vi}(
+        perm::Vi,
+        vals::Vv,
+    ) where {Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}}
         if length(perm) != length(vals)
             throw(DimensionMismatch("permutation ($(length(perm))) and multiply ($(length(vals))) length mismatch."))
         end
-        new{Tv, Ti, Vv, Vi}(perm, vals)
+        new{Tv,Ti,Vv,Vi}(perm, vals)
     end
 end
 
-function PermMatrix{Tv, Ti}(perm, vals) where {Tv, Ti<:Integer}
-    PermMatrix{Tv, Ti, Vector{Tv}, Vector{Ti}}(Vector{Ti}(perm), Vector{Tv}(vals))
+function PermMatrix{Tv,Ti}(perm, vals) where {Tv,Ti<:Integer}
+    PermMatrix{Tv,Ti,Vector{Tv},Vector{Ti}}(Vector{Ti}(perm), Vector{Tv}(vals))
 end
 
-function PermMatrix(perm::Vi, vals::Vv) where {Tv, Ti<:Integer, Vv<:AbstractVector{Tv}, Vi<:AbstractVector{Ti}}
-    PermMatrix{Tv,Ti, Vv, Vi}(perm, vals)
+function PermMatrix(
+    perm::Vi,
+    vals::Vv,
+) where {Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}}
+    PermMatrix{Tv,Ti,Vv,Vi}(perm, vals)
 end
 
 ################# Array Functions ##################
@@ -39,7 +45,7 @@ size(M::PermMatrix) = (length(M.perm), length(M.perm))
 function size(A::PermMatrix, d::Integer)
     if d < 1
         throw(ArgumentError("dimension must be ≥ 1, got $d"))
-    elseif d<=2
+    elseif d <= 2
         return length(A.perm)
     else
         return 1
@@ -55,11 +61,12 @@ Return random PermMatrix.
 """
 function pmrand end
 
-pmrand(::Type{T}, n::Int) where T = PermMatrix(randperm(n), randn(T, n))
+pmrand(::Type{T}, n::Int) where {T} = PermMatrix(randperm(n), randn(T, n))
 pmrand(n::Int) = pmrand(Float64, n)
 
-similar(x::PermMatrix{Tv, Ti}) where {Tv, Ti} = PermMatrix{Tv, Ti}(similar(x.perm), similar(x.vals))
-similar(x::PermMatrix{Tv, Ti}, ::Type{T}) where {Tv, Ti, T} = PermMatrix{T, Ti}(similar(x.perm), similar(x.vals, T))
+similar(x::PermMatrix{Tv,Ti}) where {Tv,Ti} = PermMatrix{Tv,Ti}(similar(x.perm), similar(x.vals))
+similar(x::PermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
+    PermMatrix{T,Ti}(similar(x.perm), similar(x.vals, T))
 
 # TODO: rewrite this
 # function show(io::IO, M::PermMatrix)
@@ -73,7 +80,7 @@ similar(x::PermMatrix{Tv, Ti}, ::Type{T}) where {Tv, Ti, T} = PermMatrix{T, Ti}(
 ######### sparse array interfaces  #########
 nnz(M::PermMatrix) = length(M.vals)
 nonzeros(M::PermMatrix) = M.vals
-dropzeros!(M::PermMatrix; trim::Bool=false) = M
+dropzeros!(M::PermMatrix; trim::Bool = false) = M
 isdense(::PermMatrix) = false
 
 Base.zero(pm::PermMatrix) = PermMatrix(pm.perm, zero(pm.vals))

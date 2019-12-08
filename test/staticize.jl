@@ -12,7 +12,7 @@ Random.seed!(2)
     # permmatrix
     m = pmrand(ComplexF64, 4)
     sm = m |> staticize
-    @test sm isa SPermMatrix{4, ComplexF64}
+    @test sm isa SPermMatrix{4,ComplexF64}
     @test sm.perm isa SVector
     @test sm.vals isa SVector
     @test sm.perm == m.perm
@@ -25,7 +25,7 @@ Random.seed!(2)
     @test dm.vals == m.vals
 
     # csc
-    m = sprand(ComplexF64, 4,4, 0.5)
+    m = sprand(ComplexF64, 4, 4, 0.5)
     sm = m |> staticize
     @test sm.colptr isa SVector
     @test sm.rowval isa SVector
@@ -76,7 +76,7 @@ Random.seed!(2)
 end
 
 @testset "SSparseMatrixCSC" begin
-    m = sprand(ComplexF64, 4,4, 0.5)
+    m = sprand(ComplexF64, 4, 4, 0.5)
     sm = m |> staticize
     @test nnz(sm) == nnz(m)
     @test nonzeros(sm) == nonzeros(m)
