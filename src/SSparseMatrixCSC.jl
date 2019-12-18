@@ -47,9 +47,23 @@ function getindex(ssp::SSparseMatrixCSC{Tv}, i, j) where {Tv}
     return Tv(0)
 end
 
-issparse(::SSparseMatrixCSC) = true
-nonzeros(M::SSparseMatrixCSC) = M.nzval
-nnz(spm::SSparseMatrixCSC{Tv,Ti,NNZ}) where {Tv,Ti,NNZ} = NNZ
-dropzeros!(M::SSparseMatrixCSC; trim::Bool = false) = M
+SparseArrays.issparse(::SSparseMatrixCSC) = true
+SparseArrays.nonzeros(M::SSparseMatrixCSC) = M.nzval
+SparseArrays.nnz(spm::SSparseMatrixCSC{Tv,Ti,NNZ}) where {Tv,Ti,NNZ} = NNZ
+function SparseArrays.findnz(S::SSparseMatrixCSC{Tv,Ti}) where {Tv,Ti}
+    numnz = nnz(S)
+    I = Vector{Ti}(undef, numnz)
+    J = Vector{Ti}(undef, numnz)
+    V = Vector{Tv}(undef, numnz)
 
-isdense(::SSparseMatrixCSC) = false
+    count = 1
+    @inbounds for col = 1 : S.n, k = S.colptr[col] : (S.colptr[col+1]-1)
+        I[count] = S.rowval[k]
+        J[count] = col
+        V[count] = S.nzval[k]
+        count += 1
+    end
+
+    return (I, J, V)
+end
+SparseArrays.dropzeros!(M::SSparseMatrixCSC; trim::Bool = false) = M

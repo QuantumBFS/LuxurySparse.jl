@@ -78,10 +78,10 @@ end
 @testset "SSparseMatrixCSC" begin
     m = sprand(ComplexF64, 4, 4, 0.5)
     sm = m |> staticize
-    @test nnz(sm) == nnz(m)
-    @test nonzeros(sm) == nonzeros(m)
+    @test LuxurySparse.nnz(sm) == LuxurySparse.nnz(m)
+    @test LuxurySparse.nonzeros(sm) == LuxurySparse.nonzeros(m)
     @test isdense(sm) == false
     @test issparse(sm)
-    @test dropzeros!(sm) == sm
+    @test LuxurySparse.dropzeros!(sm) == sm
     @test sm == m
 end

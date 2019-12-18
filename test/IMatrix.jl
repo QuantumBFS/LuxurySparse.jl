@@ -1,5 +1,7 @@
 using Test, Random, FillArrays
-import LuxurySparse: IMatrix, PermMatrix
+using LuxurySparse
+using SparseArrays
+using LinearAlgebra
 
 Random.seed!(2)
 
@@ -16,6 +18,9 @@ dv = Diagonal(v)
     @test size(p1) == (4, 4)
     @test size(p1, 1) == size(p1, 2) == 4
     @test Matrix(p1) == [1 0 0 0; 0 1 0 0; 0 0 1 0; 0 0 0 1]
+
+    p0 = similar(p1, ComplexF64)
+    @test p0 !== p1
 end
 
 @testset "conversion" begin
@@ -32,8 +37,8 @@ end
 end
 
 @testset "sparse" begin
-    @test nnz(p1) == 4
-    @test nonzeros(p1) == ones(4)
+    @test LuxurySparse.nnz(p1) == 4
+    @test LuxurySparse.nonzeros(p1) == ones(4)
 end
 
 @testset "linalg" begin

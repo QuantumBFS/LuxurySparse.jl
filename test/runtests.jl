@@ -1,5 +1,6 @@
 using Test
 using LinearAlgebra, SparseArrays
+using LuxurySparse
 
 @testset "IMatrix" begin
     include("IMatrix.jl")

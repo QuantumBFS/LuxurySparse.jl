@@ -52,3 +52,13 @@ dynamicize(A::PermMatrix) = PermMatrix(Vector(A.perm), Vector(A.vals))
 function dynamicize(A::SSparseMatrixCSC)
     SparseMatrixCSC(A.m, A.n, Vector(A.colptr), Vector(A.rowval), Vector(A.nzval))
 end
+
+function findnz(M::SDMatrix)
+    cis = CartesianIndices(size(M))
+    vec(getindex.(cis, 1)), vec(getindex.(cis, 2)), vec(M)
+end
+
+findnz(sp::SDSparseMatrixCSC) = SparseArrays.findnz(sp)
+dropzeros!(M::SDSparseMatrixCSC; trim::Bool = false) = SparseArrays.dropzeros!(M; trim=trim)
+nonzeros(M::SDSparseMatrixCSC) = SparseArrays.nonzeros(M)
+nnz(M::SDSparseMatrixCSC) = SparseArrays.nnz(M)

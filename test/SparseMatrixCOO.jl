@@ -27,9 +27,9 @@ end
 
 @testset "sparse" begin
     p1 = copy(coo1)
-    @test nonzeros(p1) == p1.vs
+    @test LuxurySparse.nonzeros(p1) == p1.vs
     p1.vs[2] = 0
-    @test dropzeros!(p1) == [0.1 0 0 0; 0 0.4im 0 0; 0 0 0.3 0.5 + 0.5im; 0 0 0 0]
+    @test LuxurySparse.dropzeros!(p1) == [0.1 0 0 0; 0 0.4im 0 0; 0 0 0.3 0.5 + 0.5im; 0 0 0 0]
 end
 
 @testset "basicmath" begin
