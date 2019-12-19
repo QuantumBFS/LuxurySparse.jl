@@ -1,6 +1,6 @@
 using Test
 using LinearAlgebra, SparseArrays, Random
-import LuxurySparse: IMatrix, PermMatrix, isdense, pmrand
+using LuxurySparse
 
 Random.seed!(2)
 
@@ -98,4 +98,30 @@ end
     sp = sparse(reshape([1.0 2 3 4], 4, 1))
     res = pm * sp
     @test res ≈ Matrix(pm) * Matrix(sp)
+end
+
+@testset "findnz" begin
+    for m in [p1, sp, ds, dv, pm]
+        for _m in [m, staticize(m)]
+            out = zeros(eltype(m),size(m)...)
+            for (i,j,v) in zip(LuxurySparse.findnz(_m)...)
+                out[i,j] = v
+            end
+            @test out ≈ m
+        end
+    end
+end
+
+@testset "hadamard product" begin
+    for m1 in [p1, sp, ds, dv, pm]
+        for m2 in [p1, sp, ds, dv, pm]
+            res1 = hadamard_product(m1, m2)
+            res2 = hadamard_product(m2, m1)
+            @test res1 == res2
+            @test res1 ≈ Matrix(m1) .* Matrix(m2)
+            @test LuxurySparse.sparse_ranking(res1) ==
+                max(2,min(LuxurySparse.sparse_ranking.((m1, m2))...)) ==
+                LuxurySparse.sparse_ranking(res2)
+        end
+    end
 end

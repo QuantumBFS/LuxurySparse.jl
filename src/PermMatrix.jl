@@ -52,6 +52,14 @@ function size(A::PermMatrix, d::Integer)
     end
 end
 getindex(M::PermMatrix, i::Integer, j::Integer) = M.perm[i] == j ? M.vals[i] : 0
+function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
+    if M.perm[i] == j
+        @inbounds M.vals[i] = val
+    else
+        throw(BoundsError(M, (i,j)))
+    end
+end
+
 copyto!(A::PermMatrix, B::PermMatrix) = (copyto!(A.perm, B.perm); copyto!(A.vals, B.vals); A)
 
 """
@@ -64,9 +72,9 @@ function pmrand end
 pmrand(::Type{T}, n::Int) where {T} = PermMatrix(randperm(n), randn(T, n))
 pmrand(n::Int) = pmrand(Float64, n)
 
-similar(x::PermMatrix{Tv,Ti}) where {Tv,Ti} = PermMatrix{Tv,Ti}(similar(x.perm), similar(x.vals))
+similar(x::PermMatrix{Tv,Ti}) where {Tv,Ti} = PermMatrix{Tv,Ti}(copy(x.perm), similar(x.vals))
 similar(x::PermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
-    PermMatrix{T,Ti}(similar(x.perm), similar(x.vals, T))
+    PermMatrix{T,Ti}(copy(x.perm), similar(x.vals, T))
 
 # TODO: rewrite this
 # function show(io::IO, M::PermMatrix)
@@ -80,6 +88,7 @@ similar(x::PermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
 ######### sparse array interfaces  #########
 nnz(M::PermMatrix) = length(M.vals)
 nonzeros(M::PermMatrix) = M.vals
+findnz(M::PermMatrix) = (collect(1:size(M,1)), M.perm, M.vals)
 dropzeros!(M::PermMatrix; trim::Bool = false) = M
 isdense(::PermMatrix) = false
 

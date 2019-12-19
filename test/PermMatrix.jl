@@ -1,5 +1,7 @@
 using Test, Random
 import LuxurySparse: PermMatrix, pmrand
+using SparseArrays: sprand
+using LinearAlgebra
 
 Random.seed!(2)
 p1 = PermMatrix([1, 4, 2, 3], [0.1, 0.2, 0.4im, 0.5])
@@ -18,12 +20,10 @@ v = [0.5, 0.3im, 0.2, 1.0]
     @test size(p3) == (4, 4)
     @test size(p1, 1) == size(p1, 2) == 4
     @test Matrix(p1) == [0.1 0 0 0; 0 0 0 0.2; 0 0.4im 0 0; 0 0 0.5 0]
-end
-
-@testset "sparse" begin
-    @test nnz(p1) == 4
-    @test nonzeros(p1) == p1.vals
-    @test dropzeros!(p1) == p1
+    p0 = similar(p1)
+    @test p0.perm == p1.perm
+    @test p0.perm !== p1.perm
+    @test p0.vals !== p1.vals
 end
 
 @testset "linalg" begin
@@ -64,4 +64,27 @@ end
     @test p1 == PermMatrix([1, 4, 2, 3], [0.1, 0.2, 0.4im, 0.5])
     @test p2 == PermMatrix([2, 1, 4, 3], [0.1, 0.2, 0.4, 0.5])
     @test v == [0.5, 0.3im, 0.2, 1.0]
+end
+
+@testset "sparse" begin
+    Random.seed!(2)
+    pm = pmrand(10)
+    out = zeros(10,10)
+    @test LuxurySparse.nnz(pm) == 10
+    @test LuxurySparse.nonzeros(pm) == pm.vals
+    @test LuxurySparse.dropzeros!(pm) == pm
+end
+
+@testset "identity sparse" begin
+    p1 = Diagonal(randn(10))
+    @test LuxurySparse.nnz(p1) == 10
+    @test LuxurySparse.nonzeros(p1) == p1.diag
+    @test LuxurySparse.dropzeros!(p1) == p1
+end
+
+@testset "setindex" begin
+    pm = PermMatrix([3,2,4,1], [0.0, 0.0, 0.0, 0.0])
+    pm[3, 4] = 1.0
+    @test_throws BoundsError pm[3, 1] = 1.0
+    @test pm[3, 4] == 1.0
 end
