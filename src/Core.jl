@@ -25,4 +25,4 @@ end
 dropzeros!(A::Diagonal; trim::Bool = false) = A
 nnz(M::Diagonal) = size(M, 1)
 nonzeros(M::Diagonal) = M.diag
-findnz(M::Diagonal) = (collect(1:size(M,1)), collect(1:size(M, 1)), M.diag)
+findnz(M::Diagonal) = (collect(1:size(M, 1)), collect(1:size(M, 1)), M.diag)
