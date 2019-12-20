@@ -228,14 +228,14 @@ sparse_ranking(a::SDPermMatrix) = 3
 sparse_ranking(a::SDDiagonal) = 2
 sparse_ranking(a::IMatrix) = 1
 
-function hadamard_product(a::AbstractMatrix{Ta}, b::AbstractMatrix{Tb}) where {Ta, Tb}
+function hadamard_product(a::AbstractMatrix{Ta}, b::AbstractMatrix{Tb}) where {Ta,Tb}
     # sparse goes first
     if sparse_ranking(b) < sparse_ranking(a)
         return hadamard_product(b, a)
     end
     out = similar(a, promote_type(Ta, Tb))
-    for (i,j,v) in zip(LuxurySparse.findnz(a)...)
-        out[i,j] = v*b[i,j]
+    for (i, j, v) in zip(LuxurySparse.findnz(a)...)
+        out[i, j] = v * b[i, j]
     end
     return out
 end

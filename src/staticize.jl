@@ -59,6 +59,6 @@ function findnz(M::SDMatrix)
 end
 
 findnz(sp::SDSparseMatrixCSC) = SparseArrays.findnz(sp)
-dropzeros!(M::SDSparseMatrixCSC; trim::Bool = false) = SparseArrays.dropzeros!(M; trim=trim)
+dropzeros!(M::SDSparseMatrixCSC; trim::Bool = false) = SparseArrays.dropzeros!(M; trim = trim)
 nonzeros(M::SDSparseMatrixCSC) = SparseArrays.nonzeros(M)
 nnz(M::SDSparseMatrixCSC) = SparseArrays.nnz(M)
