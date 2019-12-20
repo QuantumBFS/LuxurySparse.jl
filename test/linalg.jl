@@ -120,8 +120,8 @@ end
             @test res1 == res2
             @test res1 ≈ Matrix(m1) .* Matrix(m2)
             @test LuxurySparse.sparse_ranking(res1) ==
-                  max(2, min(LuxurySparse.sparse_ranking.((m1, m2))...)) ==
-                  LuxurySparse.sparse_ranking(res2)
+            max(2, min(LuxurySparse.sparse_ranking.((m1, m2))...)) ==
+            LuxurySparse.sparse_ranking(res2)
         end
     end
 end
