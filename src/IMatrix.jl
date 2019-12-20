@@ -18,7 +18,7 @@ getindex(A::IMatrix{N,T}, i::Integer, j::Integer) where {N,T} = T(i == j)
 ####### sparse matrix ######
 nnz(M::IMatrix{N}) where {N} = N
 nonzeros(M::IMatrix{N,T}) where {N,T} = ones(T, N)
-findnz(M::IMatrix{N,T}) where {N, T} = (collect(1:N), collect(1:N), ones(T,N))
+findnz(M::IMatrix{N,T}) where {N,T} = (collect(1:N), collect(1:N), ones(T, N))
 ishermitian(D::IMatrix) = true
 isdense(::IMatrix) = false
 

@@ -103,9 +103,9 @@ end
 @testset "findnz" begin
     for m in [p1, sp, ds, dv, pm]
         for _m in [m, staticize(m)]
-            out = zeros(eltype(m),size(m)...)
-            for (i,j,v) in zip(LuxurySparse.findnz(_m)...)
-                out[i,j] = v
+            out = zeros(eltype(m), size(m)...)
+            for (i, j, v) in zip(LuxurySparse.findnz(_m)...)
+                out[i, j] = v
             end
             @test out ≈ m
         end
@@ -120,8 +120,8 @@ end
             @test res1 == res2
             @test res1 ≈ Matrix(m1) .* Matrix(m2)
             @test LuxurySparse.sparse_ranking(res1) ==
-                max(2,min(LuxurySparse.sparse_ranking.((m1, m2))...)) ==
-                LuxurySparse.sparse_ranking(res2)
+                  max(2, min(LuxurySparse.sparse_ranking.((m1, m2))...)) ==
+                  LuxurySparse.sparse_ranking(res2)
         end
     end
 end
