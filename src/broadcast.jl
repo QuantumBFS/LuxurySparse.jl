@@ -12,21 +12,9 @@ using Base.Broadcast: BroadcastStyle, AbstractArrayStyle, Broadcasted, DefaultAr
 end
 
 # patches
-# TODO: commit this to upstream
-LinearAlgebra.fzero(S::Matrix) = zero(eltype(S))
-LinearAlgebra.fzero(S::PermMatrix) = zero(eltype(S))
 LinearAlgebra.fzero(S::IMatrix) = zero(eltype(S))
 
-# custom style
-struct PermStyle <: AbstractArrayStyle{2} end
-
-PermStyle(::Val{2}) = PermStyle()
-
 Broadcast.BroadcastStyle(::Type{<:IMatrix}) = StructuredMatrixStyle{Diagonal}()
-Broadcast.BroadcastStyle(::Type{<:PermMatrix}) = PermStyle()
-
-Broadcast.BroadcastStyle(::PermStyle, ::HigherOrderFns.SPVM) = PermStyle()
-Broadcast.BroadcastStyle(::PermStyle, ::LinearAlgebra.StructuredMatrixStyle{<:Diagonal}) = StructuredMatrixStyle{Diagonal}()
 
 # specialize identity
 Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{N, T}, b::IMatrix) where {N, T} = IMatrix{N, T}()
@@ -36,6 +24,41 @@ Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::AbstractVecOrMat,
 Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{S}, b::Number) where S = Diagonal(Fill(b, S))
 Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::Number, b::IMatrix{S}) where S = Diagonal(Fill(a, S))
 
+# specialize perm matrix
+function _broadcast_perm_prod(A::PermMatrix, B::AbstractMatrix)
+    dest = similar(A, Base.promote_op(*, eltype(A), eltype(B)))
+    i = 1
+    @inbounds for j in dest.perm
+        dest[i, j] = A[i, j] * B[i, j]
+        i += 1
+    end
+    return dest
+end
+
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::AbstractMatrix) = _broadcast_perm_prod(A, B)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::AbstractMatrix, B::PermMatrix) = _broadcast_perm_prod(B, A)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::PermMatrix) = _broadcast_perm_prod(A, B)
+
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::IMatrix) = Diagonal(A)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::IMatrix, B::PermMatrix) = Diagonal(B)
+
+function _broadcast_diag_perm_prod(A::Diagonal, B::PermMatrix)
+    dest = similar(A)
+    i = 1
+    @inbounds for j in B.perm
+        if i == j
+            dest[i, i] = A[i, i] * B[i, i]
+        else
+            dest[i, i] = 0
+        end
+        i += 1
+    end
+    return dest
+end
+
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::Diagonal) = _broadcast_diag_perm_prod(B, A)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::PermMatrix) = _broadcast_diag_perm_prod(A, B)
+
 # TODO: commit this upstream
 # specialize Diagonal .* SparseMatrixCSC
 Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::SparseMatrixCSC) =
@@ -43,32 +66,3 @@ Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::Spar
 
 Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::SparseMatrixCSC, B::Diagonal) =
     Broadcast.broadcasted(*, Diagonal(A), B)
-
-# Perm .* Perm
-function Base.similar(bc::Broadcasted{PermStyle}, ::Type{ElType}) where ElType
-    return _construct_perm_matrix(ElType, bc.args)
-end
-
-Base.similar(bc::Broadcasted{PermStyle}, ::Type{Bool}) = BitArray(undef, size(bc)...)
-
-# create perm matrix based on the first perm matrix
-_construct_perm_matrix(::Type{T}, args::Tuple) where T = _construct_perm_matrix(T, args...)
-_construct_perm_matrix(::Type{T}, a::PermMatrix, xs...) where T = similar(a, T)
-_construct_perm_matrix(::Type{T}, a, xs...) where T = _construct_perm_matrix(T, xs...)
-_construct_perm_matrix(::Type, a) = nothing
-
-function Base.copyto!(dest::PermMatrix, bc::Broadcasted{Nothing})
-    if bc.f === identity && bc.args isa Tuple{AbstractArray}
-        A = bc.args[1]
-        if axes(dest) == axes(A)
-            return copyto!(dest, A)
-        end
-    end
-
-    i = 1
-    for j in dest.perm
-        dest[i, j] = bc[i, j]
-        i += 1
-    end
-    return dest
-end
