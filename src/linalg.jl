@@ -218,32 +218,3 @@ for FUNC in [:randn!, :rand!]
         return m
     end
 end
-
-
-########### Hadamard Product
-sparse_ranking(a::AbstractMatrix) = 6
-sparse_ranking(a::SDMatrix) = 5
-sparse_ranking(a::SDSparseMatrixCSC) = 4
-sparse_ranking(a::SDPermMatrix) = 3
-sparse_ranking(a::SDDiagonal) = 2
-sparse_ranking(a::IMatrix) = 1
-
-function hadamard_product(a::AbstractMatrix{Ta}, b::AbstractMatrix{Tb}) where {Ta, Tb}
-    # sparse goes first
-    if sparse_ranking(b) < sparse_ranking(a)
-        return hadamard_product(b, a)
-    end
-    out = similar(a, promote_type(Ta, Tb))
-    for (i,j,v) in zip(LuxurySparse.findnz(a)...)
-        out[i,j] = v*b[i,j]
-    end
-    return out
-end
-
-function hadamard_product(a::SDMatrix, b::SDMatrix)
-    a .* b
-end
-
-function hadamard_product(a::IMatrix, b::AbstractMatrix)
-    Diagonal(b)
-end

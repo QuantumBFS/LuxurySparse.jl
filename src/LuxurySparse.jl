@@ -22,5 +22,6 @@ include("staticize.jl")
 include("arraymath.jl")
 include("linalg.jl")
 include("kronecker.jl")
+include("broadcast.jl")
 
 end

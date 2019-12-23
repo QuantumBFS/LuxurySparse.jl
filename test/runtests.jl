@@ -21,3 +21,7 @@ end
 @testset "staticize" begin
     include("staticize.jl")
 end
+
+@testset "broadcast" begin
+    include("broadcast.jl")
+end
