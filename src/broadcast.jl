@@ -44,6 +44,8 @@ function Base.similar(bc::Broadcasted{PermStyle}, ::Type{ElType}) where ElType
     return _construct_perm_matrix(ElType, bc.args)
 end
 
+Base.similar(bc::Broadcasted{PermStyle}, ::Type{Bool}) = BitArray(undef, size(bc)...)
+
 # create perm matrix based on the first perm matrix
 _construct_perm_matrix(::Type{T}, args::Tuple) where T = _construct_perm_matrix(T, args...)
 _construct_perm_matrix(::Type{T}, a::PermMatrix, xs...) where T = similar(a, T)
