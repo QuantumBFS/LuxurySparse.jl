@@ -55,13 +55,25 @@ end
         @test M .- M1 ≈ Matrix(M) .- M1
     end
 
-    @testset "PermMatrix .* $(nameof(typeof(M)))" for M in [2.0, rand(3, 3), pmrand(3), sprand(3, 0.5), sprand(3, 3, 0.5)]
+    @testset "PermMatrix .* $(nameof(typeof(M)))" for M in [
+        2.0,
+        rand(3, 3),
+        pmrand(3),
+        sprand(3, 0.5),
+        sprand(3, 3, 0.5),
+    ]
         M1 = pmrand(3)
         @test M1 .- M ≈ Matrix(M1) .- M
         @test M .- M1 ≈ M .- Matrix(M1)
     end
 
-    @testset "IMatrix .* $(nameof(typeof(M)))" for M in [2.0, rand(3, 3), pmrand(3), sprand(3, 0.5), sprand(3, 3, 0.5)]
+    @testset "IMatrix .* $(nameof(typeof(M)))" for M in [
+        2.0,
+        rand(3, 3),
+        pmrand(3),
+        sprand(3, 0.5),
+        sprand(3, 3, 0.5),
+    ]
         eye = IMatrix{3}()
         @test eye .- M ≈ Matrix(eye) .- M
 

@@ -40,9 +40,12 @@ function _broadcast_perm_prod(A::PermMatrix, B::AbstractMatrix)
     return dest
 end
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::AbstractMatrix) = _broadcast_perm_prod(A, B)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::AbstractMatrix, B::PermMatrix) = _broadcast_perm_prod(B, A)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::PermMatrix) = _broadcast_perm_prod(A, B)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::AbstractMatrix) =
+    _broadcast_perm_prod(A, B)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::AbstractMatrix, B::PermMatrix) =
+    _broadcast_perm_prod(B, A)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::PermMatrix) =
+    _broadcast_perm_prod(A, B)
 
 Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::IMatrix) = Diagonal(A)
 Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::IMatrix, B::PermMatrix) = Diagonal(B)
@@ -61,8 +64,10 @@ function _broadcast_diag_perm_prod(A::Diagonal, B::PermMatrix)
     return dest
 end
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::Diagonal) = _broadcast_diag_perm_prod(B, A)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::PermMatrix) = _broadcast_diag_perm_prod(A, B)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::Diagonal) =
+    _broadcast_diag_perm_prod(B, A)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::PermMatrix) =
+    _broadcast_diag_perm_prod(A, B)
 
 # TODO: commit this upstream
 # specialize Diagonal .* SparseMatrixCSC
