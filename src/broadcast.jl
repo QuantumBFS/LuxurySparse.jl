@@ -26,15 +26,21 @@ Broadcast.BroadcastStyle(::Type{<:IMatrix}) = StructuredMatrixStyle{Diagonal}()
 Broadcast.BroadcastStyle(::Type{<:PermMatrix}) = PermStyle()
 
 Broadcast.BroadcastStyle(::PermStyle, ::HigherOrderFns.SPVM) = PermStyle()
-Broadcast.BroadcastStyle(::PermStyle, ::LinearAlgebra.StructuredMatrixStyle{<:Diagonal}) = StructuredMatrixStyle{Diagonal}()
+Broadcast.BroadcastStyle(::PermStyle, ::LinearAlgebra.StructuredMatrixStyle{<:Diagonal}) =
+    StructuredMatrixStyle{Diagonal}()
 
 # specialize identity
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{N, T}, b::IMatrix) where {N, T} = IMatrix{N, T}()
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix, b::AbstractVecOrMat) = Diagonal(b)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::AbstractVecOrMat, b::IMatrix) = Diagonal(a)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{N,T}, b::IMatrix) where {N,T} =
+    IMatrix{N,T}()
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix, b::AbstractVecOrMat) =
+    Diagonal(b)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::AbstractVecOrMat, b::IMatrix) =
+    Diagonal(a)
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{S}, b::Number) where S = Diagonal(Fill(b, S))
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::Number, b::IMatrix{S}) where S = Diagonal(Fill(a, S))
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{S}, b::Number) where {S} =
+    Diagonal(Fill(b, S))
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::Number, b::IMatrix{S}) where {S} =
+    Diagonal(Fill(a, S))
 
 # TODO: commit this upstream
 # specialize Diagonal .* SparseMatrixCSC
@@ -45,16 +51,16 @@ Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::SparseMatrixCSC, 
     Broadcast.broadcasted(*, Diagonal(A), B)
 
 # Perm .* Perm
-function Base.similar(bc::Broadcasted{PermStyle}, ::Type{ElType}) where ElType
+function Base.similar(bc::Broadcasted{PermStyle}, ::Type{ElType}) where {ElType}
     return _construct_perm_matrix(ElType, bc.args)
 end
 
 Base.similar(bc::Broadcasted{PermStyle}, ::Type{Bool}) = BitArray(undef, size(bc)...)
 
 # create perm matrix based on the first perm matrix
-_construct_perm_matrix(::Type{T}, args::Tuple) where T = _construct_perm_matrix(T, args...)
-_construct_perm_matrix(::Type{T}, a::PermMatrix, xs...) where T = similar(a, T)
-_construct_perm_matrix(::Type{T}, a, xs...) where T = _construct_perm_matrix(T, xs...)
+_construct_perm_matrix(::Type{T}, args::Tuple) where {T} = _construct_perm_matrix(T, args...)
+_construct_perm_matrix(::Type{T}, a::PermMatrix, xs...) where {T} = similar(a, T)
+_construct_perm_matrix(::Type{T}, a, xs...) where {T} = _construct_perm_matrix(T, xs...)
 _construct_perm_matrix(::Type, a) = nothing
 
 function Base.copyto!(dest::PermMatrix, bc::Broadcasted{Nothing})
