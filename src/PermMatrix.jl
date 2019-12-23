@@ -56,7 +56,7 @@ function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
     if M.perm[i] == j
         @inbounds M.vals[i] = val
     else
-        throw(BoundsError(M, (i,j)))
+        throw(BoundsError(M, (i, j)))
     end
 end
 
@@ -88,7 +88,7 @@ similar(x::PermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
 ######### sparse array interfaces  #########
 nnz(M::PermMatrix) = length(M.vals)
 nonzeros(M::PermMatrix) = M.vals
-findnz(M::PermMatrix) = (collect(1:size(M,1)), M.perm, M.vals)
+findnz(M::PermMatrix) = (collect(1:size(M, 1)), M.perm, M.vals)
 dropzeros!(M::PermMatrix; trim::Bool = false) = M
 isdense(::PermMatrix) = false
 
