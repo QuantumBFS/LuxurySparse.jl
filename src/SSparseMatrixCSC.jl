@@ -2,59 +2,59 @@ export SSparseMatrixCSC
 
 @static if VERSION < v"1.4.0"
 
-"""
-    SSparseMatrixCSC{Tv,Ti<:Integer, NNZ, NP} <: AbstractSparseMatrix{Tv,Ti}
+    """
+        SSparseMatrixCSC{Tv,Ti<:Integer, NNZ, NP} <: AbstractSparseMatrix{Tv,Ti}
 
-static version of SparseMatrixCSC
-"""
-struct SSparseMatrixCSC{Tv,Ti<:Integer,NNZ,NP} <: AbstractSparseMatrix{Tv,Ti}
-    m::Int                  # Number of rows
-    n::Int                  # Number of columns
-    colptr::SVector{NP,Ti}      # Column i is in colptr[i]:(colptr[i+1]-1)
-    rowval::SVector{NNZ,Ti}      # Row values of nonzeros
-    nzval::SVector{NNZ,Tv}       # Nonzero values
+    static version of SparseMatrixCSC
+    """
+    struct SSparseMatrixCSC{Tv,Ti<:Integer,NNZ,NP} <: AbstractSparseMatrix{Tv,Ti}
+        m::Int                  # Number of rows
+        n::Int                  # Number of columns
+        colptr::SVector{NP,Ti}      # Column i is in colptr[i]:(colptr[i+1]-1)
+        rowval::SVector{NNZ,Ti}      # Row values of nonzeros
+        nzval::SVector{NNZ,Tv}       # Nonzero values
 
-    function SSparseMatrixCSC{Tv,Ti,NNZ,NP}(
-        m::Integer,
-        n::Integer,
-        colptr::SVector{NP,Ti},
-        rowval::SVector{NNZ,Ti},
-        nzval::SVector{NNZ,Tv},
-    ) where {Tv,Ti<:Integer,NNZ,NP}
-        m < 0 && throw(ArgumentError("number of rows (m) must be ≥ 0, got $m"))
-        n < 0 && throw(ArgumentError("number of columns (n) must be ≥ 0, got $n"))
-        new(Int(m), Int(n), colptr, rowval, nzval)
+        function SSparseMatrixCSC{Tv,Ti,NNZ,NP}(
+            m::Integer,
+            n::Integer,
+            colptr::SVector{NP,Ti},
+            rowval::SVector{NNZ,Ti},
+            nzval::SVector{NNZ,Tv},
+        ) where {Tv,Ti<:Integer,NNZ,NP}
+            m < 0 && throw(ArgumentError("number of rows (m) must be ≥ 0, got $m"))
+            n < 0 && throw(ArgumentError("number of columns (n) must be ≥ 0, got $n"))
+            new(Int(m), Int(n), colptr, rowval, nzval)
+        end
     end
-end
 
 else
-# NOTE: from 1.4.0, by subtyping AbstractSparseMatrixCSC, things like sparse broadcast
-# should just work.
+    # NOTE: from 1.4.0, by subtyping AbstractSparseMatrixCSC, things like sparse broadcast
+    # should just work.
 
-"""
-    SSparseMatrixCSC{Tv,Ti<:Integer, NNZ, NP} <: AbstractSparseMatrix{Tv,Ti}
+    """
+        SSparseMatrixCSC{Tv,Ti<:Integer, NNZ, NP} <: AbstractSparseMatrix{Tv,Ti}
 
-static version of SparseMatrixCSC
-"""
-struct SSparseMatrixCSC{Tv,Ti<:Integer,NNZ,NP} <: AbstractSparseMatrixCSC{Tv,Ti}
-    m::Int                  # Number of rows
-    n::Int                  # Number of columns
-    colptr::SVector{NP,Ti}      # Column i is in colptr[i]:(colptr[i+1]-1)
-    rowval::SVector{NNZ,Ti}      # Row values of nonzeros
-    nzval::SVector{NNZ,Tv}       # Nonzero values
+    static version of SparseMatrixCSC
+    """
+    struct SSparseMatrixCSC{Tv,Ti<:Integer,NNZ,NP} <: AbstractSparseMatrixCSC{Tv,Ti}
+        m::Int                  # Number of rows
+        n::Int                  # Number of columns
+        colptr::SVector{NP,Ti}      # Column i is in colptr[i]:(colptr[i+1]-1)
+        rowval::SVector{NNZ,Ti}      # Row values of nonzeros
+        nzval::SVector{NNZ,Tv}       # Nonzero values
 
-    function SSparseMatrixCSC{Tv,Ti,NNZ,NP}(
-        m::Integer,
-        n::Integer,
-        colptr::SVector{NP,Ti},
-        rowval::SVector{NNZ,Ti},
-        nzval::SVector{NNZ,Tv},
-    ) where {Tv,Ti<:Integer,NNZ,NP}
-        m < 0 && throw(ArgumentError("number of rows (m) must be ≥ 0, got $m"))
-        n < 0 && throw(ArgumentError("number of columns (n) must be ≥ 0, got $n"))
-        new(Int(m), Int(n), colptr, rowval, nzval)
+        function SSparseMatrixCSC{Tv,Ti,NNZ,NP}(
+            m::Integer,
+            n::Integer,
+            colptr::SVector{NP,Ti},
+            rowval::SVector{NNZ,Ti},
+            nzval::SVector{NNZ,Tv},
+        ) where {Tv,Ti<:Integer,NNZ,NP}
+            m < 0 && throw(ArgumentError("number of rows (m) must be ≥ 0, got $m"))
+            n < 0 && throw(ArgumentError("number of columns (n) must be ≥ 0, got $n"))
+            new(Int(m), Int(n), colptr, rowval, nzval)
+        end
     end
-end
 
 end # @static
 
