@@ -6,6 +6,11 @@ using LinearAlgebra
 using LinearAlgebra: StructuredMatrixStyle
 using Base.Broadcast: BroadcastStyle, AbstractArrayStyle, Broadcasted, DefaultArrayStyle, materialize!
 
+@static if VERSION < v"1.2"
+    Base.size(bc::Broadcasted) = map(length, axes(bc))
+    Base.length(bc::Broadcasted) = prod(size(bc))
+end
+
 # patches
 # TODO: commit this to upstream
 LinearAlgebra.fzero(S::Matrix) = zero(eltype(S))
