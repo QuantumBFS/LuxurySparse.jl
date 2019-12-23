@@ -1,7 +1,6 @@
 import Base: inv
 import LinearAlgebra: det, diag, logdet, mul!, lmul!, rmul!, rdiv!
 using LinearAlgebra, FillArrays
-export hadamard_product
 
 ####### linear algebra  ######
 inv(M::IMatrix) = M

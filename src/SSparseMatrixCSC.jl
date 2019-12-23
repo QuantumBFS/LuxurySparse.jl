@@ -90,7 +90,7 @@ function SparseArrays.findnz(S::SSparseMatrixCSC{Tv,Ti}) where {Tv,Ti}
     V = Vector{Tv}(undef, numnz)
 
     count = 1
-    @inbounds for col = 1 : S.n, k = S.colptr[col] : (S.colptr[col+1]-1)
+    @inbounds for col in 1:S.n, k in S.colptr[col]:(S.colptr[col+1]-1)
         I[count] = S.rowval[k]
         J[count] = col
         V[count] = S.nzval[k]

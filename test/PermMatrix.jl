@@ -69,7 +69,7 @@ end
 @testset "sparse" begin
     Random.seed!(2)
     pm = pmrand(10)
-    out = zeros(10,10)
+    out = zeros(10, 10)
     @test LuxurySparse.nnz(pm) == 10
     @test LuxurySparse.nonzeros(pm) == pm.vals
     @test LuxurySparse.dropzeros!(pm) == pm
@@ -83,7 +83,7 @@ end
 end
 
 @testset "setindex" begin
-    pm = PermMatrix([3,2,4,1], [0.0, 0.0, 0.0, 0.0])
+    pm = PermMatrix([3, 2, 4, 1], [0.0, 0.0, 0.0, 0.0])
     pm[3, 4] = 1.0
     @test_throws BoundsError pm[3, 1] = 1.0
     @test pm[3, 4] == 1.0
