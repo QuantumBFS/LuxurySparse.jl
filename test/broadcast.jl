@@ -39,7 +39,8 @@ using SparseArrays
     end
 
     @test IMatrix{3}() .* IMatrix{3}() === IMatrix{3}()
-    d = Diagonal(rand(3)); sp = sprand(3, 3, 0.5);
+    d = Diagonal(rand(3))
+    sp = sprand(3, 3, 0.5)
     @test d .* sp ≈ Matrix(d) .* Matrix(sp)
     @test typeof(d .* sp) <: Diagonal
 

@@ -17,12 +17,17 @@ LinearAlgebra.fzero(S::IMatrix) = zero(eltype(S))
 Broadcast.BroadcastStyle(::Type{<:IMatrix}) = StructuredMatrixStyle{Diagonal}()
 
 # specialize identity
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{N, T}, b::IMatrix) where {N, T} = IMatrix{N, T}()
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix, b::AbstractVecOrMat) = Diagonal(b)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::AbstractVecOrMat, b::IMatrix) = Diagonal(a)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{N,T}, b::IMatrix) where {N,T} =
+    IMatrix{N,T}()
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix, b::AbstractVecOrMat) =
+    Diagonal(b)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::AbstractVecOrMat, b::IMatrix) =
+    Diagonal(a)
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{S}, b::Number) where S = Diagonal(Fill(b, S))
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::Number, b::IMatrix{S}) where S = Diagonal(Fill(a, S))
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{S}, b::Number) where {S} =
+    Diagonal(Fill(b, S))
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::Number, b::IMatrix{S}) where {S} =
+    Diagonal(Fill(a, S))
 
 # specialize perm matrix
 function _broadcast_perm_prod(A::PermMatrix, B::AbstractMatrix)
