@@ -13,7 +13,8 @@ Optimizations are used to make it much faster than `SparseMatrixCSC`.
 
 [Generalized Permutation Matrix](https://en.wikipedia.org/wiki/Generalized_permutation_matrix)
 """
-struct PermMatrix{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} <: AbstractMatrix{Tv}
+struct PermMatrix{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} <:
+       AbstractMatrix{Tv}
     perm::Vi   # new orders
     vals::Vv   # multiplied values.
 
@@ -60,7 +61,8 @@ function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
     end
 end
 
-copyto!(A::PermMatrix, B::PermMatrix) = (copyto!(A.perm, B.perm); copyto!(A.vals, B.vals); A)
+copyto!(A::PermMatrix, B::PermMatrix) =
+    (copyto!(A.perm, B.perm); copyto!(A.vals, B.vals); A)
 
 """
     pmrand(T::Type, n::Int) -> PermMatrix
@@ -72,7 +74,8 @@ function pmrand end
 pmrand(::Type{T}, n::Int) where {T} = PermMatrix(randperm(n), randn(T, n))
 pmrand(n::Int) = pmrand(Float64, n)
 
-similar(x::PermMatrix{Tv,Ti}) where {Tv,Ti} = PermMatrix{Tv,Ti}(copy(x.perm), similar(x.vals))
+similar(x::PermMatrix{Tv,Ti}) where {Tv,Ti} =
+    PermMatrix{Tv,Ti}(copy(x.perm), similar(x.vals))
 similar(x::PermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
     PermMatrix{T,Ti}(copy(x.perm), similar(x.vals, T))
 
