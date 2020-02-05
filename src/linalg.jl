@@ -22,7 +22,8 @@ end
 *(A::IMatrix{N}, B::AbstractVector) where {N} = size(A, 2) == size(B, 1) ? B :
     throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $((size(B, 1), 1))"))
 
-for MATTYPE in [:AbstractMatrix, :StridedMatrix, :Diagonal, :SparseMatrixCSC, :Matrix, :PermMatrix]
+for MATTYPE in
+    [:AbstractMatrix, :StridedMatrix, :Diagonal, :SparseMatrixCSC, :Matrix, :PermMatrix]
     @eval *(A::IMatrix{N}, B::$MATTYPE) where {N} = N == size(B, 1) ? B :
         throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
 
@@ -45,7 +46,7 @@ function *(A::PermMatrix{Ta}, X::AbstractVector{Tx}) where {Ta,Tx}
     nX = length(X)
     nX == size(A, 2) || throw(DimensionMismatch())
     v = similar(X, promote_type(Ta, Tx))
-    @simd for i in 1:nX
+    @simd for i = 1:nX
         @inbounds v[i] = A.vals[i] * X[A.perm[i]]
     end
     v
@@ -55,7 +56,7 @@ function *(X::Adjoint{Tx,<:AbstractVector{Tx}}, A::PermMatrix{Ta}) where {Tx,Ta}
     nX = length(X)
     nX == size(A, 1) || throw(DimensionMismatch())
     v = similar(X, promote_type(Tx, Ta))
-    @simd for i in 1:nX
+    @simd for i = 1:nX
         @inbounds v[A.perm[i]] = A.vals[i] * X[i]
     end
     v
@@ -112,7 +113,8 @@ end
 # end
 
 ############### Transpose, Adjoint for IMatrix ###############
-for MAT in [:AbstractArray, :AbstractVector, :Matrix, :SparseMatrixCSC, :PermMatrix, :IMatrix]
+for MAT in
+    [:AbstractArray, :AbstractVector, :Matrix, :SparseMatrixCSC, :PermMatrix, :IMatrix]
     @eval *(A::Adjoint{<:Any,<:$MAT}, D::IMatrix) = Adjoint(D * parent(A))
     @eval *(A::Transpose{<:Any,<:$MAT}, D::IMatrix) = Transpose(D * parent(A))
     if MAT != :AbstactVector
@@ -129,8 +131,8 @@ function *(A::PermMatrix, X::SparseMatrixCSC)
     perm = fast_invperm(A.perm)
     nzval = similar(X.nzval)
     rowval = similar(X.rowval)
-    @inbounds for j in 1:nX
-        @inbounds for k in X.colptr[j]:X.colptr[j+1]-1
+    @inbounds for j = 1:nX
+        @inbounds for k = X.colptr[j]:X.colptr[j+1]-1
             r = perm[X.rowval[k]]
             nzval[k] = X.nzval[k] * A.vals[r]
             rowval[k] = r
@@ -149,10 +151,10 @@ function *(X::SparseMatrixCSC, A::PermMatrix)
     rowval = similar(X.rowval)
     colptr[1] = 1
     z = 1
-    @inbounds for j in 1:nA
+    @inbounds for j = 1:nA
         pk = perm[j]
         va = A.vals[pk]
-        @inbounds @simd for k in X.colptr[pk]:X.colptr[pk+1]-1
+        @inbounds @simd for k = X.colptr[pk]:X.colptr[pk+1]-1
             nzval[z] = X.nzval[k] * va
             rowval[z] = X.rowval[k]
             z += 1
@@ -169,7 +171,7 @@ function mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal{T,Vector{T}}) 
     nX == nA || throw(DimensionMismatch())
     j = 1
     va = A.diag[1]
-    @inbounds for k in 1:nnz(X)
+    @inbounds for k = 1:nnz(X)
         if k == X.colptr[j]
             va = A.diag[j]
             j = j + 1
@@ -183,7 +185,7 @@ function mul!(Y::SparseMatrixCSC, A::Diagonal{T,Vector{T}}, X::SparseMatrixCSC) 
     nA = size(A, 2)
     mX, nX = size(X)
     mX == nA || throw(DimensionMismatch())
-    @inbounds @simd for i in 1:nnz(X)
+    @inbounds @simd for i = 1:nnz(X)
         Y.nzval[i] *= A.diag[X.rowval[i]]
     end
     Y

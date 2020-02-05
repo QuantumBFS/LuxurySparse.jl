@@ -75,7 +75,7 @@ end
 
 function getindex(coo::SparseMatrixCOO{Tv,Ti}, i::Ti, j::Ti) where {Tv,Ti}
     res = zero(Tv)
-    for k in 1:nnz(coo)
+    for k = 1:nnz(coo)
         if coo.is[k] == i && coo.js[k] == j
             res += coo.vs[k]
         end

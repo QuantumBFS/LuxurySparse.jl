@@ -58,7 +58,13 @@ else
 
 end # @static
 
-function SSparseMatrixCSC(m::Integer, n::Integer, colptr::SVector, rowval::SVector, nzval::SVector)
+function SSparseMatrixCSC(
+    m::Integer,
+    n::Integer,
+    colptr::SVector,
+    rowval::SVector,
+    nzval::SVector,
+)
     Tv = eltype(nzval)
     Ti = promote_type(eltype(colptr), eltype(rowval))
     SSparseMatrixCSC{Tv,Ti,length(nzval),n + 1}(m, n, colptr, rowval, nzval)
@@ -72,7 +78,7 @@ size(spm::SSparseMatrixCSC{Tv,Ti,NNZ,NP}) where {Tv,Ti,NNZ,NP} = (spm.m, NP - 1)
 function getindex(ssp::SSparseMatrixCSC{Tv}, i, j) where {Tv}
     S = ssp.colptr[j]
     E = ssp.colptr[j+1] - 1
-    for ii in S:E
+    for ii = S:E
         if i == ssp.rowval[ii]
             return ssp.nzval[ii]
         end
@@ -90,7 +96,7 @@ function SparseArrays.findnz(S::SSparseMatrixCSC{Tv,Ti}) where {Tv,Ti}
     V = Vector{Tv}(undef, numnz)
 
     count = 1
-    @inbounds for col in 1:S.n, k in S.colptr[col]:(S.colptr[col+1]-1)
+    @inbounds for col = 1:S.n, k = S.colptr[col]:(S.colptr[col+1]-1)
         I[count] = S.rowval[k]
         J[count] = col
         V[count] = S.nzval[k]

@@ -16,7 +16,11 @@ using SparseArrays
         @test out ≈ Matrix(M) .* M1
     end
 
-    @testset "PermMatrix .* $(nameof(typeof(M)))" for M in [rand(3, 3), pmrand(3), sprand(3, 3, 0.5)]
+    @testset "PermMatrix .* $(nameof(typeof(M)))" for M in [
+        rand(3, 3),
+        pmrand(3),
+        sprand(3, 3, 0.5),
+    ]
         M1 = pmrand(3)
         out = M1 .* M
         @test typeof(out) <: PermMatrix
@@ -27,7 +31,11 @@ using SparseArrays
         @test out ≈ M .* Matrix(M1)
     end
 
-    @testset "IMatrix .* $(nameof(typeof(M)))" for M in [rand(3, 3), pmrand(3), sprand(3, 3, 0.5)]
+    @testset "IMatrix .* $(nameof(typeof(M)))" for M in [
+        rand(3, 3),
+        pmrand(3),
+        sprand(3, 3, 0.5),
+    ]
         eye = IMatrix{3}()
         out = eye .* M
         @test typeof(out) <: Diagonal

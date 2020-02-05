@@ -32,6 +32,12 @@ bg["General-CY"] = @benchmarkable general_controlled_gates(16, [P1], [7], [PAULI
 ##### TOFFOLI gate
 bg = bench["Toffoli Gate"] = BenchmarkGroup()
 bg["Toffoli"] = @benchmarkable toffoligate(16, 2, 3, 1)
-bg["General-Toffoli"] = @benchmarkable general_controlled_gates(16, [P1, P1], [2, 3], [PAULI_X], [1])
+bg["General-Toffoli"] = @benchmarkable general_controlled_gates(
+    16,
+    [P1, P1],
+    [2, 3],
+    [PAULI_X],
+    [1],
+)
 
 showall(run(bench, verbose = true))

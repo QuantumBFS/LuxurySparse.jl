@@ -4,7 +4,8 @@ using SparseArrays
 using SparseArrays.HigherOrderFns
 using LinearAlgebra
 using LinearAlgebra: StructuredMatrixStyle
-using Base.Broadcast: BroadcastStyle, AbstractArrayStyle, Broadcasted, DefaultArrayStyle, materialize!
+using Base.Broadcast:
+    BroadcastStyle, AbstractArrayStyle, Broadcasted, DefaultArrayStyle, materialize!
 
 @static if VERSION < v"1.2"
     Base.size(bc::Broadcasted) = map(length, axes(bc))
@@ -17,17 +18,37 @@ LinearAlgebra.fzero(S::IMatrix) = zero(eltype(S))
 Broadcast.BroadcastStyle(::Type{<:IMatrix}) = StructuredMatrixStyle{Diagonal}()
 
 # specialize identity
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{N,T}, b::IMatrix) where {N,T} =
-    IMatrix{N,T}()
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix, b::AbstractVecOrMat) =
-    Diagonal(b)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::AbstractVecOrMat, b::IMatrix) =
-    Diagonal(a)
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    a::IMatrix{N,T},
+    b::IMatrix,
+) where {N,T} = IMatrix{N,T}()
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    a::IMatrix,
+    b::AbstractVecOrMat,
+) = Diagonal(b)
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    a::AbstractVecOrMat,
+    b::IMatrix,
+) = Diagonal(a)
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::IMatrix{S}, b::Number) where {S} =
-    Diagonal(Fill(b, S))
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), a::Number, b::IMatrix{S}) where {S} =
-    Diagonal(Fill(a, S))
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    a::IMatrix{S},
+    b::Number,
+) where {S} = Diagonal(Fill(b, S))
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    a::Number,
+    b::IMatrix{S},
+) where {S} = Diagonal(Fill(a, S))
 
 # specialize perm matrix
 function _broadcast_perm_prod(A::PermMatrix, B::AbstractMatrix)
@@ -40,15 +61,25 @@ function _broadcast_perm_prod(A::PermMatrix, B::AbstractMatrix)
     return dest
 end
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::AbstractMatrix) =
-    _broadcast_perm_prod(A, B)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::AbstractMatrix, B::PermMatrix) =
-    _broadcast_perm_prod(B, A)
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    A::PermMatrix,
+    B::AbstractMatrix,
+) = _broadcast_perm_prod(A, B)
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    A::AbstractMatrix,
+    B::PermMatrix,
+) = _broadcast_perm_prod(B, A)
 Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::PermMatrix) =
     _broadcast_perm_prod(A, B)
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::IMatrix) = Diagonal(A)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::IMatrix, B::PermMatrix) = Diagonal(B)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::IMatrix) =
+    Diagonal(A)
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::IMatrix, B::PermMatrix) =
+    Diagonal(B)
 
 function _broadcast_diag_perm_prod(A::Diagonal, B::PermMatrix)
     dest = similar(A)
@@ -71,8 +102,16 @@ Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::Perm
 
 # TODO: commit this upstream
 # specialize Diagonal .* SparseMatrixCSC
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::SparseMatrixCSC) =
-    Broadcast.broadcasted(*, A, Diagonal(B))
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    A::Diagonal,
+    B::SparseMatrixCSC,
+) = Broadcast.broadcasted(*, A, Diagonal(B))
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::SparseMatrixCSC, B::Diagonal) =
-    Broadcast.broadcasted(*, Diagonal(A), B)
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    A::SparseMatrixCSC,
+    B::Diagonal,
+) = Broadcast.broadcasted(*, Diagonal(A), B)
