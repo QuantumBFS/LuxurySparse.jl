@@ -36,7 +36,7 @@ else
 
     static version of SparseMatrixCSC
     """
-    struct SSparseMatrixCSC{Tv,Ti<:Integer,NNZ,NP} <: AbstractSparseMatrixCSC{Tv,Ti}
+    struct SSparseMatrixCSC{Tv,Ti<:Integer,NNZ,NP} <: SparseArrays.AbstractSparseMatrixCSC{Tv,Ti}
         m::Int                  # Number of rows
         n::Int                  # Number of columns
         colptr::SVector{NP,Ti}      # Column i is in colptr[i]:(colptr[i+1]-1)
@@ -55,7 +55,8 @@ else
             new(Int(m), Int(n), colptr, rowval, nzval)
         end
     end
-
+    SparseArrays.getcolptr(M::SSparseMatrixCSC) = M.colptr
+    SparseArrays.rowvals(M::SSparseMatrixCSC) = M.rowval
 end # @static
 
 function SSparseMatrixCSC(
