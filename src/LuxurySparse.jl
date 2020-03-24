@@ -1,6 +1,7 @@
 module LuxurySparse
 
 using LinearAlgebra, SparseArrays, Random
+using SparseArrays: AbstractSparseMatrixCSC
 using StaticArrays: SVector, SMatrix, SDiagonal, SArray
 using Base: @propagate_inbounds
 
