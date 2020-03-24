@@ -55,7 +55,8 @@ else
             new(Int(m), Int(n), colptr, rowval, nzval)
         end
     end
-
+    SparseArrays.getcolptr(M::SSparseMatrixCSC) = M.colptr
+    SparseArrays.rowvals(M::SSparseMatrixCSC) = M.rowval
 end # @static
 
 function SSparseMatrixCSC(
