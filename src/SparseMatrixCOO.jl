@@ -42,7 +42,7 @@ mutable struct SparseMatrixCOO{Tv,Ti} <: AbstractSparseMatrix{Tv,Ti}
         n::Int,
     ) where {Ti,Tv}
         length(is) == length(js) == length(vs) ||
-        throw(ArgumentError("Input row, col, data should be equal size."))
+            throw(ArgumentError("Input row, col, data should be equal size."))
         new{Tv,Ti}(is, js, vs, m, n)
     end
 end
@@ -54,7 +54,7 @@ copy(coo::SparseMatrixCOO{Tv,Ti}) where {Tv,Ti} =
     SparseMatrixCOO{Tv,Ti}(copy(coo.is), copy(coo.js), copy(coo.vs), coo.m, coo.n)
 function copyto!(A::SparseMatrixCOO{Tv,Ti}, B::SparseMatrixCOO{Tv,Ti}) where {Tv,Ti}
     size(A) == size(B) && nnz(A) == nnz(B) ||
-    throw(MethodError("size/nnz of two coo matrices do not match!"))
+        throw(MethodError("size/nnz of two coo matrices do not match!"))
     copyto!(A.is, B.is)
     copyto!(A.js, B.js)
     copyto!(A.vs, B.vs)
