@@ -138,7 +138,8 @@ function *(A::PermMatrix, X::SparseMatrixCSC)
             rowval[k] = r
         end
     end
-    SparseMatrixCSC(mX, nX, X.colptr, rowval, nzval)
+    sp = SparseMatrixCSC(mX, nX, X.colptr, rowval, nzval)
+    SparseMatrixCSC(sp')'
 end
 
 function *(X::SparseMatrixCSC, A::PermMatrix)

@@ -122,3 +122,9 @@ end
         end
     end
 end
+
+@testset "fallback-issue#Yao#127" begin
+    pm = pmrand(512)
+    sp = sprand(512, 512, 0.05)
+    @test nnz(pm * sp - SparseMatrixCSC(pm) * sp) == 0
+end
