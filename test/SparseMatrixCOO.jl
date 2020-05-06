@@ -46,3 +46,10 @@ end
     @test coo1 / 2 isa SparseMatrixCOO
     @test 2 * coo1 isa SparseMatrixCOO
 end
+
+@testset "setindex" begin
+    coo[1, 1] = 0.2
+    @test coo.is[end] == 1
+    @test coo.js[end] == 1
+    @test coo.vs[end] == 0.2
+end
