@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>Tutorial · LuxurySparse.jl</title><script>(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-89508993-1', 'auto');
+ga('send', 'pageview');
+</script><link rel="canonical" href="https://quantumbfs.github.io/LuxurySparse.jl/latest/tutorial/index.html"/><link href="https://cdnjs.cloudflare.com/ajax/libs/normalize/4.2.0/normalize.min.css" rel="stylesheet" type="text/css"/><link href="https://fonts.googleapis.com/css?family=Lato|Roboto+Mono" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.2.0/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link href="../assets/documenter.css" rel="stylesheet" type="text/css"/></head><body><nav class="toc"><h1>LuxurySparse.jl</h1><select id="version-selector" onChange="window.location.href=this.value" style="visibility: hidden"></select><form class="search" id="search-form" action="../search/"><input id="search-query" name="q" type="text" placeholder="Search docs"/></form><ul><li><a class="toctext" href="../">Home</a></li><li class="current"><a class="toctext" href>Tutorial</a><ul class="internal"><li><a class="toctext" href="#Generalized-permutation-matrix-1">Generalized permutation matrix</a></li><li><a class="toctext" href="#Identity-Matrix-1">Identity Matrix</a></li></ul></li><li><a class="toctext" href="../luxurysparse/">Manual</a></li></ul></nav><article id="docs"><header><nav><ul><li><a href>Tutorial</a></li></ul><a class="edit-page" href="https://github.com/QuantumBFS/LuxurySparse.jl/blob/master/docs/src/tutorial.md"><span class="fa"></span> Edit on GitHub</a></nav><hr/><div id="topbar"><span>Tutorial</span><a class="fa fa-bars" href="#"></a></div></header><h1><a class="nav-anchor" id="Tutorial-1" href="#Tutorial-1">Tutorial</a></h1><h2><a class="nav-anchor" id="Generalized-permutation-matrix-1" href="#Generalized-permutation-matrix-1">Generalized permutation matrix</a></h2><h3><a class="nav-anchor" id="Example:-Control-Y-Gate-in-Quantum-simulation-1" href="#Example:-Control-Y-Gate-in-Quantum-simulation-1">Example: Control-Y Gate in Quantum simulation</a></h3><p><a href="https://en.wikipedia.org/wiki/Generalized_permutation_matrix">Generalized permutation matrices</a> are frequently used in fields such as quantum computation, group thoery. Here we see an example of Control-Y Gate</p><div>\[\left(\begin{matrix}
+1 &amp; 0 &amp; 0 &amp; 0\\
+0 &amp; 1 &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; 0 &amp; -i\\
+0 &amp; 0 &amp; i &amp; 0\\
+\end{matrix}\right)\]</div><p>This data structure can be represented in the form of <code>PermMatrix</code></p><ul><li>perm: [1, 2, 4, 3]</li><li>vals: [1, 1, -i, i]</li></ul><p>Now let&#39;s do a benchmark to feel the speed up</p><div><pre><code class="language-julia">using LuxurySparse: PermMatrix
+pm = PermMatrix([1,2,4,3], [1,1,-im,im])</code></pre><pre><code class="language-none">4×4 PermMatrix{Complex{Int64},Int64,Array{Complex{Int64},1},Array{Int64,1}}:
+ 1+0im   0      0      0
+  0     1+0im   0      0
+  0      0      0     0-1im
+  0      0     0+1im   0</code></pre></div><pre><code class="language-julia">v = randn(4)
+@benchmark $pm*$v</code></pre><pre><code class="language-none">BenchmarkTools.Trial: 
+  memory estimate:  144 bytes
+  allocs estimate:  1
+  --------------
+  minimum time:     36.789 ns (0.00% GC)
+  median time:      38.816 ns (0.00% GC)
+  mean time:        49.227 ns (10.20% GC)
+  maximum time:     1.629 μs (89.36% GC)
+  --------------
+  samples:          10000
+  evals/sample:     992</code></pre><p>As a comparison</p><pre><code class="language-julia">sp = SparseMatrixCSC(pm)
+@benchmark $sp*$v</code></pre><pre><code class="language-none">BenchmarkTools.Trial: 
+  memory estimate:  144 bytes
+  allocs estimate:  1
+  --------------
+  minimum time:     64.578 ns (0.00% GC)
+  median time:      65.769 ns (0.00% GC)
+  mean time:        74.292 ns (6.80% GC)
+  maximum time:     1.419 μs (87.15% GC)
+  --------------
+  samples:          10000
+  evals/sample:     979</code></pre><h2><a class="nav-anchor" id="Identity-Matrix-1" href="#Identity-Matrix-1">Identity Matrix</a></h2><p>Identity matrix is static, which is defined as</p><pre><code class="language-none">struct IMatrix{N, Tv} &lt;: AbstractMatrix{Tv} end</code></pre><p>With this type, the <a href="https://en.wikipedia.org/wiki/Kronecker_product">Kronecker product</a> operation can be much faster. Now let&#39;s see a benchmark</p><div><pre><code class="language-julia">using LuxurySparse: IMatrix
+Id = IMatrix{1, Float64}()
+B = randn(7,7);</code></pre></div><pre><code class="language-julia">@benchmark kron($Id, $B)</code></pre><pre><code class="language-none">BenchmarkTools.Trial: 
+  memory estimate:  0 bytes
+  allocs estimate:  0
+  --------------
+  minimum time:     1.642 ns (0.00% GC)
+  median time:      1.651 ns (0.00% GC)
+  mean time:        1.658 ns (0.00% GC)
+  maximum time:     32.101 ns (0.00% GC)
+  --------------
+  samples:          10000
+  evals/sample:     1000</code></pre><p>With the help of Julia&#39;s multiple dispatch, the above trivil <code>kron</code> operation can be avoided.</p><footer><hr/><a class="previous" href="../"><span class="direction">Previous</span><span class="title">Home</span></a><a class="next" href="../luxurysparse/"><span class="direction">Next</span><span class="title">Manual</span></a></footer></article></body></html>
