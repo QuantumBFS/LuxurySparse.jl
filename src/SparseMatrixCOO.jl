@@ -61,7 +61,7 @@ function copyto!(A::SparseMatrixCOO{Tv,Ti}, B::SparseMatrixCOO{Tv,Ti}) where {Tv
     A
 end
 
-function SparseMatrixCOO{T}(::UndefInitializer, m::Int, n::Int, nnz::Int=0) where T
+function SparseMatrixCOO{T}(::UndefInitializer, m::Int, n::Int, nnz::Int = 0) where {T}
     is = Vector{Int}(undef, nnz)
     js = Vector{Int}(undef, nnz)
     vs = Vector{T}(undef, nnz)
@@ -103,7 +103,7 @@ end
 findnz(coo::SparseMatrixCOO) = (coo.is, coo.js, coo.vs)
 isdense(::SparseMatrixCOO) = false
 
-function Base.setindex!(coo::SparseMatrixCOO{Tv, Ti}, v::Tv, i::Ti, j::Ti) where {Tv, Ti}
+function Base.setindex!(coo::SparseMatrixCOO{Tv,Ti}, v::Tv, i::Ti, j::Ti) where {Tv,Ti}
     push!(coo.is, i)
     push!(coo.js, j)
     push!(coo.vs, v)
