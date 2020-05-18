@@ -52,7 +52,7 @@ function size(A::PermMatrix, d::Integer)
         return 1
     end
 end
-getindex(M::PermMatrix, i::Integer, j::Integer) = M.perm[i] == j ? M.vals[i] : 0
+getindex(M::PermMatrix{Tv}, i::Integer, j::Integer) where Tv = M.perm[i] == j ? M.vals[i] : zero(Tv)
 function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
     if M.perm[i] == j
         @inbounds M.vals[i] = val
