@@ -13,10 +13,10 @@ ga('send', 'pageview');
 0 &amp; 0 &amp; i &amp; 0\\
 \end{matrix}\right)\]</div><p>This data structure can be represented in the form of <code>PermMatrix</code></p><ul><li>perm: [1, 2, 4, 3]</li><li>vals: [1, 1, -i, i]</li></ul><p>Now let&#39;s do a benchmark to feel the speed up</p><div><pre><code class="language-julia">using LuxurySparse: PermMatrix
 pm = PermMatrix([1,2,4,3], [1,1,-im,im])</code></pre><pre><code class="language-none">4×4 PermMatrix{Complex{Int64},Int64,Array{Complex{Int64},1},Array{Int64,1}}:
- 1+0im   0      0      0
-  0     1+0im   0      0
-  0      0      0     0-1im
-  0      0     0+1im   0</code></pre></div><pre><code class="language-julia">v = randn(4)
+ 1+0im  0+0im  0+0im  0+0im
+ 0+0im  1+0im  0+0im  0+0im
+ 0+0im  0+0im  0+0im  0-1im
+ 0+0im  0+0im  0+1im  0+0im</code></pre></div><pre><code class="language-julia">v = randn(4)
 @benchmark $pm*$v</code></pre><pre><code class="language-none">BenchmarkTools.Trial: 
   memory estimate:  144 bytes
   allocs estimate:  1
