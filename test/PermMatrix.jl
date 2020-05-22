@@ -26,7 +26,7 @@ v = [0.5, 0.3im, 0.2, 1.0]
     @test p0.perm !== p1.perm
     @test p0.vals !== p1.vals
     @test p1[2, 2] === 0.0im
-    @test p1[1, 1] === 0.1+0.0im
+    @test p1[1, 1] === 0.1 + 0.0im
 end
 
 @testset "linalg" begin
