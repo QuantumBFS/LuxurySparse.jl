@@ -6,7 +6,7 @@ IMatrix(A::AbstractMatrix{T}) where {T} =
 
 ################## To Diagonal ######################
 Diagonal(A::PermMatrix) = Diagonal(diag(A))
-Diagonal(A::IMatrix) = Eye(size(A, 1))
+Diagonal(A::IMatrix{N,T}) where {N,T} = Diagonal{T}(ones(T, N))
 Diagonal{T}(::IMatrix{N}) where {T,N} = Diagonal{T}(ones(T, N))
 
 ################## To SparseMatrixCSC ######################

@@ -1,4 +1,4 @@
-using Test, Random, FillArrays
+using Test, Random
 using LuxurySparse
 using SparseArrays
 using LinearAlgebra
@@ -33,7 +33,7 @@ end
     end
     @test Diagonal(p1) == p1
 
-    @test SparseMatrixCSC(Diagonal(Fill(2, 4))) ≈ Diagonal(Fill(2, 4))
+    @test SparseMatrixCSC(Diagonal(fill(2, 4))) ≈ Diagonal(fill(2, 4))
 end
 
 @testset "sparse" begin
