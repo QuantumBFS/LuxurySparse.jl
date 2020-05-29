@@ -1,4 +1,3 @@
-using FillArrays
 using LuxurySparse
 using SparseArrays
 using SparseArrays.HigherOrderFns
@@ -42,13 +41,13 @@ Broadcast.broadcasted(
     ::typeof(*),
     a::IMatrix{S},
     b::Number,
-) where {S} = Diagonal(Fill(b, S))
+) where {S} = Diagonal(fill(b, S))
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),
     a::Number,
     b::IMatrix{S},
-) where {S} = Diagonal(Fill(a, S))
+) where {S} = Diagonal(fill(a, S))
 
 # specialize perm matrix
 function _broadcast_perm_prod(A::PermMatrix, B::AbstractMatrix)

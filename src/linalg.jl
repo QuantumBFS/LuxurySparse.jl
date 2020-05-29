@@ -1,6 +1,6 @@
 import Base: inv
 import LinearAlgebra: det, diag, logdet, mul!, lmul!, rmul!, rdiv!
-using LinearAlgebra, FillArrays
+using LinearAlgebra
 
 ####### linear algebra  ######
 inv(M::IMatrix) = M
