@@ -103,9 +103,9 @@ end
 findnz(coo::SparseMatrixCOO) = (coo.is, coo.js, coo.vs)
 isdense(::SparseMatrixCOO) = false
 
-function Base.setindex!(coo::SparseMatrixCOO{Tv,Ti}, v::Tv, i::Ti, j::Ti) where {Tv,Ti}
+function Base.setindex!(coo::SparseMatrixCOO{Tv,Ti}, v, i::Ti, j::Ti) where {Tv,Ti}
     push!(coo.is, i)
     push!(coo.js, j)
-    push!(coo.vs, v)
+    push!(coo.vs, convert(Tv, v))
     return coo
 end
