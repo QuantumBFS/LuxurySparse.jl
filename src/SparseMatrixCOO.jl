@@ -103,7 +103,12 @@ end
 findnz(coo::SparseMatrixCOO) = (coo.is, coo.js, coo.vs)
 isdense(::SparseMatrixCOO) = false
 
-Base.@propagate_inbounds function Base.setindex!(coo::SparseMatrixCOO{Tv,Ti}, v, i::Ti, j::Ti) where {Tv,Ti}
+Base.@propagate_inbounds function Base.setindex!(
+    coo::SparseMatrixCOO{Tv,Ti},
+    v,
+    i::Ti,
+    j::Ti,
+) where {Tv,Ti}
     @boundscheck (1 <= i <= coo.m) && (1 <= j <= coo.n) || throw(BoundsError(coo, (i, j)))
 
     push!(coo.is, i)
