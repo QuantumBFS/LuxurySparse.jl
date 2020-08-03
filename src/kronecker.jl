@@ -281,7 +281,7 @@ function kron(A::SparseMatrixCSC{T}, B::PermMatrix{Tb}) where {T<:Number,Tb<:Num
                 nzval[z] = A.nzval[r] * bval
                 z += 1
             end
-            colptr[(i - 1) * nB+k+1] = z
+            colptr[(i-1)*nB+k+1] = z
         end
     end
     SparseMatrixCSC(mA * nB, nA * nB, colptr, rowval, nzval)
