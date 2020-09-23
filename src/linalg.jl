@@ -170,14 +170,10 @@ function mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal{T,Vector{T}}) 
     nA = size(A, 1)
     mX, nX = size(X)
     nX == nA || throw(DimensionMismatch())
-    j = 1
-    va = A.diag[1]
-    @inbounds for k = 1:nnz(X)
-        if k == X.colptr[j]
-            va = A.diag[j]
-            j = j + 1
+    @inbounds for j = 1:nA
+        for k = X.colptr[j]:X.colptr[j+1]-1
+            Y.nzval[k] *= A.diag[j]
         end
-        Y.nzval[k] *= va
     end
     Y
 end
