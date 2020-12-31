@@ -131,6 +131,6 @@ end
 
 @testset "regression test" begin
     pop = sparse([2, 3], [4, 5], [1, √2], 5, 5)
-    zop = Diagonal([0, 1/2, 1, -1/2, 0])
-    @test (pop * zop)[2,4] == -0.5
+    zop = Diagonal([0, 1 / 2, 1, -1 / 2, 0])
+    @test (pop*zop)[2, 4] == -0.5
 end
