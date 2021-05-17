@@ -1,6 +1,7 @@
 # LuxurySparse.jl
 
-[![Build Status](https://travis-ci.org/QuantumBFS/LuxurySparse.jl.svg?branch=master)](https://travis-ci.org/QuantumBFS/LuxurySparse.jl)
+[![Build Status](https://github.com/QuantumBFS/LuxurySparse.jl/workflows/CI/badge.svg)](https://github.com/QuantumBFS/LuxurySparse.jl/actions)
+[![Codecov](https://codecov.io/gh/QuantumBFS/LuxurySparse.jl/branch/master/graph/badge.svg)](https://codecov.io/gh/QuantumBFS/LuxurySparse.jl)
 
 High performance extension for sparse matrices.
 
