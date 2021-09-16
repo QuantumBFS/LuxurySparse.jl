@@ -81,7 +81,7 @@ function allocated_coo(::Type{T}, M::Int, N::Int, nnz::Int) where {T}
     SparseMatrixCOO{T}(undef, M, N, nnz)
 end
 
-function getindex(coo::SparseMatrixCOO{Tv,Ti}, i::Ti, j::Ti) where {Tv,Ti}
+function getindex(coo::SparseMatrixCOO{Tv,Ti}, i::Integer, j::Integer) where {Tv,Ti}
     res = zero(Tv)
     for k = 1:nnz(coo)
         if coo.is[k] == i && coo.js[k] == j
@@ -110,8 +110,8 @@ isdense(::SparseMatrixCOO) = false
 Base.@propagate_inbounds function Base.setindex!(
     coo::SparseMatrixCOO{Tv,Ti},
     v,
-    i::Ti,
-    j::Ti,
+    i::Integer,
+    j::Integer,
 ) where {Tv,Ti}
     @boundscheck (1 <= i <= coo.m) && (1 <= j <= coo.n) || throw(BoundsError(coo, (i, j)))
 
