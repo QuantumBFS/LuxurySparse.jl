@@ -61,7 +61,12 @@ function copyto!(A::SparseMatrixCOO{Tv,Ti}, B::SparseMatrixCOO{Tv,Ti}) where {Tv
     A
 end
 
-function SparseMatrixCOO{Tv, Ti}(::UndefInitializer, m::Int, n::Int, nnz::Int = 0) where {Tv, Ti <: Integer}
+function SparseMatrixCOO{Tv,Ti}(
+    ::UndefInitializer,
+    m::Int,
+    n::Int,
+    nnz::Int = 0,
+) where {Tv,Ti<:Integer}
     is = Vector{Ti}(undef, nnz)
     js = Vector{Ti}(undef, nnz)
     vs = Vector{Tv}(undef, nnz)
@@ -69,7 +74,7 @@ function SparseMatrixCOO{Tv, Ti}(::UndefInitializer, m::Int, n::Int, nnz::Int = 
 end
 
 function SparseMatrixCOO{T}(::UndefInitializer, m::Int, n::Int, nnz::Int = 0) where {T}
-    return SparseMatrixCOO{T, Int}(undef, m, n, nnz)
+    return SparseMatrixCOO{T,Int}(undef, m, n, nnz)
 end
 
 """

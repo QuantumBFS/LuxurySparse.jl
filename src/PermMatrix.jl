@@ -23,7 +23,11 @@ struct PermMatrix{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} 
         vals::Vv,
     ) where {Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}}
         if length(perm) != length(vals)
-            throw(DimensionMismatch("permutation ($(length(perm))) and multiply ($(length(vals))) length mismatch."))
+            throw(
+                DimensionMismatch(
+                    "permutation ($(length(perm))) and multiply ($(length(vals))) length mismatch.",
+                ),
+            )
         end
         new{Tv,Ti,Vv,Vi}(perm, vals)
     end

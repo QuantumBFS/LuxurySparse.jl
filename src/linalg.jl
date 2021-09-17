@@ -21,26 +21,46 @@ end
 ####### multiply ###########
 *(A::IMatrix{N}, B::AbstractVector) where {N} =
     size(A, 2) == size(B, 1) ? B :
-    throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $((size(B, 1), 1))"))
+    throw(
+        DimensionMismatch(
+            "matrix A has dimensions $(size(A)), matrix B has dimensions $((size(B, 1), 1))",
+        ),
+    )
 
 for MATTYPE in
     [:AbstractMatrix, :StridedMatrix, :Diagonal, :SparseMatrixCSC, :Matrix, :PermMatrix]
     @eval *(A::IMatrix{N}, B::$MATTYPE) where {N} =
         N == size(B, 1) ? B :
-        throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
+        throw(
+            DimensionMismatch(
+                "matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))",
+            ),
+        )
 
     @eval *(A::$MATTYPE, B::IMatrix{N}) where {N} =
         size(A, 2) == N ? A :
-        throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
+        throw(
+            DimensionMismatch(
+                "matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))",
+            ),
+        )
 end
 
 *(A::Adjoint{T,<:AbstractVector{T}}, B::IMatrix) where {T} =
     size(A, 2) == size(B, 1) ? A :
-    throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
+    throw(
+        DimensionMismatch(
+            "matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))",
+        ),
+    )
 
 *(A::IMatrix, B::IMatrix) =
     size(A, 2) == size(B, 1) ? A :
-    throw(DimensionMismatch("matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))"))
+    throw(
+        DimensionMismatch(
+            "matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))",
+        ),
+    )
 
 
 ########## Multiplication #############
