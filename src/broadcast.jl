@@ -114,3 +114,11 @@ Broadcast.broadcasted(
     A::SparseMatrixCSC,
     B::Diagonal,
 ) = Broadcast.broadcasted(*, Diagonal(A), B)
+
+Broadcast.BroadcastStyle(::Type{T}) where T<:PermMatrix = StructuredMatrixStyle{T}()
+Broadcast.broadcasted(
+    ::StructuredMatrixStyle{PermMatrix{Tv,Ti,vTv,vTi}},
+    ::typeof(*),
+    a::PermMatrix,
+    b::Number,
+) where {Tv,Ti,vTv,vTi} = PermMatrix(a.perm, a.vals .* b)

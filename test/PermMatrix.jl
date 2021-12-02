@@ -91,3 +91,9 @@ end
     @test_throws BoundsError pm[3, 1] = 1.0
     @test pm[3, 4] == 1.0
 end
+
+@testset "broadcast" begin
+    pm = PermMatrix([3, 2, 4, 1], [0.2, 0.6, 0.1, 0.3])
+    res = pm .* 3im
+    @test res == PermMatrix([3, 2, 4, 1], [0.2, 0.6, 0.1, 0.3] .* 3im) && res isa PermMatrix
+end
