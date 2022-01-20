@@ -77,7 +77,7 @@ function size(spm::SSparseMatrixCSC{Tv,Ti,NNZ,NP}, i::Integer) where {Tv,Ti,NNZ,
 end
 size(spm::SSparseMatrixCSC{Tv,Ti,NNZ,NP}) where {Tv,Ti,NNZ,NP} = (spm.m, NP - 1)
 
-function getindex(ssp::SSparseMatrixCSC{Tv}, i, j) where {Tv}
+function getindex(ssp::SSparseMatrixCSC{Tv}, i::Integer, j::Integer) where {Tv}
     S = ssp.colptr[j]
     E = ssp.colptr[j+1] - 1
     for ii = S:E
