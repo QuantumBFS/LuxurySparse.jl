@@ -1,9 +1,6 @@
 using Test
-using LinearAlgebra
-using SparseArrays
+using LinearAlgebra, SparseArrays
 using LuxurySparse
-using Aqua
-Aqua.test_all(LuxurySparse)
 
 @testset "IMatrix" begin
     include("IMatrix.jl")
