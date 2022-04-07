@@ -114,3 +114,10 @@ Broadcast.broadcasted(
     A::SparseMatrixCSC,
     B::Diagonal,
 ) = Broadcast.broadcasted(*, Diagonal(A), B)
+
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    a::PermMatrix,
+    b::Number,
+) = PermMatrix(a.perm, a.vals .* b)
