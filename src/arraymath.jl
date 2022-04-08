@@ -38,7 +38,7 @@ import Base: *, /, ==, +, -, ≈
 #-(A::PermMatrix, B::PermMatrix) = PermMatrix(A.dv-B.dv, A.ev-B.ev)
 
 
-const IDP = Union{Diagonal,PermMatrix,IMatrix}
+const IDP = Union{PermMatrix,IMatrix}
 
 for op in [:+, :-, :(==), :≈]
     @eval begin
