@@ -45,26 +45,14 @@ end
 
 ########## Multiplication #############
 
-# NOTE: making them dry?
-# to vector
-function *(A::PermMatrix{Ta}, X::AbstractVector{Tx}) where {Ta,Tx}
-    nX = length(X)
-    nX == size(A, 2) || throw(DimensionMismatch())
-    v = similar(X, promote_type(Ta, Tx))
-    @simd for i = 1:nX
-        @inbounds v[i] = A.vals[i] * X[A.perm[i]]
-    end
-    v
-end
+function LinearAlgebra.mul!(Y::AbstractVector, A::PermMatrix, X::AbstractVector, alpha::Number, beta::Number)
+    length(X) == size(A, 2) || throw(DimensionMismatch("input X length does not match PermMatrix A"))
+    length(Y) == size(A, 2) || throw(DimensionMismatch("output Y length does not match PermMatrix A"))
 
-function *(X::Adjoint{Tx,<:AbstractVector{Tx}}, A::PermMatrix{Ta}) where {Tx,Ta}
-    nX = length(X)
-    nX == size(A, 1) || throw(DimensionMismatch())
-    v = similar(X, promote_type(Tx, Ta))
-    @simd for i = 1:nX
-        @inbounds v[A.perm[i]] = A.vals[i] * X[i]
+    @inbounds for I in eachindex(X)
+        Y[I] = A.vals[I] * X[A.perm[I]] * alpha + beta * Y[I]
     end
-    v
+    return Y
 end
 
 # to diagonal
