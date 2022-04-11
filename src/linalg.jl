@@ -45,14 +45,12 @@ end
 
 ########## Multiplication #############
 
-# NOTE: making them dry?
-# to vector
-function LinearAlgebra.mul!(Y::AbstractVector, A::PermMatrix, X::AbstractVector)
+function LinearAlgebra.mul!(Y::AbstractVector, A::PermMatrix, X::AbstractVector, alpha::Number, beta::Number)
     length(X) == size(A, 2) || throw(DimensionMismatch("input X length does not match PermMatrix A"))
     length(Y) == size(A, 2) || throw(DimensionMismatch("output Y length does not match PermMatrix A"))
 
     @inbounds for I in eachindex(X)
-        Y[I] = A.vals[I] * X[A.perm[I]]
+        Y[I] = A.vals[I] * X[A.perm[I]] * alpha + beta * Y[I]
     end
     return Y
 end
