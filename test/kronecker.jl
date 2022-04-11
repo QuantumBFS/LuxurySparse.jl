@@ -11,21 +11,18 @@ v = [0.5, 0.3im, 0.2, 1.0]
 dv = Diagonal(v)
 
 
-@testset "kron" begin
-    for source in [p1, sp, ds, dv, pm]
-        for target in [p1, sp, ds, dv, pm]
-            lres = kron(source, target)
-            rres = kron(target, source)
-            flres = kron(Matrix(source), Matrix(target))
-            frres = kron(Matrix(target), Matrix(source))
-            @test lres == flres
-            @test rres == frres
-            @test eltype(lres) == eltype(flres)
-            @test eltype(rres) == eltype(frres)
-            if !(target === ds && source === ds)
-                @test !(typeof(lres) <: StridedMatrix)
-                @test !(typeof(rres) <: StridedMatrix)
-            end
-        end
+@testset "kron(::$(typeof(source)), ::$(typeof(target)))" for source in [p1, sp, ds, dv, pm],
+                                      target in [p1, sp, ds, dv, pm]
+    lres = kron(source, target)
+    rres = kron(target, source)
+    flres = kron(Matrix(source), Matrix(target))
+    frres = kron(Matrix(target), Matrix(source))
+    @test lres == flres
+    @test rres == frres
+    @test eltype(lres) == eltype(flres)
+    @test eltype(rres) == eltype(frres)
+    if !(target === ds && source === ds)
+        @test !(typeof(lres) <: StridedMatrix)
+        @test !(typeof(rres) <: StridedMatrix)
     end
 end
