@@ -53,7 +53,7 @@ end
     @test coo.js[end] == 1
     @test coo.vs[end] == 0.2
 
-    S = SparseMatrixCOO{Float32, Cint}(Cint[], Cint[], Float32[], 5, 5)
+    S = SparseMatrixCOO{Float32,Cint}(Cint[], Cint[], Float32[], 5, 5)
     S[1, 1] = 3
     @test S[1, 1] == 3
 end
