@@ -101,7 +101,7 @@ end
 function *(X::AbstractMatrix, A::PermMatrix)
     mX, nX = size(X)
     nX == size(A, 1) || throw(DimensionMismatch())
-    return @views (A.vals'.*X)[:, fast_invperm(A.perm)]
+    return @views (transpose(A.vals) .* X)[:, fast_invperm(A.perm)]
 end
 
 # NOTE: this is just a temperory fix for v0.7. We should overload mul! in
