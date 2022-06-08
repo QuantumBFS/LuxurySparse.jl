@@ -19,12 +19,12 @@ dv = Diagonal(v)
     @test logdet(p1) == 0
     @test inv(pm) == inv(Matrix(pm))
 
-    for m in [pm, sp, p1, dv]
+    for m in Any[pm, sp, p1, dv]
         @test !(m |> isdense)
         @test !(m' |> isdense)
         @test !(transpose(m) |> isdense)
     end
-    for m in [ds, v]
+    for m in Any[ds, v]
         @test m |> isdense
         @test m' |> isdense
         @test transpose(m) |> isdense
@@ -32,9 +32,9 @@ dv = Diagonal(v)
 end
 
 @testset "multiply" begin
-    for source_ in [p1, sp, ds, dv, pm]
-        for target in [p1, sp, ds, dv, pm]
-            for source in [source_, source_', transpose(source_)]
+    for source_ in Any[p1, sp, ds, dv, pm]
+        for target in Any[p1, sp, ds, dv, pm]
+            for source in Any[source_, source_', transpose(source_)]
                 @test (source == target) == (Matrix(source) == Matrix(target))
                 @test (source == target) ≈ (Matrix(source) ≈ Matrix(target))
                 # *
@@ -93,7 +93,7 @@ end
 @testset "randn" begin
     Random.seed!(2)
     T = ComplexF64
-    for m in [sprand(T, 5, 5, 0.5)]
+    for m in Any[sprand(T, 5, 5, 0.5)]
         zm = zero(m)
         @test zm ≈ zeros(T, 5, 5)
         if VERSION < v"1.4.0"
@@ -104,7 +104,7 @@ end
             @test !(zm ≈ zeros(T, 5, 5))
         end
     end
-    for m in [pmrand(T, 5), Diagonal(randn(T, 5))]
+    for m in Any[pmrand(T, 5), Diagonal(randn(T, 5))]
         zm = zero(m)
         @test zm ≈ zeros(T, 5, 5)
         rand!(zm)
@@ -123,8 +123,8 @@ end
 end
 
 @testset "findnz" begin
-    for m in [p1, sp, ds, dv, pm]
-        for _m in [m, staticize(m)]
+    for m in Any[p1, sp, ds, dv, pm]
+        for _m in Any[m, staticize(m)]
             out = zeros(eltype(m), size(m)...)
             for (i, j, v) in zip(LuxurySparse.findnz(_m)...)
                 out[i, j] = v
