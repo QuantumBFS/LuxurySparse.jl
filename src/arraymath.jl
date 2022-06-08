@@ -37,38 +37,48 @@ import Base: *, /, ==, +, -, ≈
 #+(A::PermMatrix, B::PermMatrix) = PermMatrix(A.dv+B.dv, A.ev+B.ev)
 #-(A::PermMatrix, B::PermMatrix) = PermMatrix(A.dv-B.dv, A.ev-B.ev)
 
-
-const IDP = Union{PermMatrix,IMatrix}
-
-for op in [:+, :-, :(==), :≈]
+for op in [:+, :-]
+    for MT in [:IMatrix, :PermMatrix]
+        @eval begin
+            # IMatrix, PermMatrix - SparseMatrixCSC
+            $op(A::$MT, B::SparseMatrixCSC) = $op(SparseMatrixCSC(A), B)
+            $op(B::SparseMatrixCSC, A::$MT) = $op(B, SparseMatrixCSC(A))
+        end
+    end
     @eval begin
-        $op(A::IDP, B::SparseMatrixCSC) = $op(SparseMatrixCSC(A), B)
-        $op(B::SparseMatrixCSC, A::IDP) = $op(B, SparseMatrixCSC(A))
-
-        # intra-IDP
-        $op(A::PermMatrix, B::IDP) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
-        $op(A::IDP, B::PermMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
+        # IMatrix, PermMatrix - Diagonal
+        $op(d1::IMatrix, d2::Diagonal) = Diagonal($op(diag(d1), d2.diag))
+        $op(d1::Diagonal, d2::IMatrix) = Diagonal($op(d1.diag, diag(d2)))
+        $op(d1::PermMatrix, d2::Diagonal) = $op(SparseMatrixCSC(d1), d2)
+        $op(d1::Diagonal, d2::PermMatrix) = $op(d1, SparseMatrixCSC(d2))
+        # PermMatrix - IMatrix
+        $op(A::PermMatrix, B::IMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
+        $op(A::IMatrix, B::PermMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
         $op(A::PermMatrix, B::PermMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
     end
-
-    # intra-ID
-    if op in [:+, :-]
-        @eval begin
-            $op(d1::Diagonal, d2::IMatrix) = Diagonal($op(d1.diag, diag(d2)))
-            $op(d1::IMatrix, d2::Diagonal) = Diagonal($op(diag(d1), d2.diag))
-        end
-    else
-        @eval begin
-            $op(d1::IMatrix, d2::Diagonal) = $op(diag(d1), d2.diag)
-            $op(d1::Diagonal, d2::IMatrix) = $op(d1.diag, diag(d2))
-            $op(d1::IMatrix{Na}, d2::IMatrix{Nb}) where {Na,Nb} = $op(Na, Nb)
-        end
-    end
-
 end
-
-# NOTE: promote 2 at least as an integer
+# NOTE: promote to integer
 +(d1::IMatrix{Na,Ta}, d2::IMatrix{Nb,Tb}) where {Na,Nb,Ta,Tb} =
     d1 == d2 ? Diagonal(fill(promote_type(Ta, Tb, Int)(2), Na)) : throw(DimensionMismatch())
 -(d1::IMatrix{Na,Ta}, d2::IMatrix{Nb,Tb}) where {Na,Ta,Nb,Tb} =
     d1 == d2 ? spzeros(promote_type(Ta, Tb), Na, Na) : throw(DimensionMismatch())
+
+for MT in [:IMatrix, :PermMatrix]
+    @eval Base.:(==)(A::$MT, B::SparseMatrixCSC) = SparseMatrixCSC(A) == B
+    @eval Base.:(==)(A::SparseMatrixCSC, B::$MT) = A == SparseMatrixCSC(B)
+end
+Base.:(==)(d1::IMatrix, d2::Diagonal) = all(isone, d2.diag)
+Base.:(==)(d1::Diagonal, d2::IMatrix) = all(isone, d1.diag)
+Base.:(==)(d1::PermMatrix, d2::Diagonal) = SparseMatrixCSC(d1) == SparseMatrixCSC(d2)
+Base.:(==)(d1::Diagonal, d2::PermMatrix) = SparseMatrixCSC(d1) == SparseMatrixCSC(d2)
+Base.:(==)(A::IMatrix, B::PermMatrix) = SparseMatrixCSC(A) == SparseMatrixCSC(B)
+Base.:(==)(A::PermMatrix, B::IMatrix) = SparseMatrixCSC(A) == SparseMatrixCSC(B)
+
+for MT in [:IMatrix, :PermMatrix]
+    @eval Base.isapprox(A::$MT, B::SparseMatrixCSC; kwargs...) = isapprox(SparseMatrixCSC(A), B)
+    @eval Base.isapprox(A::SparseMatrixCSC, B::$MT; kwargs...) = isapprox(A, SparseMatrixCSC(B))
+    @eval Base.isapprox(d1::$MT, d2::Diagonal; kwargs...) = isapprox(diag(d1), d2.diag)
+    @eval Base.isapprox(d1::Diagonal, d2::$MT; kwargs...) = isapprox(d1.diag, diag(d2))
+end
+Base.isapprox(A::IMatrix, B::PermMatrix; kwargs...) = isapprox(SparseMatrixCSC(A), SparseMatrixCSC(B); kwargs...)
+Base.isapprox(A::PermMatrix, B::IMatrix; kwargs...) = isapprox(SparseMatrixCSC(A), SparseMatrixCSC(B); kwargs...)

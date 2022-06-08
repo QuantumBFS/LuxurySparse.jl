@@ -15,6 +15,9 @@ size(A::IMatrix{N}, i::Int) where {N} = N
 size(A::IMatrix{N}) where {N} = (N, N)
 getindex(A::IMatrix{N,T}, i::Integer, j::Integer) where {N,T} = T(i == j)
 
+Base.:(==)(d1::IMatrix{Na}, d2::IMatrix{Nb}) where {Na,Nb} = Na == Nb
+Base.isapprox(d1::IMatrix{Na}, d2::IMatrix{Nb}; kwargs...) where {Na,Nb} = Na == Nb
+
 ####### sparse matrix ######
 nnz(M::IMatrix{N}) where {N} = N
 nonzeros(M::IMatrix{N,T}) where {N,T} = ones(T, N)
