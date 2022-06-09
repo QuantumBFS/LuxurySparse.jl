@@ -35,6 +35,9 @@ end
     for source_ in Any[p1, sp, ds, dv, pm]
         for target in Any[p1, sp, ds, dv, pm]
             for source in Any[source_, source_', transpose(source_)]
+                @test (source == target) == (Matrix(source) == Matrix(target))
+                @test (source == target) ≈ (Matrix(source) ≈ Matrix(target))
+                # *
                 lres = source * target
                 rres = target * source
                 flres = Matrix(source) * Matrix(target)
@@ -49,6 +52,14 @@ end
                     @test lres |> isdense == false
                     @test lres |> isdense == false
                 end
+
+                # +, -
+                lres2 = source + target
+                rres2 = target - source
+                flres2 = Matrix(source) + Matrix(target)
+                frres2 = Matrix(target) - Matrix(source)
+                @test lres2 ≈ flres2
+                @test rres2 ≈ frres2
             end
         end
     end

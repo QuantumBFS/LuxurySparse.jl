@@ -44,6 +44,9 @@ function PermMatrix(
     PermMatrix{Tv,Ti,Vv,Vi}(perm, vals)
 end
 
+Base.:(==)(d1::PermMatrix, d2::PermMatrix) = SparseMatrixCSC(d1) == SparseMatrixCSC(d2)
+Base.isapprox(d1::PermMatrix, d2::PermMatrix; kwargs...) = isapprox(SparseMatrixCSC(d1), SparseMatrixCSC(d2); kwargs...)
+
 ################# Array Functions ##################
 
 size(M::PermMatrix) = (length(M.perm), length(M.perm))

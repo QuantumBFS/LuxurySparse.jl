@@ -95,13 +95,14 @@ end
 # to matrix
 function *(A::PermMatrix, X::AbstractMatrix)
     size(X, 1) == size(A, 2) || throw(DimensionMismatch())
-    return @views A.vals .* X[A.perm, :]   # this may be inefficient for sparse CSC matrix.
+    return A.vals .* view(X,A.perm,:)   # this may be inefficient for sparse CSC matrix.
 end
 
 function *(X::AbstractMatrix, A::PermMatrix)
     mX, nX = size(X)
     nX == size(A, 1) || throw(DimensionMismatch())
-    return @views (transpose(A.vals) .* X)[:, fast_invperm(A.perm)]
+    perm = fast_invperm(A.perm)
+    return transpose(view(A.vals, perm)) .* view(X, :, perm)
 end
 
 # NOTE: this is just a temperory fix for v0.7. We should overload mul! in
