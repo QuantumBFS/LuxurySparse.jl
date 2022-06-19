@@ -24,11 +24,11 @@ dv = Diagonal(v)
 end
 
 @testset "conversion" begin
-    for mat in [p1, pm, dv]
+    for mat in Any[p1, pm, dv]
         @test mat == SparseMatrixCSC(mat)
         @test mat == Matrix(mat)
     end
-    for mat in [p1, pm, dv]
+    for mat in Any[p1, pm, dv]
         @test mat == PermMatrix(mat)
     end
     @test Diagonal(p1) == p1
@@ -42,7 +42,7 @@ end
 end
 
 @testset "linalg" begin
-    for op in [conj, real, transpose, copy, inv]
+    for op in Any[conj, real, transpose, copy, inv]
         @test op(p1) == Matrix(I, 4, 4)
         @test typeof(op(p1)) == typeof(p1)
     end

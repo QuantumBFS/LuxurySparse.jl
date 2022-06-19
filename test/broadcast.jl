@@ -5,7 +5,7 @@ using SparseArrays
 
 @testset "broadcast *" begin
 
-    @testset "Diagonal .* $(nameof(typeof(M)))" for M in [pmrand(3)]
+    @testset "Diagonal .* $(nameof(typeof(M)))" for M in Any[pmrand(3)]
         M1 = Diagonal(rand(3))
         out = M1 .* M
         @test typeof(out) <: Diagonal
@@ -16,7 +16,7 @@ using SparseArrays
         @test out ≈ Matrix(M) .* M1
     end
 
-    @testset "PermMatrix .* $(nameof(typeof(M)))" for M in [
+    @testset "PermMatrix .* $(nameof(typeof(M)))" for M in Any[
         rand(3, 3),
         pmrand(3),
         sprand(3, 3, 0.5),
@@ -31,7 +31,7 @@ using SparseArrays
         @test out ≈ M .* Matrix(M1)
     end
 
-    @testset "IMatrix .* $(nameof(typeof(M)))" for M in [
+    @testset "IMatrix .* $(nameof(typeof(M)))" for M in Any[
         rand(3, 3),
         pmrand(3),
         sprand(3, 3, 0.5),
@@ -52,18 +52,22 @@ using SparseArrays
     @test d .* sp ≈ Matrix(d) .* Matrix(sp)
     @test typeof(d .* sp) <: Diagonal
 
+    @testset "Number .* $(nameof(typeof(M)))" for M in Any[pmrand(3), Diagonal(randn(3))]
+        @test 3.0 .* M ≈ 3.0 .* Matrix(M) && M .* 3.0 ≈ Matrix(M) .* 3.0
+        @test typeof(M .* 3.0) == typeof(M)
+    end
 end
 
 
 @testset "broadcast -" begin
 
-    @testset "Diagonal .- $(nameof(typeof(M)))" for M in [pmrand(3)]
+    @testset "Diagonal .- $(nameof(typeof(M)))" for M in Any[pmrand(3)]
         M1 = Diagonal(rand(3))
         @test M1 .- M ≈ Matrix(M1) .- M
         @test M .- M1 ≈ Matrix(M) .- M1
     end
 
-    @testset "PermMatrix .* $(nameof(typeof(M)))" for M in [
+    @testset "PermMatrix .* $(nameof(typeof(M)))" for M in Any[
         2.0,
         rand(3, 3),
         pmrand(3),
@@ -75,7 +79,7 @@ end
         @test M .- M1 ≈ M .- Matrix(M1)
     end
 
-    @testset "IMatrix .* $(nameof(typeof(M)))" for M in [
+    @testset "IMatrix .* $(nameof(typeof(M)))" for M in Any[
         2.0,
         rand(3, 3),
         pmrand(3),

@@ -77,12 +77,10 @@ end
 
 # to diagonal
 function *(D::Diagonal{Td}, A::PermMatrix{Ta}) where {Td,Ta}
-    T = Base.promote_op(*, Td, Ta)
     PermMatrix(A.perm, A.vals .* D.diag)
 end
 
 function *(A::PermMatrix{Ta}, D::Diagonal{Td}) where {Td,Ta}
-    T = Base.promote_op(*, Td, Ta)
     PermMatrix(A.perm, A.vals .* view(D.diag, A.perm))
 end
 

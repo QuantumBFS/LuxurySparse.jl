@@ -121,3 +121,10 @@ Broadcast.broadcasted(
     a::PermMatrix,
     b::Number,
 ) = PermMatrix(a.perm, a.vals .* b)
+
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    a::Number,
+    b::PermMatrix,
+) = PermMatrix(b.perm, a .* b.vals)
