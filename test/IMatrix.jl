@@ -67,3 +67,15 @@ end
     @test p1 * 2im == Matrix(p1) * 2im
     @test p1 / 2.0 == Matrix(p1) / 2.0
 end
+
+@testset "push coverage" begin
+    @test SparseMatrixCSC(IMatrix(3)) ≈ Diagonal(ones(3))
+    @test Diagonal(IMatrix(3)) ≈ Diagonal(ones(3))
+    @test IMatrix(Diagonal(ones(3))) === IMatrix{Float64}(3)
+    @test IMatrix{ComplexF64}(Diagonal(ones(3))) === IMatrix{ComplexF64}(3)
+    @test_throws DimensionMismatch IMatrix(ones(3, 5))
+    @test_throws DimensionMismatch IMatrix{ComplexF64}(ones(3, 5))
+    @test IMatrix(3) .* 2 == IMatrix(3) * 2 == Diagonal([2,2,2])
+    @test 2 .* IMatrix(3) == 2 * IMatrix(3) == Diagonal([2,2,2])
+    @test IMatrix(3) ≈ IMatrix{Float64}(3)
+end

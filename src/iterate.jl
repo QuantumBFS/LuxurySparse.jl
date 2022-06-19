@@ -64,7 +64,7 @@ function Base.iterate(it::IterNz{<:AbstractMatrix}, state)
 end
 
 # SparseMatrixCSC
-function Base.iterate(it::IterNz{<:SparseMatrixCSC})
+function Base.iterate(it::IterNz{<:SDSparseMatrixCSC})
     0 == length(it) && return nothing
     j = 1
     while j <= size(it.A, 2)
@@ -73,7 +73,7 @@ function Base.iterate(it::IterNz{<:SparseMatrixCSC})
     end
     return (@inbounds(it.A.rowval[1]), j, @inbounds(it.A.nzval[1])), (j, 1)
 end
-function Base.iterate(it::IterNz{<:SparseMatrixCSC}, state)
+function Base.iterate(it::IterNz{<:SDSparseMatrixCSC}, state)
     (j, k) = state
     k == length(it) && return nothing
     k += 1

@@ -1,5 +1,5 @@
 ################## To IMatrix ######################
-function IMatrix{T}(::AbstractMatrix) where {T}
+function IMatrix{T}(A::AbstractMatrix) where {T}
     IMatrix{T}(size(A, 1) == size(A, 2) ? size(A, 2) : throw(DimensionMismatch()))
 end
 function IMatrix(A::AbstractMatrix{T}) where {T}
