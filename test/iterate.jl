@@ -10,7 +10,8 @@ using Test, LuxurySparse, SparseArrays, LinearAlgebra
     ]
         for A in Any[M, M', transpose(M)]
             O = zeros(eltype(A), size(A)...)
-            @test eltype(IterNz(A)) == eltype(A)
+            it = IterNz(A)
+            @test eltype(it) == eltype(A)
             for (i, j, v) in it
                 O[i,j] = v
             end
