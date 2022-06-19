@@ -26,20 +26,10 @@ end
 
 # TODO: since 0.7 transpose is different, we don't take transpose serious here.
 ####### kronecker product ###########
-# TODO: if IMatrix{1}, do nothing
-kron(A::IMatrix{Na,Ta}, B::IMatrix{Nb,Tb}) where {Na,Nb,Ta<:Number,Tb<:Number} =
-    IMatrix{Na * Nb,promote_type(Ta, Tb)}()
-kron(A::IMatrix{Na,Ta}, B::IMatrix{1,Tb}) where {Na,Ta<:Number,Tb<:Number} =
-    IMatrix{Na,promote_type(Ta, Tb)}()
-kron(A::IMatrix{1,Ta}, B::IMatrix{Nb,Tb}) where {Nb,Ta<:Number,Tb<:Number} =
-    IMatrix{Nb,promote_type(Ta, Tb)}()
-kron(A::IMatrix{Na,<:Number}, B::Diagonal{<:Number}) where {Na} =
-    Diagonal(orepeat(B.diag, Na))
-kron(B::Diagonal{<:Number}, A::IMatrix{Na}) where {Na} = Diagonal(irepeat(B.diag, Na))
-for MT in [:AbstractMatrix, :PermMatrix, :SparseMatrixCSC, :Diagonal]
-    @eval kron(A::IMatrix{1,<:Number}, B::$MT{<:Number}) = B
-    @eval kron(B::$MT{<:Number}, A::IMatrix{1,<:Number}) = B
-end
+kron(A::IMatrix{Ta}, B::IMatrix{Tb}) where {Ta<:Number,Tb<:Number} =
+    IMatrix{promote_type(Ta, Tb)}(A.n * B.n)
+kron(A::IMatrix{<:Number}, B::Diagonal{<:Number}) = A.n == 1 ? B : Diagonal(orepeat(B.diag, A.n))
+kron(B::Diagonal{<:Number}, A::IMatrix) = A.n == 1 ? B : Diagonal(irepeat(B.diag, A.n))
 
 ####### diagonal kron ########
 kron(A::StridedMatrix{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
@@ -47,32 +37,33 @@ kron(A::Diagonal{<:Number}, B::StridedMatrix{<:Number}) = kron(PermMatrix(A), B)
 kron(A::Diagonal{<:Number}, B::SparseMatrixCSC{<:Number}) = kron(PermMatrix(A), B)
 kron(A::SparseMatrixCSC{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
 
-
-function kron(A::AbstractMatrix{Tv}, B::IMatrix{Nb}) where {Nb,Tv<:Number}
+function kron(A::AbstractMatrix{Tv}, B::IMatrix) where {Tv<:Number}
+    B.n == 1 && return A
     mA, nA = size(A)
-    nzval = Vector{Tv}(undef, Nb * mA * nA)
-    rowval = Vector{Int}(undef, Nb * mA * nA)
-    colptr = collect(1:mA:Nb*mA*nA+1)
+    nzval = Vector{Tv}(undef, B.n * mA * nA)
+    rowval = Vector{Int}(undef, B.n * mA * nA)
+    colptr = collect(1:mA:B.n*mA*nA+1)
     @inbounds for j = 1:nA
         source = view(A, :, j)
-        startbase = (j - 1) * Nb * mA - mA
-        for j2 = 1:Nb
+        startbase = (j - 1) * B.n * mA - mA
+        for j2 = 1:B.n
             start = startbase + j2 * mA
-            row = j2 - Nb
+            row = j2 - B.n
             @inbounds @simd for i = 1:mA
                 nzval[start+i] = source[i]
-                rowval[start+i] = row + Nb * i
+                rowval[start+i] = row + B.n * i
             end
         end
     end
-    SparseMatrixCSC(mA * Nb, nA * Nb, colptr, rowval, nzval)
+    SparseMatrixCSC(mA * B.n, nA * B.n, colptr, rowval, nzval)
 end
 
-function kron(A::IMatrix{Na}, B::AbstractMatrix{Tv}) where {Na,Tv<:Number}
+function kron(A::IMatrix, B::AbstractMatrix{Tv}) where {Tv<:Number}
+    A.n == 1 && return B
     mB, nB = size(B)
-    rowval = Vector{Int}(undef, nB * mB * Na)
-    nzval = Vector{Tv}(undef, nB * mB * Na)
-    @inbounds for j = 1:Na
+    rowval = Vector{Int}(undef, nB * mB * A.n)
+    nzval = Vector{Tv}(undef, nB * mB * A.n)
+    @inbounds for j = 1:A.n
         r0 = (j - 1) * mB
         for j2 = 1:nB
             start = ((j - 1) * nB + j2 - 1) * mB
@@ -82,19 +73,20 @@ function kron(A::IMatrix{Na}, B::AbstractMatrix{Tv}) where {Na,Tv<:Number}
             end
         end
     end
-    colptr = collect(1:mB:nB*mB*Na+1)
-    SparseMatrixCSC(mB * Na, Na * nB, colptr, rowval, nzval)
+    colptr = collect(1:mB:nB*mB*A.n+1)
+    SparseMatrixCSC(mB * A.n, A.n * nB, colptr, rowval, nzval)
 end
 
-function kron(A::IMatrix{Na}, B::SparseMatrixCSC{T}) where {Na,T<:Number}
+function kron(A::IMatrix, B::SparseMatrixCSC{T}) where {T<:Number}
+    A.n == 1 && return B
     mB, nB = size(B)
     nV = nnz(B)
-    nzval = Vector{T}(undef, Na * nV)
-    rowval = Vector{Int}(undef, Na * nV)
-    colptr = Vector{Int}(undef, nB * Na + 1)
-    nzval = Vector{T}(undef, Na * nV)
+    nzval = Vector{T}(undef, A.n * nV)
+    rowval = Vector{Int}(undef, A.n * nV)
+    colptr = Vector{Int}(undef, nB * A.n + 1)
+    nzval = Vector{T}(undef, A.n * nV)
     colptr[1] = 1
-    for i = 1:Na
+    for i = 1:A.n
         r0 = (i - 1) * mB
         start = nV * (i - 1)
         @inbounds @simd for k = 1:nV
@@ -106,37 +98,39 @@ function kron(A::IMatrix{Na}, B::SparseMatrixCSC{T}) where {Na,T<:Number}
             colptr[colbase+j] = B.colptr[j] + start
         end
     end
-    SparseMatrixCSC(mB * Na, nB * Na, colptr, rowval, nzval)
+    SparseMatrixCSC(mB * A.n, nB * A.n, colptr, rowval, nzval)
 end
 
-function kron(A::SparseMatrixCSC{T}, B::IMatrix{Nb}) where {T<:Number,Nb}
+function kron(A::SparseMatrixCSC{T}, B::IMatrix) where {T<:Number}
+    B.n == 1 && return A
     mA, nA = size(A)
     nV = nnz(A)
-    rowval = Vector{Int}(undef, Nb * nV)
-    colptr = Vector{Int}(undef, nA * Nb + 1)
-    nzval = Vector{T}(undef, Nb * nV)
+    rowval = Vector{Int}(undef, B.n * nV)
+    colptr = Vector{Int}(undef, nA * B.n + 1)
+    nzval = Vector{T}(undef, B.n * nV)
     z = 1
     colptr[1] = 1
     @inbounds for i = 1:nA
         rstart = A.colptr[i]
         rend = A.colptr[i+1] - 1
-        colbase = (i - 1) * Nb + 1
-        @inbounds for k = 1:Nb
-            irow_Nb = k - Nb
+        colbase = (i - 1) * B.n + 1
+        @inbounds for k = 1:B.n
+            irow_Nb = k - B.n
             @inbounds @simd for r = rstart:rend
-                rowval[z] = A.rowval[r] * Nb + irow_Nb
+                rowval[z] = A.rowval[r] * B.n + irow_Nb
                 nzval[z] = A.nzval[r]
                 z += 1
             end
             colptr[colbase+k] = z
         end
     end
-    SparseMatrixCSC(mA * Nb, nA * Nb, colptr, rowval, nzval)
+    SparseMatrixCSC(mA * B.n, nA * B.n, colptr, rowval, nzval)
 end
 
 function kron(A::PermMatrix{T}, B::IMatrix) where {T<:Number}
     nA = size(A, 1)
     nB = size(B, 1)
+    nB == 1 && return A
     vals = Vector{T}(undef, nB * nA)
     perm = Vector{Int}(undef, nB * nA)
     @inbounds for i = 1:nA
@@ -154,6 +148,7 @@ end
 function kron(A::IMatrix, B::PermMatrix{Tv,Ti}) where {Tv<:Number,Ti<:Integer}
     nA = size(A, 1)
     nB = size(B, 1)
+    nA == 1 && return B
     perm = Vector{Int}(undef, nB * nA)
     vals = Vector{Tv}(undef, nB * nA)
     @inbounds for i = 1:nA

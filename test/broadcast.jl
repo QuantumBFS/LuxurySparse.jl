@@ -36,7 +36,7 @@ using SparseArrays
         pmrand(3),
         sprand(3, 3, 0.5),
     ]
-        eye = IMatrix{3}()
+        eye = IMatrix(3)
         out = eye .* M
         @test typeof(out) <: Diagonal
         @test out ≈ Matrix(eye) .* M
@@ -46,7 +46,7 @@ using SparseArrays
         @test out ≈ M .* Matrix(eye)
     end
 
-    @test IMatrix{3}() .* IMatrix{3}() === IMatrix{3}()
+    @test IMatrix(3) .* IMatrix(3) === IMatrix(3)
     d = Diagonal(rand(3))
     sp = sprand(3, 3, 0.5)
     @test d .* sp ≈ Matrix(d) .* Matrix(sp)
@@ -82,11 +82,11 @@ end
         sprand(3, 0.5),
         sprand(3, 3, 0.5),
     ]
-        eye = IMatrix{3}()
+        eye = IMatrix(3)
         @test eye .- M ≈ Matrix(eye) .- M
 
         @test M .- eye ≈ M .- Matrix(eye)
     end
 
-    @test IMatrix{3}() .- IMatrix{3}() ≈ zeros(3, 3)
+    @test IMatrix(3) .- IMatrix(3) ≈ zeros(3, 3)
 end

@@ -25,3 +25,7 @@ end
 @testset "broadcast" begin
     include("broadcast.jl")
 end
+
+@testset "iterate" begin
+    include("iterate.jl")
+end

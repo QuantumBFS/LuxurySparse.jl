@@ -3,12 +3,12 @@ import LinearAlgebra: transpose, transpose!, adjoint!, adjoint
 
 # IMatrix
 for func in (:conj, :real, :transpose, :adjoint, :copy)
-    @eval ($func)(M::IMatrix{N,T}) where {N,T} = IMatrix{N,T}()
+    @eval ($func)(M::IMatrix{T}) where {T} = IMatrix{T}(M.n)
 end
 for func in (:adjoint!, :transpose!)
     @eval ($func)(M::IMatrix) = M
 end
-imag(M::IMatrix{N,T}) where {N,T} = Diagonal(zeros(T, N))
+imag(M::IMatrix{T}) where {N,T} = Diagonal(zeros(T, M.n))
 
 # PermMatrix
 for func in (:conj, :real, :imag)
@@ -26,10 +26,10 @@ adjoint(S::PermMatrix{<:Complex}) = conj(transpose(S))
 
 # scalar
 import Base: *, /, ==, +, -, ≈
-*(A::IMatrix{N,T}, B::Number) where {N,T} = Diagonal(fill(promote_type(T, eltype(B))(B), N))
-*(B::Number, A::IMatrix{N,T}) where {N,T} = Diagonal(fill(promote_type(T, eltype(B))(B), N))
-/(A::IMatrix{N,T}, B::Number) where {N,T} =
-    Diagonal(fill(promote_type(T, eltype(B))(1 / B), N))
+*(A::IMatrix{T}, B::Number) where {T} = Diagonal(fill(promote_type(T, eltype(B))(B), A.n))
+*(B::Number, A::IMatrix{T}) where {T} = Diagonal(fill(promote_type(T, eltype(B))(B), A.n))
+/(A::IMatrix{T}, B::Number) where {T} =
+    Diagonal(fill(promote_type(T, eltype(B))(1 / B), A.n))
 
 *(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals * B)
 *(B::Number, A::PermMatrix) = A * B
@@ -58,10 +58,10 @@ for op in [:+, :-]
     end
 end
 # NOTE: promote to integer
-+(d1::IMatrix{Na,Ta}, d2::IMatrix{Nb,Tb}) where {Na,Nb,Ta,Tb} =
-    d1 == d2 ? Diagonal(fill(promote_type(Ta, Tb, Int)(2), Na)) : throw(DimensionMismatch())
--(d1::IMatrix{Na,Ta}, d2::IMatrix{Nb,Tb}) where {Na,Ta,Nb,Tb} =
-    d1 == d2 ? spzeros(promote_type(Ta, Tb), Na, Na) : throw(DimensionMismatch())
++(d1::IMatrix{Ta}, d2::IMatrix{Tb}) where {Ta,Tb} =
+    d1 == d2 ? Diagonal(fill(promote_type(Ta, Tb, Int)(2), d1.n)) : throw(DimensionMismatch())
+-(d1::IMatrix{Ta}, d2::IMatrix{Tb}) where {Ta,Tb} =
+    d1 == d2 ? spzeros(promote_type(Ta, Tb), d1.n, d1.n) : throw(DimensionMismatch())
 
 for MT in [:IMatrix, :PermMatrix]
     @eval Base.:(==)(A::$MT, B::SparseMatrixCSC) = SparseMatrixCSC(A) == B

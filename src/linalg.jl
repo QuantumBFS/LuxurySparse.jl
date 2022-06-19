@@ -5,7 +5,7 @@ using LinearAlgebra
 ####### linear algebra  ######
 inv(M::IMatrix) = M
 det(M::IMatrix) = 1
-diag(M::IMatrix{N,T}) where {N,T} = ones(T, N)
+diag(M::IMatrix{T}) where {T} = ones(T, M.n)
 logdet(M::IMatrix) = 0
 Base.sqrt(x::PermMatrix) = sqrt(Matrix(x))
 Base.sqrt(x::IMatrix) = x
@@ -19,7 +19,7 @@ function inv(M::PermMatrix)
 end
 
 ####### multiply ###########
-*(A::IMatrix{N}, B::AbstractVector) where {N} =
+*(A::IMatrix, B::AbstractVector) =
     size(A, 2) == size(B, 1) ? B :
     throw(
         DimensionMismatch(
@@ -29,16 +29,16 @@ end
 
 for MATTYPE in
     [:AbstractMatrix, :StridedMatrix, :Diagonal, :SparseMatrixCSC, :Matrix, :PermMatrix]
-    @eval *(A::IMatrix{N}, B::$MATTYPE) where {N} =
-        N == size(B, 1) ? B :
+    @eval *(A::IMatrix, B::$MATTYPE) =
+        A.n == size(B, 1) ? B :
         throw(
             DimensionMismatch(
                 "matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))",
             ),
         )
 
-    @eval *(A::$MATTYPE, B::IMatrix{N}) where {N} =
-        size(A, 2) == N ? A :
+    @eval *(A::$MATTYPE, B::IMatrix) =
+        size(A, 2) == B.n ? A :
         throw(
             DimensionMismatch(
                 "matrix A has dimensions $(size(A)), matrix B has dimensions $(size(B))",

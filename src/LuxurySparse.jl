@@ -9,6 +9,7 @@ import LinearAlgebra: ishermitian
 import Base: getindex, size, similar, copy, show
 
 export I, fast_invperm, isdense, allocated_coo
+export IterNz
 
 include("Core.jl")
 include("IMatrix.jl")
@@ -23,5 +24,7 @@ include("arraymath.jl")
 include("linalg.jl")
 include("kronecker.jl")
 include("broadcast.jl")
+
+include("iterate.jl")
 
 end

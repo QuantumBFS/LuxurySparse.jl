@@ -6,12 +6,12 @@ promote_rule(::Type{SparseMatrixCSC{Tv,Ti}}, ::Type{Matrix{T}}) where {Tv,Ti,T} 
 
 # IMatrix
 promote_rule(
-    ::Type{IMatrix{N,T}},
+    ::Type{IMatrix{T}},
     ::Type{PermMatrix{Tv,Ti,Vv,Vi}},
-) where {N,T,Tv,Ti,Vv,Vi} = (TT = promote_type(T, Tv); PermMatrix{TT,Ti,Vector{TT},Vi})
-promote_rule(::Type{IMatrix{N,T}}, ::Type{SparseMatrixCSC{Tv,Ti}}) where {N,T,Tv,Ti} =
+) where {T,Tv,Ti,Vv,Vi} = (TT = promote_type(T, Tv); PermMatrix{TT,Ti,Vector{TT},Vi})
+promote_rule(::Type{IMatrix{T}}, ::Type{SparseMatrixCSC{Tv,Ti}}) where {T,Tv,Ti} =
     SparseMatrixCSC{promote_type(T, Tv),Ti}
-promote_rule(::Type{IMatrix{M,TA}}, ::Type{Matrix{TB}}) where {M,TA,TB} = Array{TB,2}
+promote_rule(::Type{IMatrix{TA}}, ::Type{Matrix{TB}}) where {TA,TB} = Array{TB,2}
 
 # PermMatrix
 promote_rule(

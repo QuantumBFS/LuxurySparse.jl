@@ -5,8 +5,8 @@ export SDPermMatrix,
 const SDMatrix{T} = Union{Matrix{T},SArray{Shape,T,2,L} where {Shape,L}}
 const SDDiagonal{T} = Union{Diagonal{T},SDiagonal{N,T} where N}
 const SDVector{T} = Union{Vector{T},SVector{N,T} where N}
-const SDPermMatrix{Tv,Ti} = PermMatrix{Tv,Ti,<:SDVector{Tv},<:SDVector{Ti}}
-const SPermMatrix{N,Tv,Ti} = PermMatrix{Tv,Ti,<:SVector{N,Tv},<:SVector{N,Ti}}
+const SDPermMatrix{Tv,Ti<:Integer} = PermMatrix{Tv,Ti,<:SDVector{Tv},<:SDVector{Ti}}
+const SPermMatrix{N,Tv,Ti<:Integer} = PermMatrix{Tv,Ti,<:SVector{N,Tv},<:SVector{N,Ti}}
 const SDSparseMatrixCSC{Tv,Ti} = Union{SparseMatrixCSC{Tv,Ti},SSparseMatrixCSC{Tv,Ti}}
 
 ######### staticize ##########
