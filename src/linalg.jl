@@ -1,25 +1,21 @@
-import Base: inv
-import LinearAlgebra: det, diag, logdet, mul!, lmul!, rmul!, rdiv!
-using LinearAlgebra
-
 ####### linear algebra  ######
-inv(M::IMatrix) = M
-det(M::IMatrix) = 1
-diag(M::IMatrix{T}) where {T} = ones(T, M.n)
-logdet(M::IMatrix) = 0
+Base.inv(M::IMatrix) = M
+LinearAlgebra.det(M::IMatrix) = 1
+LinearAlgebra.diag(M::IMatrix{T}) where {T} = ones(T, M.n)
+LinearAlgebra.logdet(M::IMatrix) = 0
 Base.sqrt(x::PermMatrix) = sqrt(Matrix(x))
 Base.sqrt(x::IMatrix) = x
 Base.exp(x::PermMatrix) = exp(Matrix(x))
 Base.exp(x::IMatrix) = ℯ * x
 
 #det(M::PermMatrix) = parity(M.perm)*prod(M.vals)
-function inv(M::PermMatrix)
+function Base.inv(M::PermMatrix)
     new_perm = fast_invperm(M.perm)
     return PermMatrix(new_perm, 1.0 ./ M.vals[new_perm])
 end
 
 ####### multiply ###########
-*(A::IMatrix, B::AbstractVector) =
+Base.:*(A::IMatrix, B::AbstractVector) =
     size(A, 2) == size(B, 1) ? B :
     throw(
         DimensionMismatch(
@@ -29,7 +25,7 @@ end
 
 for MATTYPE in
     [:AbstractMatrix, :StridedMatrix, :Diagonal, :SparseMatrixCSC, :Matrix, :PermMatrix]
-    @eval *(A::IMatrix, B::$MATTYPE) =
+    @eval Base.:*(A::IMatrix, B::$MATTYPE) =
         A.n == size(B, 1) ? B :
         throw(
             DimensionMismatch(
@@ -37,7 +33,7 @@ for MATTYPE in
             ),
         )
 
-    @eval *(A::$MATTYPE, B::IMatrix) =
+    @eval Base.:*(A::$MATTYPE, B::IMatrix) =
         size(A, 2) == B.n ? A :
         throw(
             DimensionMismatch(
@@ -46,7 +42,7 @@ for MATTYPE in
         )
 end
 
-*(A::Adjoint{T,<:AbstractVector{T}}, B::IMatrix) where {T} =
+Base.:*(A::Adjoint{T,<:AbstractVector{T}}, B::IMatrix) where {T} =
     size(A, 2) == size(B, 1) ? A :
     throw(
         DimensionMismatch(
@@ -54,7 +50,7 @@ end
         ),
     )
 
-*(A::IMatrix, B::IMatrix) =
+Base.:*(A::IMatrix, B::IMatrix) =
     size(A, 2) == size(B, 1) ? A :
     throw(
         DimensionMismatch(
@@ -76,27 +72,27 @@ function LinearAlgebra.mul!(Y::AbstractVector, A::PermMatrix, X::AbstractVector,
 end
 
 # to diagonal
-function *(D::Diagonal{Td}, A::PermMatrix{Ta}) where {Td,Ta}
+function Base.:*(D::Diagonal{Td}, A::PermMatrix{Ta}) where {Td,Ta}
     PermMatrix(A.perm, A.vals .* D.diag)
 end
 
-function *(A::PermMatrix{Ta}, D::Diagonal{Td}) where {Td,Ta}
+function Base.:*(A::PermMatrix{Ta}, D::Diagonal{Td}) where {Td,Ta}
     PermMatrix(A.perm, A.vals .* view(D.diag, A.perm))
 end
 
 # to self
-function *(A::PermMatrix, B::PermMatrix)
+function Base.:*(A::PermMatrix, B::PermMatrix)
     size(A, 1) == size(B, 1) || throw(DimensionMismatch())
     PermMatrix(B.perm[A.perm], A.vals .* view(B.vals, A.perm))
 end
 
 # to matrix
-function *(A::PermMatrix, X::AbstractMatrix)
+function Base.:*(A::PermMatrix, X::AbstractMatrix)
     size(X, 1) == size(A, 2) || throw(DimensionMismatch())
     return A.vals .* view(X,A.perm,:)   # this may be inefficient for sparse CSC matrix.
 end
 
-function *(X::AbstractMatrix, A::PermMatrix)
+function Base.:*(X::AbstractMatrix, A::PermMatrix)
     mX, nX = size(X)
     nX == size(A, 1) || throw(DimensionMismatch())
     perm = fast_invperm(A.perm)
@@ -106,14 +102,14 @@ end
 # NOTE: this is just a temperory fix for v0.7. We should overload mul! in
 # the future (when we start to drop v0.6) to enable buildin lazy evaluation.
 
-*(x::Adjoint{<:Any,<:AbstractVector}, D::PermMatrix) = Matrix(x) * D
-*(x::Transpose{<:Any,<:AbstractVector}, D::PermMatrix) = Matrix(x) * D
-*(A::Adjoint{<:Any,<:AbstractArray}, D::PermMatrix) = Adjoint(adjoint(D) * parent(A))
-*(A::Transpose{<:Any,<:AbstractArray}, D::PermMatrix) = Transpose(transpose(D) * parent(A))
-*(A::Adjoint{<:Any,<:PermMatrix}, D::PermMatrix) = adjoint(parent(A)) * D
-*(A::Transpose{<:Any,<:PermMatrix}, D::PermMatrix) = transpose(parent(A)) * D
-*(A::PermMatrix, D::Adjoint{<:Any,<:PermMatrix}) = A * adjoint(parent(D))
-*(A::PermMatrix, D::Transpose{<:Any,<:PermMatrix}) = A * transpose(parent(D))
+Base.:*(x::Adjoint{<:Any,<:AbstractVector}, D::PermMatrix) = Matrix(x) * D
+Base.:*(x::Transpose{<:Any,<:AbstractVector}, D::PermMatrix) = Matrix(x) * D
+Base.:*(A::Adjoint{<:Any,<:AbstractArray}, D::PermMatrix) = Adjoint(adjoint(D) * parent(A))
+Base.:*(A::Transpose{<:Any,<:AbstractArray}, D::PermMatrix) = Transpose(transpose(D) * parent(A))
+Base.:*(A::Adjoint{<:Any,<:PermMatrix}, D::PermMatrix) = adjoint(parent(A)) * D
+Base.:*(A::Transpose{<:Any,<:PermMatrix}, D::PermMatrix) = transpose(parent(A)) * D
+Base.:*(A::PermMatrix, D::Adjoint{<:Any,<:PermMatrix}) = A * adjoint(parent(D))
+Base.:*(A::PermMatrix, D::Transpose{<:Any,<:PermMatrix}) = A * transpose(parent(D))
 
 # for MAT in [:AbstractArray, :Matrix, :SparseMatrixCSC, :PermMatrix]
 #     @eval begin
@@ -127,16 +123,16 @@ end
 ############### Transpose, Adjoint for IMatrix ###############
 for MAT in
     [:AbstractArray, :AbstractVector, :Matrix, :SparseMatrixCSC, :PermMatrix, :IMatrix]
-    @eval *(A::Adjoint{<:Any,<:$MAT}, D::IMatrix) = Adjoint(D * parent(A))
-    @eval *(A::Transpose{<:Any,<:$MAT}, D::IMatrix) = Transpose(D * parent(A))
+    @eval Base.:*(A::Adjoint{<:Any,<:$MAT}, D::IMatrix) = Adjoint(D * parent(A))
+    @eval Base.:*(A::Transpose{<:Any,<:$MAT}, D::IMatrix) = Transpose(D * parent(A))
     if MAT != :AbstactVector
-        @eval *(A::IMatrix, D::Transpose{<:Any,<:$MAT}) = Transpose(parent(D) * A)
-        @eval *(A::IMatrix, D::Adjoint{<:Any,<:$MAT}) = Adjoint(parent(D) * A)
+        @eval Base.:*(A::IMatrix, D::Transpose{<:Any,<:$MAT}) = Transpose(parent(D) * A)
+        @eval Base.:*(A::IMatrix, D::Adjoint{<:Any,<:$MAT}) = Adjoint(parent(D) * A)
     end
 end
 
 # to sparse
-function *(A::PermMatrix, X::SparseMatrixCSC)
+function Base.:*(A::PermMatrix, X::SparseMatrixCSC)
     nA = size(A, 1)
     mX, nX = size(X)
     mX == nA || throw(DimensionMismatch())
@@ -154,7 +150,7 @@ function *(A::PermMatrix, X::SparseMatrixCSC)
     SparseMatrixCSC(sp')'
 end
 
-function *(X::SparseMatrixCSC, A::PermMatrix)
+function Base.:*(X::SparseMatrixCSC, A::PermMatrix)
     nA = size(A, 1)
     mX, nX = size(X)
     nX == nA || throw(DimensionMismatch())
@@ -178,7 +174,7 @@ function *(X::SparseMatrixCSC, A::PermMatrix)
 end
 
 ############ SparseMatrixCSC and Diagonal #############
-function mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal{T,Vector{T}}) where {T}
+function LinearAlgebra.mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal{T,Vector{T}}) where {T}
     nA = size(A, 1)
     mX, nX = size(X)
     nX == nA || throw(DimensionMismatch())
@@ -190,7 +186,7 @@ function mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal{T,Vector{T}}) 
     Y
 end
 
-function mul!(Y::SparseMatrixCSC, A::Diagonal{T,Vector{T}}, X::SparseMatrixCSC) where {T}
+function LinearAlgebra.mul!(Y::SparseMatrixCSC, A::Diagonal{T,Vector{T}}, X::SparseMatrixCSC) where {T}
     nA = size(A, 2)
     mX, nX = size(X)
     mX == nA || throw(DimensionMismatch())
@@ -201,16 +197,16 @@ function mul!(Y::SparseMatrixCSC, A::Diagonal{T,Vector{T}}, X::SparseMatrixCSC) 
 end
 
 
-rmul!(A::SparseMatrixCOO, B::Int) = (A.vs *= B; A)
-lmul!(B::Int, A::SparseMatrixCOO) = (A.vs *= B; A)
-rdiv!(A::SparseMatrixCOO, B::Int) = (A.vs /= B; A)
+LinearAlgebra.rmul!(A::SparseMatrixCOO, B::Int) = (A.vs *= B; A)
+LinearAlgebra.lmul!(B::Int, A::SparseMatrixCOO) = (A.vs *= B; A)
+LinearAlgebra.rdiv!(A::SparseMatrixCOO, B::Int) = (A.vs /= B; A)
 
-*(A::SparseMatrixCOO, B::Int) = rmul!(copy(A), B)
-*(B::Int, A::SparseMatrixCOO) = lmul!(B, copy(A))
-/(A::SparseMatrixCOO, B::Int) = rdiv!(copy(A), B)
+Base.:*(A::SparseMatrixCOO, B::Int) = rmul!(copy(A), B)
+Base.:*(B::Int, A::SparseMatrixCOO) = lmul!(B, copy(A))
+Base.:/(A::SparseMatrixCOO, B::Int) = rdiv!(copy(A), B)
 
--(ii::IMatrix) = (-1) * ii
--(pm::PermMatrix) = (-1) * pm
+Base.:-(ii::IMatrix) = (-1) * ii
+Base.:-(pm::PermMatrix) = (-1) * pm
 
 for FUNC in [:randn!, :rand!]
     @eval function Random.$FUNC(m::Diagonal)

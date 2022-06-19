@@ -2,16 +2,26 @@ module LuxurySparse
 
 using LinearAlgebra, SparseArrays, Random
 using StaticArrays: SVector, SMatrix, SDiagonal, SArray
+using SparseArrays: SparseMatrixCSC
+using SparseArrays.HigherOrderFns
 using Base: @propagate_inbounds
+using LinearAlgebra
+using LinearAlgebra: StructuredMatrixStyle
+using Base.Broadcast:
+    BroadcastStyle, AbstractArrayStyle, Broadcasted, DefaultArrayStyle, materialize!
 
-import Base: copyto!, *, kron, -
-import LinearAlgebra: ishermitian
-import Base: getindex, size, similar, copy, show
+# static types
+export SDPermMatrix, SPermMatrix, PermMatrix, pmrand,
+    SDSparseMatrixCSC, SSparseMatrixCSC, SparseMatrixCSC, sprand,
+    SparseMatrixCOO,
+    SDMatrix, SDVector,
+    SDDiagonal, Diagonal,
+    IMatrix,
+    staticize, dynamicize,
+    fast_invperm,
+    IterNz
 
-export I, fast_invperm, isdense, allocated_coo
-export IterNz
-
-include("Core.jl")
+include("utils.jl")
 include("IMatrix.jl")
 include("PermMatrix.jl")
 include("SparseMatrixCOO.jl")

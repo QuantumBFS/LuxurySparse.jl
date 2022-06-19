@@ -26,18 +26,18 @@ end
 
 # TODO: since 0.7 transpose is different, we don't take transpose serious here.
 ####### kronecker product ###########
-kron(A::IMatrix{Ta}, B::IMatrix{Tb}) where {Ta<:Number,Tb<:Number} =
+LinearAlgebra.kron(A::IMatrix{Ta}, B::IMatrix{Tb}) where {Ta<:Number,Tb<:Number} =
     IMatrix{promote_type(Ta, Tb)}(A.n * B.n)
-kron(A::IMatrix{<:Number}, B::Diagonal{<:Number}) = A.n == 1 ? B : Diagonal(orepeat(B.diag, A.n))
-kron(B::Diagonal{<:Number}, A::IMatrix) = A.n == 1 ? B : Diagonal(irepeat(B.diag, A.n))
+LinearAlgebra.kron(A::IMatrix{<:Number}, B::Diagonal{<:Number}) = A.n == 1 ? B : Diagonal(orepeat(B.diag, A.n))
+LinearAlgebra.kron(B::Diagonal{<:Number}, A::IMatrix) = A.n == 1 ? B : Diagonal(irepeat(B.diag, A.n))
 
 ####### diagonal kron ########
-kron(A::StridedMatrix{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
-kron(A::Diagonal{<:Number}, B::StridedMatrix{<:Number}) = kron(PermMatrix(A), B)
-kron(A::Diagonal{<:Number}, B::SparseMatrixCSC{<:Number}) = kron(PermMatrix(A), B)
-kron(A::SparseMatrixCSC{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
+LinearAlgebra.kron(A::StridedMatrix{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
+LinearAlgebra.kron(A::Diagonal{<:Number}, B::StridedMatrix{<:Number}) = kron(PermMatrix(A), B)
+LinearAlgebra.kron(A::Diagonal{<:Number}, B::SparseMatrixCSC{<:Number}) = kron(PermMatrix(A), B)
+LinearAlgebra.kron(A::SparseMatrixCSC{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
 
-function kron(A::AbstractMatrix{Tv}, B::IMatrix) where {Tv<:Number}
+function LinearAlgebra.kron(A::AbstractMatrix{Tv}, B::IMatrix) where {Tv<:Number}
     B.n == 1 && return A
     mA, nA = size(A)
     nzval = Vector{Tv}(undef, B.n * mA * nA)
@@ -58,7 +58,7 @@ function kron(A::AbstractMatrix{Tv}, B::IMatrix) where {Tv<:Number}
     SparseMatrixCSC(mA * B.n, nA * B.n, colptr, rowval, nzval)
 end
 
-function kron(A::IMatrix, B::AbstractMatrix{Tv}) where {Tv<:Number}
+function LinearAlgebra.kron(A::IMatrix, B::AbstractMatrix{Tv}) where {Tv<:Number}
     A.n == 1 && return B
     mB, nB = size(B)
     rowval = Vector{Int}(undef, nB * mB * A.n)
@@ -77,7 +77,7 @@ function kron(A::IMatrix, B::AbstractMatrix{Tv}) where {Tv<:Number}
     SparseMatrixCSC(mB * A.n, A.n * nB, colptr, rowval, nzval)
 end
 
-function kron(A::IMatrix, B::SparseMatrixCSC{T}) where {T<:Number}
+function LinearAlgebra.kron(A::IMatrix, B::SparseMatrixCSC{T}) where {T<:Number}
     A.n == 1 && return B
     mB, nB = size(B)
     nV = nnz(B)
@@ -101,7 +101,7 @@ function kron(A::IMatrix, B::SparseMatrixCSC{T}) where {T<:Number}
     SparseMatrixCSC(mB * A.n, nB * A.n, colptr, rowval, nzval)
 end
 
-function kron(A::SparseMatrixCSC{T}, B::IMatrix) where {T<:Number}
+function LinearAlgebra.kron(A::SparseMatrixCSC{T}, B::IMatrix) where {T<:Number}
     B.n == 1 && return A
     mA, nA = size(A)
     nV = nnz(A)
@@ -127,7 +127,7 @@ function kron(A::SparseMatrixCSC{T}, B::IMatrix) where {T<:Number}
     SparseMatrixCSC(mA * B.n, nA * B.n, colptr, rowval, nzval)
 end
 
-function kron(A::PermMatrix{T}, B::IMatrix) where {T<:Number}
+function LinearAlgebra.kron(A::PermMatrix{T}, B::IMatrix) where {T<:Number}
     nA = size(A, 1)
     nB = size(B, 1)
     nB == 1 && return A
@@ -145,7 +145,7 @@ function kron(A::PermMatrix{T}, B::IMatrix) where {T<:Number}
     PermMatrix(perm, vals)
 end
 
-function kron(A::IMatrix, B::PermMatrix{Tv,Ti}) where {Tv<:Number,Ti<:Integer}
+function LinearAlgebra.kron(A::IMatrix, B::PermMatrix{Tv,Ti}) where {Tv<:Number,Ti<:Integer}
     nA = size(A, 1)
     nB = size(B, 1)
     nA == 1 && return B
@@ -162,7 +162,7 @@ function kron(A::IMatrix, B::PermMatrix{Tv,Ti}) where {Tv<:Number,Ti<:Integer}
 end
 
 
-function kron(A::StridedMatrix{Tv}, B::PermMatrix{Tb}) where {Tv<:Number,Tb<:Number}
+function LinearAlgebra.kron(A::StridedMatrix{Tv}, B::PermMatrix{Tb}) where {Tv<:Number,Tb<:Number}
     mA, nA = size(A)
     nB = size(B, 1)
     perm = fast_invperm(B.perm)
@@ -186,7 +186,7 @@ function kron(A::StridedMatrix{Tv}, B::PermMatrix{Tb}) where {Tv<:Number,Tb<:Num
     SparseMatrixCSC(mA * nB, nA * nB, colptr, rowval, nzval)
 end
 
-function kron(A::PermMatrix{Ta}, B::StridedMatrix{Tb}) where {Tb<:Number,Ta<:Number}
+function LinearAlgebra.kron(A::PermMatrix{Ta}, B::StridedMatrix{Tb}) where {Tb<:Number,Ta<:Number}
     mB, nB = size(B)
     nA = size(A, 1)
     perm = fast_invperm(A.perm)
@@ -210,7 +210,7 @@ function kron(A::PermMatrix{Ta}, B::StridedMatrix{Tb}) where {Tb<:Number,Ta<:Num
     SparseMatrixCSC(nA * mB, nA * nB, colptr, rowval, nzval)
 end
 
-function kron(A::PermMatrix{<:Number}, B::PermMatrix{<:Number})
+function LinearAlgebra.kron(A::PermMatrix{<:Number}, B::PermMatrix{<:Number})
     nA = size(A, 1)
     nB = size(B, 1)
     vals = kron(A.vals, B.vals)
@@ -225,10 +225,10 @@ function kron(A::PermMatrix{<:Number}, B::PermMatrix{<:Number})
     PermMatrix(perm, vals)
 end
 
-kron(A::PermMatrix{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
-kron(A::Diagonal{<:Number}, B::PermMatrix{<:Number}) = kron(PermMatrix(A), B)
+LinearAlgebra.kron(A::PermMatrix{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
+LinearAlgebra.kron(A::Diagonal{<:Number}, B::PermMatrix{<:Number}) = kron(PermMatrix(A), B)
 
-function kron(A::PermMatrix{Ta}, B::SparseMatrixCSC{Tb}) where {Ta<:Number,Tb<:Number}
+function LinearAlgebra.kron(A::PermMatrix{Ta}, B::SparseMatrixCSC{Tb}) where {Ta<:Number,Tb<:Number}
     nA = size(A, 1)
     mB, nB = size(B)
     nV = nnz(B)
@@ -254,7 +254,7 @@ function kron(A::PermMatrix{Ta}, B::SparseMatrixCSC{Tb}) where {Ta<:Number,Tb<:N
     SparseMatrixCSC(mB * nA, nB * nA, colptr, rowval, nzval)
 end
 
-function kron(A::SparseMatrixCSC{T}, B::PermMatrix{Tb}) where {T<:Number,Tb<:Number}
+function LinearAlgebra.kron(A::SparseMatrixCSC{T}, B::PermMatrix{Tb}) where {T<:Number,Tb<:Number}
     nB = size(B, 1)
     mA, nA = size(A)
     nV = nnz(A)

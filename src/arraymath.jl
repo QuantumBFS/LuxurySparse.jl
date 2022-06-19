@@ -1,39 +1,35 @@
-import Base: conj, copy, real, imag
-import LinearAlgebra: transpose, transpose!, adjoint!, adjoint
-
 # IMatrix
 for func in (:conj, :real, :transpose, :adjoint, :copy)
-    @eval ($func)(M::IMatrix{T}) where {T} = IMatrix{T}(M.n)
+    @eval (Base.$func)(M::IMatrix{T}) where {T} = IMatrix{T}(M.n)
 end
 for func in (:adjoint!, :transpose!)
-    @eval ($func)(M::IMatrix) = M
+    @eval (LinearAlgebra.$func)(M::IMatrix) = M
 end
-imag(M::IMatrix{T}) where {N,T} = Diagonal(zeros(T, M.n))
+Base.imag(M::IMatrix{T}) where {N,T} = Diagonal(zeros(T, M.n))
 
 # PermMatrix
 for func in (:conj, :real, :imag)
-    @eval ($func)(M::PermMatrix) = PermMatrix(M.perm, ($func)(M.vals))
+    @eval (Base.$func)(M::PermMatrix) = PermMatrix(M.perm, ($func)(M.vals))
 end
-copy(M::PermMatrix) = PermMatrix(copy(M.perm), copy(M.vals))
+Base.copy(M::PermMatrix) = PermMatrix(copy(M.perm), copy(M.vals))
 
-function transpose(M::PermMatrix)
+function Base.transpose(M::PermMatrix)
     new_perm = fast_invperm(M.perm)
     return PermMatrix(new_perm, M.vals[new_perm])
 end
 
-adjoint(S::PermMatrix{<:Real}) = transpose(S)
-adjoint(S::PermMatrix{<:Complex}) = conj(transpose(S))
+Base.adjoint(S::PermMatrix{<:Real}) = transpose(S)
+Base.adjoint(S::PermMatrix{<:Complex}) = conj(transpose(S))
 
 # scalar
-import Base: *, /, ==, +, -, ≈
-*(A::IMatrix{T}, B::Number) where {T} = Diagonal(fill(promote_type(T, eltype(B))(B), A.n))
-*(B::Number, A::IMatrix{T}) where {T} = Diagonal(fill(promote_type(T, eltype(B))(B), A.n))
-/(A::IMatrix{T}, B::Number) where {T} =
+Base.:*(A::IMatrix{T}, B::Number) where {T} = Diagonal(fill(promote_type(T, eltype(B))(B), A.n))
+Base.:*(B::Number, A::IMatrix{T}) where {T} = Diagonal(fill(promote_type(T, eltype(B))(B), A.n))
+Base.:/(A::IMatrix{T}, B::Number) where {T} =
     Diagonal(fill(promote_type(T, eltype(B))(1 / B), A.n))
 
-*(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals * B)
-*(B::Number, A::PermMatrix) = A * B
-/(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals / B)
+Base.:*(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals * B)
+Base.:*(B::Number, A::PermMatrix) = A * B
+Base.:/(A::PermMatrix, B::Number) = PermMatrix(A.perm, A.vals / B)
 #+(A::PermMatrix, B::PermMatrix) = PermMatrix(A.dv+B.dv, A.ev+B.ev)
 #-(A::PermMatrix, B::PermMatrix) = PermMatrix(A.dv-B.dv, A.ev-B.ev)
 
@@ -41,26 +37,26 @@ for op in [:+, :-]
     for MT in [:IMatrix, :PermMatrix]
         @eval begin
             # IMatrix, PermMatrix - SparseMatrixCSC
-            $op(A::$MT, B::SparseMatrixCSC) = $op(SparseMatrixCSC(A), B)
-            $op(B::SparseMatrixCSC, A::$MT) = $op(B, SparseMatrixCSC(A))
+            Base.$op(A::$MT, B::SparseMatrixCSC) = $op(SparseMatrixCSC(A), B)
+            Base.$op(B::SparseMatrixCSC, A::$MT) = $op(B, SparseMatrixCSC(A))
         end
     end
     @eval begin
         # IMatrix, PermMatrix - Diagonal
-        $op(d1::IMatrix, d2::Diagonal) = Diagonal($op(diag(d1), d2.diag))
-        $op(d1::Diagonal, d2::IMatrix) = Diagonal($op(d1.diag, diag(d2)))
-        $op(d1::PermMatrix, d2::Diagonal) = $op(SparseMatrixCSC(d1), d2)
-        $op(d1::Diagonal, d2::PermMatrix) = $op(d1, SparseMatrixCSC(d2))
+        Base.$op(d1::IMatrix, d2::Diagonal) = Diagonal($op(diag(d1), d2.diag))
+        Base.$op(d1::Diagonal, d2::IMatrix) = Diagonal($op(d1.diag, diag(d2)))
+        Base.$op(d1::PermMatrix, d2::Diagonal) = $op(SparseMatrixCSC(d1), d2)
+        Base.$op(d1::Diagonal, d2::PermMatrix) = $op(d1, SparseMatrixCSC(d2))
         # PermMatrix - IMatrix
-        $op(A::PermMatrix, B::IMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
-        $op(A::IMatrix, B::PermMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
-        $op(A::PermMatrix, B::PermMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
+        Base.$op(A::PermMatrix, B::IMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
+        Base.$op(A::IMatrix, B::PermMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
+        Base.$op(A::PermMatrix, B::PermMatrix) = $op(SparseMatrixCSC(A), SparseMatrixCSC(B))
     end
 end
 # NOTE: promote to integer
-+(d1::IMatrix{Ta}, d2::IMatrix{Tb}) where {Ta,Tb} =
+Base.:+(d1::IMatrix{Ta}, d2::IMatrix{Tb}) where {Ta,Tb} =
     d1 == d2 ? Diagonal(fill(promote_type(Ta, Tb, Int)(2), d1.n)) : throw(DimensionMismatch())
--(d1::IMatrix{Ta}, d2::IMatrix{Tb}) where {Ta,Tb} =
+Base.:-(d1::IMatrix{Ta}, d2::IMatrix{Tb}) where {Ta,Tb} =
     d1 == d2 ? spzeros(promote_type(Ta, Tb), d1.n, d1.n) : throw(DimensionMismatch())
 
 for MT in [:IMatrix, :PermMatrix]

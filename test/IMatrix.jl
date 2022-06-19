@@ -37,8 +37,9 @@ end
 end
 
 @testset "sparse" begin
+    @show p1
     @test LuxurySparse.nnz(p1) == 4
-    @test LuxurySparse.nonzeros(p1) == ones(4)
+    @test length(LuxurySparse.findnz(p1)[3]) == 4
 end
 
 @testset "linalg" begin

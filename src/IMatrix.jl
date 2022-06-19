@@ -1,5 +1,3 @@
-export IMatrix
-
 """
     IMatrix{Tv}
 
@@ -13,24 +11,22 @@ struct IMatrix{Tv} <: AbstractMatrix{Tv}
 end
 IMatrix(n::Integer) = IMatrix{Bool}(n)
 
-size(A::IMatrix, i::Int) = A.n
-size(A::IMatrix) = (A.n, A.n)
-getindex(::IMatrix{T}, i::Integer, j::Integer) where {T} = T(i == j)
+Base.size(A::IMatrix, i::Int) = (@assert i == 1 || i == 2; A.n)
+Base.size(A::IMatrix) = (A.n, A.n)
+Base.getindex(::IMatrix{T}, i::Integer, j::Integer) where {T} = T(i == j)
 
 Base.:(==)(d1::IMatrix, d2::IMatrix) = d1.n == d2.n
 Base.isapprox(d1::IMatrix, d2::IMatrix; kwargs...) = d1 == d2
 
-####### sparse matrix ######
-nnz(M::IMatrix) = M.n
-nonzeros(M::IMatrix{T}) where {T} = ones(T, M.n)
-findnz(M::IMatrix{T}) where {T} = (collect(1:M.n), collect(1:M.n), ones(T, M.n))
-ishermitian(D::IMatrix) = true
-isdense(::IMatrix) = false
-
-similar(A::IMatrix{Tv}, ::Type{T}) where {Tv,T} = IMatrix{T}(A.n)
-function copyto!(A::IMatrix, B::IMatrix)
+Base.similar(A::IMatrix{Tv}, ::Type{T}) where {Tv,T} = IMatrix{T}(A.n)
+function Base.copyto!(A::IMatrix, B::IMatrix)
     if A.n != B.n
         DimensionMismatch("matrix dimension mismatch, got $(A.n) and $(B.n)")
     end
     A
 end
+LinearAlgebra.ishermitian(D::IMatrix) = true
+
+####### sparse matrix ######
+nnz(M::IMatrix) = M.n
+findnz(M::IMatrix{T}) where {T} = (collect(1:M.n), collect(1:M.n), ones(T, M.n))

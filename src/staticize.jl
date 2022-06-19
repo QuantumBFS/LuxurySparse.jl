@@ -1,6 +1,3 @@
-export SDPermMatrix,
-    SPermMatrix, SDSparseMatrixCSC, SDMatrix, SDDiagonal, SDVector, staticize, dynamicize
-
 ######### Union of static and dynamic matrices ##########
 const SDMatrix{T} = Union{Matrix{T},SArray{Shape,T,2,L} where {Shape,L}}
 const SDDiagonal{T} = Union{Diagonal{T},SDiagonal{N,T} where N}
@@ -58,9 +55,7 @@ function findnz(M::SDMatrix)
     cis = CartesianIndices(size(M))
     vec(getindex.(cis, 1)), vec(getindex.(cis, 2)), vec(M)
 end
+nnz(M::SDMatrix) = length(M)
 
-findnz(sp::SDSparseMatrixCSC) = SparseArrays.findnz(sp)
-dropzeros!(M::SDSparseMatrixCSC; trim::Bool = false) =
-    SparseArrays.dropzeros!(M; trim = trim)
-nonzeros(M::SDSparseMatrixCSC) = SparseArrays.nonzeros(M)
+findnz(sp::AbstractSparseMatrix) = SparseArrays.findnz(sp)
 nnz(M::SDSparseMatrixCSC) = SparseArrays.nnz(M)

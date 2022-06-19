@@ -74,15 +74,13 @@ end
     pm = pmrand(10)
     out = zeros(10, 10)
     @test LuxurySparse.nnz(pm) == 10
-    @test LuxurySparse.nonzeros(pm) == pm.vals
-    @test LuxurySparse.dropzeros!(pm) == pm
+    @test LuxurySparse.findnz(pm)[3] == pm.vals
 end
 
 @testset "identity sparse" begin
     p1 = Diagonal(randn(10))
     @test LuxurySparse.nnz(p1) == 10
-    @test LuxurySparse.nonzeros(p1) == p1.diag
-    @test LuxurySparse.dropzeros!(p1) == p1
+    @test LuxurySparse.findnz(p1)[3] == p1.diag
 end
 
 @testset "setindex" begin

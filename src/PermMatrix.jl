@@ -1,5 +1,3 @@
-export PermMatrix, pmrand
-
 """
     PermMatrix{Tv, Ti}(perm::AbstractVector{Ti}, vals::AbstractVector{Tv}) where {Tv, Ti<:Integer}
     PermMatrix(perm::Vector{Ti}, vals::Vector{Tv}) where {Tv, Ti}
@@ -46,11 +44,12 @@ end
 
 Base.:(==)(d1::PermMatrix, d2::PermMatrix) = SparseMatrixCSC(d1) == SparseMatrixCSC(d2)
 Base.isapprox(d1::PermMatrix, d2::PermMatrix; kwargs...) = isapprox(SparseMatrixCSC(d1), SparseMatrixCSC(d2); kwargs...)
+Base.zero(pm::PermMatrix) = PermMatrix(pm.perm, zero(pm.vals))
 
 ################# Array Functions ##################
 
-size(M::PermMatrix) = (length(M.perm), length(M.perm))
-function size(A::PermMatrix, d::Integer)
+Base.size(M::PermMatrix) = (length(M.perm), length(M.perm))
+function Base.size(A::PermMatrix, d::Integer)
     if d < 1
         throw(ArgumentError("dimension must be ≥ 1, got $d"))
     elseif d <= 2
@@ -59,7 +58,7 @@ function size(A::PermMatrix, d::Integer)
         return 1
     end
 end
-getindex(M::PermMatrix{Tv}, i::Integer, j::Integer) where {Tv} =
+Base.getindex(M::PermMatrix{Tv}, i::Integer, j::Integer) where {Tv} =
     M.perm[i] == j ? M.vals[i] : zero(Tv)
 function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
     if M.perm[i] == j
@@ -69,7 +68,7 @@ function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
     end
 end
 
-copyto!(A::PermMatrix, B::PermMatrix) =
+Base.copyto!(A::PermMatrix, B::PermMatrix) =
     (copyto!(A.perm, B.perm); copyto!(A.vals, B.vals); A)
 
 """
@@ -82,9 +81,9 @@ function pmrand end
 pmrand(::Type{T}, n::Int) where {T} = PermMatrix(randperm(n), randn(T, n))
 pmrand(n::Int) = pmrand(Float64, n)
 
-similar(x::PermMatrix{Tv,Ti}) where {Tv,Ti} =
+Base.similar(x::PermMatrix{Tv,Ti}) where {Tv,Ti} =
     PermMatrix{Tv,Ti}(copy(x.perm), similar(x.vals))
-similar(x::PermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
+Base.similar(x::PermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
     PermMatrix{T,Ti}(copy(x.perm), similar(x.vals, T))
 
 # TODO: rewrite this
@@ -98,9 +97,4 @@ similar(x::PermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
 
 ######### sparse array interfaces  #########
 nnz(M::PermMatrix) = length(M.vals)
-nonzeros(M::PermMatrix) = M.vals
 findnz(M::PermMatrix) = (collect(1:size(M, 1)), M.perm, M.vals)
-dropzeros!(M::PermMatrix; trim::Bool = false) = M
-isdense(::PermMatrix) = false
-
-Base.zero(pm::PermMatrix) = PermMatrix(pm.perm, zero(pm.vals))

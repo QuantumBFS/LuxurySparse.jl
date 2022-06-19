@@ -1,11 +1,3 @@
-using LuxurySparse
-using SparseArrays
-using SparseArrays.HigherOrderFns
-using LinearAlgebra
-using LinearAlgebra: StructuredMatrixStyle
-using Base.Broadcast:
-    BroadcastStyle, AbstractArrayStyle, Broadcasted, DefaultArrayStyle, materialize!
-
 @static if VERSION < v"1.2"
     Base.size(bc::Broadcasted) = map(length, axes(bc))
     Base.length(bc::Broadcasted) = prod(size(bc))
@@ -22,7 +14,7 @@ Broadcast.broadcasted(
     ::typeof(*),
     a::IMatrix{T},
     b::IMatrix,
-) where {N,T} = IMatrix{T}(a.n)
+) where {T} = IMatrix{T}(a.n)
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),

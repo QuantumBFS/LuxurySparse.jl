@@ -66,6 +66,7 @@ PermMatrix(X::IMatrix{T}) where {T} = PermMatrix{T,Int}(X)
 PermMatrix{Tv,Ti}(A::PermMatrix) where {Tv,Ti} =
     PermMatrix(Vector{Ti}(A.perm), Vector{Tv}(A.vals))
 
+# NOTE: bad implementation!
 function _findnz(A::AbstractMatrix)
     I = findall(!iszero, A)
     getindex.(I, 1), getindex.(I, 2), A[I]
@@ -110,7 +111,6 @@ function SparseMatrixCOO(A::Matrix{Tv}; atol = 1e-12) where {Tv}
     SparseMatrixCOO(is, js, vs, m, n)
 end
 
-import Base: convert
-convert(T::Type{<:PermMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
-convert(T::Type{<:IMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
-convert(T::Type{<:Diagonal}, m::AbstractMatrix) = m isa T ? m : T(m)
+Base.convert(T::Type{<:PermMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
+Base.convert(T::Type{<:IMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
+Base.convert(T::Type{<:Diagonal}, m::AbstractMatrix) = m isa T ? m : T(m)
