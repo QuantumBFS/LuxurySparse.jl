@@ -21,7 +21,7 @@ Base.isapprox(d1::IMatrix, d2::IMatrix; kwargs...) = d1 == d2
 Base.similar(A::IMatrix{Tv}, ::Type{T}) where {Tv,T} = IMatrix{T}(A.n)
 function Base.copyto!(A::IMatrix, B::IMatrix)
     if A.n != B.n
-        DimensionMismatch("matrix dimension mismatch, got $(A.n) and $(B.n)")
+        throw(DimensionMismatch("matrix dimension mismatch, got $(A.n) and $(B.n)"))
     end
     A
 end

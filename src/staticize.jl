@@ -58,4 +58,4 @@ end
 nnz(M::SDMatrix) = length(M)
 
 findnz(sp::AbstractSparseMatrix) = SparseArrays.findnz(sp)
-nnz(M::SDSparseMatrixCSC) = SparseArrays.nnz(M)
+nnz(M::AbstractSparseMatrix) = SparseArrays.nnz(M)

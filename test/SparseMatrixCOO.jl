@@ -47,10 +47,10 @@ end
 end
 
 @testset "setindex" begin
-    coo[1, 1] = 0.2
-    @test coo.is[end] == 1
-    @test coo.js[end] == 1
-    @test coo.vs[end] == 0.2
+    coo1[1, 1] = 0.2
+    @test coo1.is[end] == 1
+    @test coo1.js[end] == 1
+    @test coo1.vs[end] == 0.2
 
     S = SparseMatrixCOO{Float32,Cint}(Cint[], Cint[], Float32[], 5, 5)
     S[1, 1] = 3

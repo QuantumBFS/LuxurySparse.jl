@@ -21,6 +21,9 @@ dv = Diagonal(v)
 
     p0 = similar(p1, ComplexF64)
     @test p0 !== p1
+    p2 = copyto!(p1, p0)
+    @test p2 == p0
+    @test_throws DimensionMismatch copyto!(p0, IMatrix(2))
 end
 
 @testset "conversion" begin

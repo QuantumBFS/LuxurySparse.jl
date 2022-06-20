@@ -106,3 +106,5 @@ function SparseArrays.findnz(S::SSparseMatrixCSC{Tv,Ti}) where {Tv,Ti}
     return (I, J, V)
 end
 SparseArrays.dropzeros!(M::SSparseMatrixCSC; trim::Bool = false) = M
+SparseArrays.SparseMatrixCSC(sm::SSparseMatrixCSC) = dynamicize(sm)
+Base.Matrix(sm::SSparseMatrixCSC) = Matrix(SparseMatrixCSC(sm))
