@@ -64,14 +64,14 @@ BenchmarkTools.Trial:
 ## Identity Matrix
 Identity matrix is static, which is defined as
 ```
-struct IMatrix{N, Tv} <: AbstractMatrix{Tv} end
+struct IMatrix{Tv} <: AbstractMatrix{Tv} end
 ```
 
 With this type, the [Kronecker product](https://en.wikipedia.org/wiki/Kronecker_product) operation can be much faster. Now let's see a benchmark
 
 ```@example identity
 using LuxurySparse: IMatrix
-Id = IMatrix{1, Float64}()
+Id = IMatrix{Float64}(1)
 B = randn(7,7);
 ```
 

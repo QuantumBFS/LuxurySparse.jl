@@ -1,11 +1,3 @@
-using LuxurySparse
-using SparseArrays
-using SparseArrays.HigherOrderFns
-using LinearAlgebra
-using LinearAlgebra: StructuredMatrixStyle
-using Base.Broadcast:
-    BroadcastStyle, AbstractArrayStyle, Broadcasted, DefaultArrayStyle, materialize!
-
 @static if VERSION < v"1.2"
     Base.size(bc::Broadcasted) = map(length, axes(bc))
     Base.length(bc::Broadcasted) = prod(size(bc))
@@ -20,9 +12,9 @@ Broadcast.BroadcastStyle(::Type{<:IMatrix}) = StructuredMatrixStyle{Diagonal}()
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),
-    a::IMatrix{N,T},
+    a::IMatrix{T},
     b::IMatrix,
-) where {N,T} = IMatrix{N,T}()
+) where {T} = IMatrix{T}(a.n)
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),
@@ -39,15 +31,15 @@ Broadcast.broadcasted(
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),
-    a::IMatrix{S},
+    a::IMatrix,
     b::Number,
-) where {S} = Diagonal(fill(b, S))
+) = Diagonal(fill(b, a.n))
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),
     a::Number,
-    b::IMatrix{S},
-) where {S} = Diagonal(fill(a, S))
+    b::IMatrix,
+) where {S} = Diagonal(fill(a, b.n))
 
 # specialize perm matrix
 function _broadcast_perm_prod(A::PermMatrix, B::AbstractMatrix)
@@ -121,3 +113,10 @@ Broadcast.broadcasted(
     a::PermMatrix,
     b::Number,
 ) = PermMatrix(a.perm, a.vals .* b)
+
+Broadcast.broadcasted(
+    ::AbstractArrayStyle{2},
+    ::typeof(*),
+    a::Number,
+    b::PermMatrix,
+) = PermMatrix(b.perm, a .* b.vals)

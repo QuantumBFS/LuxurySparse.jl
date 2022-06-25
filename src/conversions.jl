@@ -1,19 +1,21 @@
 ################## To IMatrix ######################
-IMatrix{N,T}(::AbstractMatrix) where {N,T} = IMatrix{N,T}()
-IMatrix{N}(A::AbstractMatrix{T}) where {N,T} = IMatrix{N,T}()
-IMatrix(A::AbstractMatrix{T}) where {T} =
-    IMatrix{size(A, 1) == size(A, 2) ? size(A, 2) : throw(DimensionMismatch()),T}()
+function IMatrix{T}(A::AbstractMatrix) where {T}
+    IMatrix{T}(size(A, 1) == size(A, 2) ? size(A, 2) : throw(DimensionMismatch()))
+end
+function IMatrix(A::AbstractMatrix{T}) where {T}
+    IMatrix{T}(size(A, 1) == size(A, 2) ? size(A, 2) : throw(DimensionMismatch()))
+end
 
 ################## To Diagonal ######################
 Diagonal(A::PermMatrix) = Diagonal(diag(A))
-Diagonal(A::IMatrix{N,T}) where {N,T} = Diagonal{T}(ones(T, N))
-Diagonal{T}(::IMatrix{N}) where {T,N} = Diagonal{T}(ones(T, N))
+Diagonal(A::IMatrix{T}) where {T} = Diagonal{T}(ones(T, A.n))
+Diagonal{T}(A::IMatrix) where {T} = Diagonal{T}(ones(T, A.n))
 
 ################## To SparseMatrixCSC ######################
-SparseMatrixCSC{Tv,Ti}(A::IMatrix{N}) where {Tv,Ti<:Integer,N} =
-    SparseMatrixCSC{Tv,Ti}(I, N, N)
+SparseMatrixCSC{Tv,Ti}(A::IMatrix) where {Tv,Ti<:Integer} =
+    SparseMatrixCSC{Tv,Ti}(I, A.n, A.n)
 SparseMatrixCSC{Tv}(A::IMatrix) where {Tv} = SparseMatrixCSC{Tv,Int}(A)
-SparseMatrixCSC(A::IMatrix{N,T}) where {N,T} = SparseMatrixCSC{T,Int}(I, N, N)
+SparseMatrixCSC(A::IMatrix{T}) where {T} = SparseMatrixCSC{T,Int}(I, A.n, A.n)
 function SparseMatrixCSC(M::PermMatrix)
     n = size(M, 1)
     #SparseMatrixCSC(n, n, collect(1:n+1), M.perm, M.vals)
@@ -34,8 +36,8 @@ SparseMatrixCSC{Tv,Ti}(M::PermMatrix{Tv,Ti}) where {Tv,Ti} = SparseMatrixCSC(M)
 SparseMatrixCSC(coo::SparseMatrixCOO) = sparse(coo.is, coo.js, coo.vs, coo.m, coo.n)
 
 ################## To Dense ######################
-Matrix{T}(::IMatrix{N}) where {T,N} = Matrix{T}(I, N, N)
-Matrix(::IMatrix{N,T}) where {N,T} = Matrix{T}(I, N, N)
+Matrix{T}(A::IMatrix) where {T} = Matrix{T}(I, A.n, A.n)
+Matrix(A::IMatrix{T}) where {T} = Matrix{T}(I, A.n, A.n)
 
 function Matrix{T}(X::PermMatrix) where {T}
     n = size(X, 1)
@@ -56,14 +58,15 @@ function Matrix(coo::SparseMatrixCOO{T}) where {T}
 end
 
 ################## To PermMatrix ######################
-PermMatrix{Tv,Ti}(::IMatrix{N}) where {Tv,Ti,N} =
-    PermMatrix{Tv,Ti}(Vector{Ti}(1:N), ones(Tv, N))
+PermMatrix{Tv,Ti}(A::IMatrix) where {Tv,Ti} =
+    PermMatrix{Tv,Ti}(Vector{Ti}(1:A.n), ones(Tv, A.n))
 PermMatrix{Tv}(X::IMatrix) where {Tv} = PermMatrix{Tv,Int}(X)
-PermMatrix(X::IMatrix{N,T}) where {N,T} = PermMatrix{T,Int}(X)
+PermMatrix(X::IMatrix{T}) where {T} = PermMatrix{T,Int}(X)
 
 PermMatrix{Tv,Ti}(A::PermMatrix) where {Tv,Ti} =
     PermMatrix(Vector{Ti}(A.perm), Vector{Tv}(A.vals))
 
+# NOTE: bad implementation!
 function _findnz(A::AbstractMatrix)
     I = findall(!iszero, A)
     getindex.(I, 1), getindex.(I, 2), A[I]
@@ -108,7 +111,6 @@ function SparseMatrixCOO(A::Matrix{Tv}; atol = 1e-12) where {Tv}
     SparseMatrixCOO(is, js, vs, m, n)
 end
 
-import Base: convert
-convert(T::Type{<:PermMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
-convert(T::Type{<:IMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
-convert(T::Type{<:Diagonal}, m::AbstractMatrix) = m isa T ? m : T(m)
+Base.convert(T::Type{<:PermMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
+Base.convert(T::Type{<:IMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
+Base.convert(T::Type{<:Diagonal}, m::AbstractMatrix) = m isa T ? m : T(m)

@@ -1,5 +1,3 @@
-export SSparseMatrixCSC
-
 @static if VERSION < v"1.4.0"
 
     """
@@ -72,12 +70,12 @@ function SSparseMatrixCSC(
     SSparseMatrixCSC{Tv,Ti,length(nzval),n + 1}(m, n, colptr, rowval, nzval)
 end
 
-function size(spm::SSparseMatrixCSC{Tv,Ti,NNZ,NP}, i::Integer) where {Tv,Ti,NNZ,NP}
+function Base.size(spm::SSparseMatrixCSC{Tv,Ti,NNZ,NP}, i::Integer) where {Tv,Ti,NNZ,NP}
     i == 1 ? spm.m : (i == 2 ? NP - 1 : throw(ArgumentError("dimension out of bound!")))
 end
-size(spm::SSparseMatrixCSC{Tv,Ti,NNZ,NP}) where {Tv,Ti,NNZ,NP} = (spm.m, NP - 1)
+Base.size(spm::SSparseMatrixCSC{Tv,Ti,NNZ,NP}) where {Tv,Ti,NNZ,NP} = (spm.m, NP - 1)
 
-function getindex(ssp::SSparseMatrixCSC{Tv}, i::Integer, j::Integer) where {Tv}
+function Base.getindex(ssp::SSparseMatrixCSC{Tv}, i::Integer, j::Integer) where {Tv}
     S = ssp.colptr[j]
     E = ssp.colptr[j+1] - 1
     for ii = S:E
@@ -108,3 +106,5 @@ function SparseArrays.findnz(S::SSparseMatrixCSC{Tv,Ti}) where {Tv,Ti}
     return (I, J, V)
 end
 SparseArrays.dropzeros!(M::SSparseMatrixCSC; trim::Bool = false) = M
+SparseArrays.SparseMatrixCSC(sm::SSparseMatrixCSC) = dynamicize(sm)
+Base.Matrix(sm::SSparseMatrixCSC) = Matrix(SparseMatrixCSC(sm))

@@ -74,14 +74,3 @@ Random.seed!(2)
     m = rand(2, 2)
     @test dynamicize(m) === m
 end
-
-@testset "SSparseMatrixCSC" begin
-    m = sprand(ComplexF64, 4, 4, 0.5)
-    sm = m |> staticize
-    @test LuxurySparse.nnz(sm) == LuxurySparse.nnz(m)
-    @test LuxurySparse.nonzeros(sm) == LuxurySparse.nonzeros(m)
-    @test isdense(sm) == false
-    @test issparse(sm)
-    @test LuxurySparse.dropzeros!(sm) == sm
-    @test sm == m
-end

@@ -1,12 +1,9 @@
-export SDPermMatrix,
-    SPermMatrix, SDSparseMatrixCSC, SDMatrix, SDDiagonal, SDVector, staticize, dynamicize
-
 ######### Union of static and dynamic matrices ##########
 const SDMatrix{T} = Union{Matrix{T},SArray{Shape,T,2,L} where {Shape,L}}
 const SDDiagonal{T} = Union{Diagonal{T},SDiagonal{N,T} where N}
 const SDVector{T} = Union{Vector{T},SVector{N,T} where N}
-const SDPermMatrix{Tv,Ti} = PermMatrix{Tv,Ti,<:SDVector{Tv},<:SDVector{Ti}}
-const SPermMatrix{N,Tv,Ti} = PermMatrix{Tv,Ti,<:SVector{N,Tv},<:SVector{N,Ti}}
+const SDPermMatrix{Tv,Ti<:Integer} = PermMatrix{Tv,Ti,<:SDVector{Tv},<:SDVector{Ti}}
+const SPermMatrix{N,Tv,Ti<:Integer} = PermMatrix{Tv,Ti,<:SVector{N,Tv},<:SVector{N,Ti}}
 const SDSparseMatrixCSC{Tv,Ti} = Union{SparseMatrixCSC{Tv,Ti},SSparseMatrixCSC{Tv,Ti}}
 
 ######### staticize ##########
@@ -58,9 +55,7 @@ function findnz(M::SDMatrix)
     cis = CartesianIndices(size(M))
     vec(getindex.(cis, 1)), vec(getindex.(cis, 2)), vec(M)
 end
+nnz(M::SDMatrix) = length(M)
 
-findnz(sp::SDSparseMatrixCSC) = SparseArrays.findnz(sp)
-dropzeros!(M::SDSparseMatrixCSC; trim::Bool = false) =
-    SparseArrays.dropzeros!(M; trim = trim)
-nonzeros(M::SDSparseMatrixCSC) = SparseArrays.nonzeros(M)
-nnz(M::SDSparseMatrixCSC) = SparseArrays.nnz(M)
+findnz(sp::AbstractSparseMatrix) = SparseArrays.findnz(sp)
+nnz(M::AbstractSparseMatrix) = SparseArrays.nnz(M)

@@ -4,7 +4,7 @@ using LuxurySparse
 
 Random.seed!(2)
 
-p1 = IMatrix{4}()
+p1 = IMatrix(4)
 sp = sprand(ComplexF64, 4, 4, 0.5)
 ds = rand(ComplexF64, 4, 4)
 pm = PermMatrix([2, 3, 4, 1], randn(4))
@@ -18,17 +18,6 @@ dv = Diagonal(v)
     @test diag(p1) == diag(Matrix(p1))
     @test logdet(p1) == 0
     @test inv(pm) == inv(Matrix(pm))
-
-    for m in Any[pm, sp, p1, dv]
-        @test !(m |> isdense)
-        @test !(m' |> isdense)
-        @test !(transpose(m) |> isdense)
-    end
-    for m in Any[ds, v]
-        @test m |> isdense
-        @test m' |> isdense
-        @test transpose(m) |> isdense
-    end
 end
 
 @testset "multiply" begin
@@ -47,10 +36,6 @@ end
                 if !(target === p1 || parent(source) === p1)
                     @test eltype(lres) == eltype(flres)
                     @test eltype(rres) == eltype(frres)
-                end
-                if !(target |> isdense) && !(parent(source) |> isdense)
-                    @test lres |> isdense == false
-                    @test lres |> isdense == false
                 end
 
                 # +, -

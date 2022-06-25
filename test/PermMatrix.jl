@@ -27,6 +27,8 @@ v = [0.5, 0.3im, 0.2, 1.0]
     @test p0.vals !== p1.vals
     @test p1[2, 2] === 0.0im
     @test p1[1, 1] === 0.1 + 0.0im
+    copyto!(p0, p1)
+    @test p0 == p1
 end
 
 @testset "linalg" begin
@@ -74,15 +76,13 @@ end
     pm = pmrand(10)
     out = zeros(10, 10)
     @test LuxurySparse.nnz(pm) == 10
-    @test LuxurySparse.nonzeros(pm) == pm.vals
-    @test LuxurySparse.dropzeros!(pm) == pm
+    @test LuxurySparse.findnz(pm)[3] == pm.vals
 end
 
 @testset "identity sparse" begin
     p1 = Diagonal(randn(10))
     @test LuxurySparse.nnz(p1) == 10
-    @test LuxurySparse.nonzeros(p1) == p1.diag
-    @test LuxurySparse.dropzeros!(p1) == p1
+    @test LuxurySparse.findnz(p1)[3] == p1.diag
 end
 
 @testset "setindex" begin

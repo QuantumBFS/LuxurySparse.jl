@@ -1,5 +1,5 @@
 using Test, SparseArrays
-import LuxurySparse: SparseMatrixCOO, allocated_coo, isdense
+import LuxurySparse: SparseMatrixCOO, allocated_coo
 
 coo1 = SparseMatrixCOO(
     [1, 4, 2, 3, 3, 3],
@@ -23,8 +23,7 @@ coo1 = SparseMatrixCOO(
     @test coo1 == copyto!(coo2, coo1)
 
     @test Matrix(coo1) == [0.1 0 0 0; 0 0.4im 0 0; 0 0 0.3 0.5+0.5im; 0.2 0 0 0]
-    @test sparse(coo1) == sparse(findnz(coo1)...)
-    @test isdense(coo1) == false
+    @test sparse(coo1) == sparse(LuxurySparse.findnz(coo1)...)
 
     A = sprand(50, 50, 0.2) |> Matrix
     @test SparseMatrixCOO(A) == A
@@ -48,10 +47,10 @@ end
 end
 
 @testset "setindex" begin
-    coo[1, 1] = 0.2
-    @test coo.is[end] == 1
-    @test coo.js[end] == 1
-    @test coo.vs[end] == 0.2
+    coo1[1, 1] = 0.2
+    @test coo1.is[end] == 1
+    @test coo1.js[end] == 1
+    @test coo1.vs[end] == 0.2
 
     S = SparseMatrixCOO{Float32,Cint}(Cint[], Cint[], Float32[], 5, 5)
     S[1, 1] = 3

@@ -4,7 +4,7 @@ import LuxurySparse: IMatrix, PermMatrix
 @testset "kron" begin
     Random.seed!(2)
 
-    p1 = IMatrix{4}()
+    p1 = IMatrix(4)
     sp = sprand(ComplexF64, 4, 4, 0.5)
     ds = rand(ComplexF64, 4, 4)
     pm = PermMatrix([2, 3, 4, 1], randn(4))

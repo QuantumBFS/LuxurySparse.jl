@@ -1,5 +1,3 @@
-export SparseMatrixCOO
-
 """
     SparseMatrixCOO(is::Vector, js::Vector, vs::Vector, m::Int, n::Int) -> SparseMatrixCOO
     SparseMatrixCOO{Tv, Ti}(is::Vector{Ti}, js::Vector{Ti}, vs::Vector{Tv}, m::Int, n::Int) -> SparseMatrixCOO
@@ -50,9 +48,9 @@ end
 SparseMatrixCOO(is::Vector{Ti}, js::Vector{Ti}, vs::Vector{Tv}, m, n) where {Ti,Tv} =
     SparseMatrixCOO{Tv,Ti}(is, js, vs, m, n)
 
-copy(coo::SparseMatrixCOO{Tv,Ti}) where {Tv,Ti} =
+Base.copy(coo::SparseMatrixCOO{Tv,Ti}) where {Tv,Ti} =
     SparseMatrixCOO{Tv,Ti}(copy(coo.is), copy(coo.js), copy(coo.vs), coo.m, coo.n)
-function copyto!(A::SparseMatrixCOO{Tv,Ti}, B::SparseMatrixCOO{Tv,Ti}) where {Tv,Ti}
+function Base.copyto!(A::SparseMatrixCOO{Tv,Ti}, B::SparseMatrixCOO{Tv,Ti}) where {Tv,Ti}
     size(A) == size(B) && nnz(A) == nnz(B) ||
         throw(MethodError("size/nnz of two coo matrices do not match!"))
     copyto!(A.is, B.is)
@@ -86,7 +84,7 @@ function allocated_coo(::Type{T}, M::Int, N::Int, nnz::Int) where {T}
     SparseMatrixCOO{T}(undef, M, N, nnz)
 end
 
-function getindex(coo::SparseMatrixCOO{Tv,Ti}, i::Integer, j::Integer) where {Tv,Ti}
+function Base.getindex(coo::SparseMatrixCOO{Tv,Ti}, i::Integer, j::Integer) where {Tv,Ti}
     res = zero(Tv)
     for k = 1:nnz(coo)
         if coo.is[k] == i && coo.js[k] == j
@@ -96,21 +94,19 @@ function getindex(coo::SparseMatrixCOO{Tv,Ti}, i::Integer, j::Integer) where {Tv
     res
 end
 
-size(coo::SparseMatrixCOO) = (coo.m, coo.n)
-size(coo::SparseMatrixCOO, axis::Int) =
+Base.size(coo::SparseMatrixCOO) = (coo.m, coo.n)
+Base.size(coo::SparseMatrixCOO, axis::Int) =
     axis == 1 ? coo.m : (axis == 2 ? coo.n : throw(MethodError("invalid axis parameter")))
 
-# SparseArrays: SparseMatrixCSC, nnz, nonzeros, dropzeros!, findnz
-nnz(coo::SparseMatrixCOO) = coo.is |> length
-nonzeros(coo::SparseMatrixCOO) = coo.vs
+SparseArrays.nnz(coo::SparseMatrixCOO) = coo.is |> length
+SparseArrays.nonzeros(coo::SparseMatrixCOO) = coo.vs
 
-function dropzeros!(coo::SparseMatrixCOO{Tv,Ti}; trim::Bool = false) where {Tv,Ti}
+function SparseArrays.dropzeros!(coo::SparseMatrixCOO{Tv,Ti}; trim::Bool = false) where {Tv,Ti}
     mask = abs.(coo.vs) .> 1e-15
     SparseMatrixCOO{Tv,Ti}(coo.is[mask], coo.js[mask], coo.vs[mask], coo.m, coo.n)
 end
 
-findnz(coo::SparseMatrixCOO) = (coo.is, coo.js, coo.vs)
-isdense(::SparseMatrixCOO) = false
+SparseArrays.findnz(coo::SparseMatrixCOO) = (coo.is, coo.js, coo.vs)
 
 Base.@propagate_inbounds function Base.setindex!(
     coo::SparseMatrixCOO{Tv,Ti},

@@ -5,7 +5,7 @@ using LinearAlgebra
 
 Random.seed!(2)
 
-p1 = IMatrix{4}()
+p1 = IMatrix(4)
 sp = sprand(ComplexF64, 4, 4, 0.5)
 ds = rand(ComplexF64, 4, 4)
 pm = PermMatrix([2, 3, 4, 1], randn(4))
@@ -21,14 +21,17 @@ dv = Diagonal(v)
 
     p0 = similar(p1, ComplexF64)
     @test p0 !== p1
+    p2 = copyto!(p1, p0)
+    @test p2 == p0
+    @test_throws DimensionMismatch copyto!(p0, IMatrix(2))
 end
 
 @testset "conversion" begin
-    for mat in [p1, pm, dv]
+    for mat in Any[p1, pm, dv]
         @test mat == SparseMatrixCSC(mat)
         @test mat == Matrix(mat)
     end
-    for mat in [p1, pm, dv]
+    for mat in Any[p1, pm, dv]
         @test mat == PermMatrix(mat)
     end
     @test Diagonal(p1) == p1
@@ -37,12 +40,13 @@ end
 end
 
 @testset "sparse" begin
+    @show p1
     @test LuxurySparse.nnz(p1) == 4
-    @test LuxurySparse.nonzeros(p1) == ones(4)
+    @test length(LuxurySparse.findnz(p1)[3]) == 4
 end
 
 @testset "linalg" begin
-    for op in [conj, real, transpose, copy, inv]
+    for op in Any[conj, real, transpose, copy, inv]
         @test op(p1) == Matrix(I, 4, 4)
         @test typeof(op(p1)) == typeof(p1)
     end
@@ -66,4 +70,16 @@ end
 @testset "basicmath" begin
     @test p1 * 2im == Matrix(p1) * 2im
     @test p1 / 2.0 == Matrix(p1) / 2.0
+end
+
+@testset "push coverage" begin
+    @test SparseMatrixCSC(IMatrix(3)) ≈ Diagonal(ones(3))
+    @test Diagonal(IMatrix(3)) ≈ Diagonal(ones(3))
+    @test IMatrix(Diagonal(ones(3))) === IMatrix{Float64}(3)
+    @test IMatrix{ComplexF64}(Diagonal(ones(3))) === IMatrix{ComplexF64}(3)
+    @test_throws DimensionMismatch IMatrix(ones(3, 5))
+    @test_throws DimensionMismatch IMatrix{ComplexF64}(ones(3, 5))
+    @test IMatrix(3) .* 2 == IMatrix(3) * 2 == Diagonal([2,2,2])
+    @test 2 .* IMatrix(3) == 2 * IMatrix(3) == Diagonal([2,2,2])
+    @test IMatrix(3) ≈ IMatrix{Float64}(3)
 end
