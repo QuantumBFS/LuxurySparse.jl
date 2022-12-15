@@ -173,30 +173,6 @@ function Base.:*(X::SparseMatrixCSC, A::PermMatrix)
     SparseMatrixCSC(mX, nX, colptr, rowval, nzval)
 end
 
-############ SparseMatrixCSC and Diagonal #############
-function LinearAlgebra.mul!(Y::SparseMatrixCSC, X::SparseMatrixCSC, A::Diagonal{T,Vector{T}}) where {T}
-    nA = size(A, 1)
-    mX, nX = size(X)
-    nX == nA || throw(DimensionMismatch())
-    @inbounds for j = 1:nA
-        for k = X.colptr[j]:X.colptr[j+1]-1
-            Y.nzval[k] *= A.diag[j]
-        end
-    end
-    Y
-end
-
-function LinearAlgebra.mul!(Y::SparseMatrixCSC, A::Diagonal{T,Vector{T}}, X::SparseMatrixCSC) where {T}
-    nA = size(A, 2)
-    mX, nX = size(X)
-    mX == nA || throw(DimensionMismatch())
-    @inbounds @simd for i = 1:nnz(X)
-        Y.nzval[i] *= A.diag[X.rowval[i]]
-    end
-    Y
-end
-
-
 LinearAlgebra.rmul!(A::SparseMatrixCOO, B::Int) = (A.vs *= B; A)
 LinearAlgebra.lmul!(B::Int, A::SparseMatrixCOO) = (A.vs *= B; A)
 LinearAlgebra.rdiv!(A::SparseMatrixCOO, B::Int) = (A.vs /= B; A)
