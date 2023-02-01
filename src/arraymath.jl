@@ -5,7 +5,7 @@ end
 for func in (:adjoint!, :transpose!)
     @eval (LinearAlgebra.$func)(M::IMatrix) = M
 end
-Base.imag(M::IMatrix{T}) where {N,T} = Diagonal(zeros(T, M.n))
+Base.imag(M::IMatrix{T}) where {T} = Diagonal(zeros(T, M.n))
 
 # PermMatrix
 for func in (:conj, :real, :imag)
