@@ -108,3 +108,7 @@ end
 SparseArrays.dropzeros!(M::SSparseMatrixCSC; trim::Bool = false) = M
 SparseArrays.SparseMatrixCSC(sm::SSparseMatrixCSC) = dynamicize(sm)
 Base.Matrix(sm::SSparseMatrixCSC) = Matrix(SparseMatrixCSC(sm))
+
+# fix issue #73 - show fail
+SparseArrays._checkbuffers(S::SSparseMatrixCSC) = (@assert SparseArrays._goodbuffers(S); S)
+SparseArrays._goodbuffers(S::SSparseMatrixCSC) = SparseArrays._goodbuffers(size(S)..., SparseArrays.getcolptr(S), SparseArrays.getrowval(S), SparseArrays.nonzeros(S))

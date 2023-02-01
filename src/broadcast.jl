@@ -39,7 +39,7 @@ Broadcast.broadcasted(
     ::typeof(*),
     a::Number,
     b::IMatrix,
-) where {S} = Diagonal(fill(a, b.n))
+) = Diagonal(fill(a, b.n))
 
 # specialize perm matrix
 function _broadcast_perm_prod(A::PermMatrix, B::AbstractMatrix)

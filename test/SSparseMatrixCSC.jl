@@ -14,4 +14,6 @@ using Test, LuxurySparse
     @test issparse(sm)
     @test LuxurySparse.dropzeros!(sm) == sm
     @test sm == m
+    @test print(sm) === nothing
+    @test display(sm) === nothing
 end
