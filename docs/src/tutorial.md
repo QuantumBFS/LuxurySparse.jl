@@ -1,9 +1,9 @@
 # Tutorial
 
-## Generalized permutation matrix
+## Generalized Permutation Matrix
 
 ### Example: Control-Y Gate in Quantum simulation
-[Generalized permutation matrices](https://en.wikipedia.org/wiki/Generalized_permutation_matrix) are frequently used in fields such as quantum computation, group thoery. Here we see an example of Control-Y Gate
+[Generalized permutation matrices](https://en.wikipedia.org/wiki/Generalized_permutation_matrix) are frequently used in fields such as quantum computation and group theory. Here we see an example of Control-Y Gate in matrix form:
 ```math
 \left(\begin{matrix}
 1 & 0 & 0 & 0\\
@@ -13,9 +13,10 @@
 \end{matrix}\right)
 ```
 
-This data structure can be represented in the form of `PermMatrix`
-* perm: [1, 2, 4, 3]
-* vals: [1, 1, -i, i]
+We can represent the matrix using a `PermMatrix` type with the following fields:
+
+* `perm`: [1, 2, 4, 3]
+* `vals`: [1, 1, -i, i]
 
 Now let's do a benchmark to feel the speed up
 
@@ -25,8 +26,9 @@ pm = PermMatrix([1,2,4,3], [1,1,-im,im])
 ```
 
 ```julia
+using BenchmarkTools
 v = randn(4)
-@benchmark $pm*$v
+@benchmark $pm*$v samples=100000 evals=1000
 ```
 ```
 BenchmarkTools.Trial: 
@@ -45,7 +47,7 @@ BenchmarkTools.Trial:
 As a comparison
 ```julia
 sp = SparseMatrixCSC(pm)
-@benchmark $sp*$v
+@benchmark $sp*$v samples=100000 evals=1000
 ```
 ```
 BenchmarkTools.Trial: 
@@ -62,7 +64,7 @@ BenchmarkTools.Trial:
 ```
 
 ## Identity Matrix
-Identity matrix is static, which is defined as
+The identity matrix is static and is defined as:
 ```
 struct IMatrix{Tv} <: AbstractMatrix{Tv} end
 ```
@@ -76,19 +78,40 @@ B = randn(7,7);
 ```
 
 ```julia
-@benchmark kron($Id, $B)
+using BenchmarkTools
+@benchmark kron($Id, $B) samples=100000 evals=1000
 ```
 ```
-BenchmarkTools.Trial: 
-  memory estimate:  0 bytes
-  allocs estimate:  0
-  --------------
-  minimum time:     1.642 ns (0.00% GC)
-  median time:      1.651 ns (0.00% GC)
-  mean time:        1.658 ns (0.00% GC)
-  maximum time:     32.101 ns (0.00% GC)
-  --------------
-  samples:          10000
-  evals/sample:     1000
+BenchmarkTools.Trial: 100000 samples with 1000 evaluations.
+ Range (min … max):  3.333 ns … 22.667 ns  ┊ GC (min … max): 0.00% … 0.00%
+ Time  (median):     3.417 ns              ┊ GC (median):    0.00%
+ Time  (mean ± σ):   3.457 ns ±  0.343 ns  ┊ GC (mean ± σ):  0.00% ± 0.00%
+
+        ▄     █      ▆     ▄      ▅     ▄      ▃     ▃       ▃
+  ▆▁▁▁▁▁█▁▁▁▁▁█▁▁▁▁▁▁█▁▁▁▁▁█▁▁▁▁▁▁█▁▁▁▁▁█▁▁▁▁▁▁█▁▁▁▁▁█▁▁▁▁▁▇ █
+  3.33 ns      Histogram: log(frequency) by time     3.71 ns <
+
+ Memory estimate: 0 bytes, allocs estimate: 0.
 ```
-With the help of Julia's multiple dispatch, the above trivil `kron` operation can be avoided.
+As a comparison
+```julia
+using LinearAlgebra, SparseArrays
+spI = sparse(I, 7, 7)
+@benchmark kron($spI, $B) samples=100000 evals=1000 seconds=3600
+```
+```
+julia> @benchmark kron($spI, $B) samples=100000 evals=1000 seconds=3600
+BenchmarkTools.Trial: 100000 samples with 1000 evaluations.
+ Range (min … max):  694.417 ns …  23.188 μs  ┊ GC (min … max):  0.00% …  0.00%
+ Time  (median):       1.117 μs               ┊ GC (median):     0.00%
+ Time  (mean ± σ):     1.499 μs ± 977.508 ns  ┊ GC (mean ± σ):  28.57% ± 26.68%
+
+       ▃██▃                                                      
+  ▃▃▃▄▅████▆▄▃▂▂▂▂▂▂▂▂▂▂▂▂▁▂▁▁▁▁▂▂▂▂▂▂▂▂▂▂▂▂▂▂▂▃▃▃▃▃▃▃▃▃▃▃▃▂▂▂▂ ▃
+  694 ns           Histogram: frequency by time         4.23 μs <
+
+ Memory estimate: 7.11 KiB, allocs estimate: 8.
+
+```
+
+With the help of Julia's multiple dispatch, a more performant `kron` operation can be implemented with LuxurySparse's `IMatrix` type versus the standard sparse identity matrix.

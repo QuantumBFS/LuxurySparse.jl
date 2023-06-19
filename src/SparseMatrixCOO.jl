@@ -4,6 +4,8 @@
 
 A sparse matrix in COOrdinate format.
 
+Values `vs` are added to the matrix at rows `is` and columns `js` in a matrix with `m` rows and `n` columns.
+
 Also known as the ‘ijv’ or ‘triplet’ format.
 
 # Notes
@@ -24,6 +26,19 @@ does not directly support:
 * COO is a fast format for constructing sparse matrices
 * Once a matrix has been constructed, convert to CSR or CSC format for fast arithmetic and matrix vector operations
 * By default when converting to CSR or CSC format, duplicate (i,j) entries will be summed together. This facilitates efficient construction of finite element matrices and the like. (see example)
+
+# Example
+
+```julia-repl
+julia> SparseMatrixCOO([4,3,1,2,2], [2,3,1,4,4], [1,2,3,4,5], 4,4) # duplicate entries at (2,4) summed together
+4×4 SparseMatrixCOO{Int64, Int64}:
+ 3  0  0  0
+ 0  0  0  9
+ 0  0  2  0
+ 0  1  0  0
+
+```
+
 """
 mutable struct SparseMatrixCOO{Tv,Ti} <: AbstractSparseMatrix{Tv,Ti}
     is::Vector{Ti}
@@ -78,7 +93,7 @@ end
 """
     allocated_coo(::Type, M::Int, N::Int, nnz::Int) -> SparseMatrixCOO
 
-Construct a preallocated `SparseMatrixCOO` instance.
+Construct a preallocated [`SparseMatrixCOO`](@ref) instance that holds values of `::Type` with `M` rows, `N` columns, and `nnz` nonzero elements.
 """
 function allocated_coo(::Type{T}, M::Int, N::Int, nnz::Int) where {T}
     SparseMatrixCOO{T}(undef, M, N, nnz)

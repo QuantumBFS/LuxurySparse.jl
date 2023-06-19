@@ -5,5 +5,6 @@ operations related to quantum gates.
 
 ```@autodocs
 Modules = [LuxurySparse]
+Private = false
 Order   = [:module, :constant, :type, :macro, :function]
 ```

@@ -11,13 +11,12 @@ High performance extension for sparse matrices.
 * Coordinate Format Matrix `SparseMatrixCOO`,
 * Static Matrices `SSparseMatrixCSC`, `SPermMatrix` et. al.
 
-with high performance `type convertion`, `kron` and `multiplication` operations.
+with high performance type conversion, `kron`, and multiplication operations.
 
 ## Installation
 Install with the package manager, `pkg> add LuxurySparse`.
 
-## How to use
-Here is a simple example
+## Usage
 
 ```julia
 using SparseArrays
@@ -28,17 +27,17 @@ pm = pmrand(7)  # a random permutation matrix
 id = IMatrix(3) # an identity matrix
 @benchmark kron(pm, id) # kronecker product
 
-Spm = pm |> SparseMatrixCSC  # convertion to SparseMatrixCSC
+Spm = pm |> SparseMatrixCSC  # convert to SparseMatrixCSC
 Sid = id |> SparseMatrixCSC
-@benchmark kron(Spm, Sid)    # compare the performance.
+@benchmark kron(Spm, Sid)    # compare the performance to the previous operation.
 
-spm = pm |> staticize        # convertion to static matrices, notice `id` is already static.
-@benchmark kron(spm, spm)    # compare the performance.
-@benchmark kron(pm, pm)    # compare the performance.
+spm = pm |> staticize        # convert to static matrix, notice that `id` is already static.
+@benchmark kron(spm, spm)    # compare performance
+@benchmark kron(pm, pm) 
 ```
 
-For more information, please refer the latest [document](https://quantumbfs.github.io/LuxurySparse.jl/latest/).
+For more information, please refer the latest [Documentation](https://quantumbfs.github.io/LuxurySparse.jl/latest/).
 
 ## Planned features
 * Change `PermMatrix` to column major
-* Better support to static matrices.
+* Better support of conversion to static matrices
