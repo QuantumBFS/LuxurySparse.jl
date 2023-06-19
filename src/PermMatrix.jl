@@ -3,13 +3,25 @@
     PermMatrix(perm::Vector{Ti}, vals::Vector{Tv}) where {Tv, Ti}
     PermMatrix(ds::AbstractMatrix)
 
-PermMatrix represents a special kind linear operator: Permute and Multiply, which means `M * v = v[perm] * val`
-Optimizations are used to make it much faster than `SparseMatrixCSC`.
+PermMatrix represents a special kind of linear operator: Permute and Multiply, which means `M * v = v[perm] * val`
+Optimized implementations of `inv` and `*` make it much faster than `SparseMatrixCSC`.
 
 * `perm` is the permutation order,
 * `vals` is the multiplication factor.
 
 [Generalized Permutation Matrix](https://en.wikipedia.org/wiki/Generalized_permutation_matrix)
+
+# Example
+
+```julia-repl
+julia> PermMatrix([2,1,4,3], rand(4))
+4×4 SDPermMatrix{Float64, Int64, Vector{Float64}, Vector{Int64}}:
+ 0.0       0.182251  0.0      0.0
+ 0.887485  0.0       0.0      0.0
+ 0.0       0.0       0.0      0.182831
+ 0.0       0.0       0.22895  0.0
+
+```
 """
 struct PermMatrix{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} <:
        AbstractMatrix{Tv}
@@ -74,7 +86,19 @@ Base.copyto!(A::PermMatrix, B::PermMatrix) =
 """
     pmrand(T::Type, n::Int) -> PermMatrix
 
-Return random PermMatrix.
+Return a random [`PermMatrix`](@ref) with type `T`, `n` rows and `n` columns.
+
+# Example
+
+```julia-repl
+julia> pmrand(ComplexF64, 4)
+4×4 SDPermMatrix{ComplexF64, Int64, Vector{ComplexF64}, Vector{Int64}}:
+        0.0+0.0im      0.112104+0.0179632im       0.0+0.0im              0.0+0.0im
+ -0.0625997+1.00664im       0.0+0.0im             0.0+0.0im              0.0+0.0im
+        0.0+0.0im           0.0+0.0im             0.0+0.0im       -0.0981836-0.839471im
+        0.0+0.0im           0.0+0.0im        0.735853-0.747084im         0.0+0.0im
+
+```
 """
 function pmrand end
 

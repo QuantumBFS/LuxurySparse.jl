@@ -10,7 +10,8 @@ const SDSparseMatrixCSC{Tv,Ti} = Union{SparseMatrixCSC{Tv,Ti},SSparseMatrixCSC{T
 """
     staticize(A::AbstractMatrix) -> AbastractMatrix
 
-transform a matrix to a static form.
+Transform a matrix to a static form by converting its representation to types from StaticArrays.jl.
+Enables faster linear algebra operations.
 """
 function staticize end
 staticize(x) = x # do nothing if it is not defined
@@ -39,7 +40,7 @@ end
 """
     dynamicize(A::AbstractMatrix) -> AbastractMatrix
 
-transform a matrix to a dynamic form.
+Converts matrices dependent on StaticArrays.jl types to Julia-standard ones.
 """
 function dynamicize end
 dynamicize(x) = x # do nothing if it is not defined
