@@ -113,4 +113,3 @@ end
 
 Base.convert(T::Type{<:PermMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
 Base.convert(T::Type{<:IMatrix}, m::AbstractMatrix) = m isa T ? m : T(m)
-Base.convert(T::Type{<:Diagonal}, m::AbstractMatrix) = m isa T ? m : T(m)
