@@ -150,10 +150,16 @@ pmcscrand(n::Int) = pmcscrand(Float64, n)
 
 Base.show(io::IO, ::MIME"text/plain", M::AbstractPermMatrix) = show(io, M)
 function Base.show(io::IO, M::AbstractPermMatrix)
-    println(io, "PermMatrix")
-    for ((i, j), p) in IterNz(M)
-        print(io, "($i, $j) = $p")
-        i < length(M.perm) && println(io)
+    n = size(M, 1)
+    println(io, typeof(M))
+    nmax = 20
+    for (k, (i, j, p)) in enumerate(IterNz(M))
+        if k <= nmax || k > n-nmax
+            print(io, "($i, $j) = $p")
+            k < n && println(io)
+        elseif k == nmax+1
+            println(io, "...")
+        end
     end
 end
 

@@ -64,7 +64,7 @@ function LinearAlgebra.mul!(Y::AbstractVector, A::AbstractPermMatrix, X::Abstrac
     length(X) == size(A, 2) || throw(DimensionMismatch("input X length does not match permutation matrix A"))
     length(Y) == size(A, 2) || throw(DimensionMismatch("output Y length does not match permutation matrix A"))
 
-    @inbounds for ((i, j), p) in IterNz(A)
+    @inbounds for (i, j, p) in IterNz(A)
         Y[i] = p * X[j] * alpha + beta * Y[i]
     end
     return Y
@@ -85,22 +85,28 @@ function Base.:*(A::PermMatrixCSC{Ta}, D::Diagonal{Td}) where {Td,Ta}
 end
 
 # to self
-function Base.:*(A::AbstractPermMatrix, B::AbstractPermMatrix)
+function Base.:*(A::PermMatrix, B::PermMatrix)
     @assert basetype(A) == basetype(B)
     size(A, 1) == size(B, 1) || throw(DimensionMismatch())
-    PermMatrix(B.perm[A.perm], A.vals .* view(B.vals, A.perm))
+    basetype(A)(B.perm[A.perm], A.vals .* view(B.vals, A.perm))
+end
+
+function Base.:*(A::PermMatrixCSC, B::PermMatrixCSC)
+    @assert basetype(A) == basetype(B)
+    size(A, 1) == size(B, 1) || throw(DimensionMismatch())
+    basetype(A)(A.perm[B.perm], B.vals .* view(A.vals, B.perm))
 end
 
 # to matrix
-function LinearAlgebra.:mul!(C::AbstractMatrix, A::AbstractPermMatrix, X::AbstractMatrix, alpha::Number, beta::Number)
+function LinearAlgebra.mul!(C::AbstractMatrix, A::AbstractPermMatrix, X::AbstractMatrix, alpha::Number, beta::Number)
     size(X, 1) == size(A, 2) || throw(DimensionMismatch())
     AR = PermMatrix(A)
-    C .= C .* beta .+ AR.vals .* view(X,AR.perm,:) .* alpha
+    C .= C .* beta .+ AR.vals .* view(X, AR.perm, :) .* alpha
 end
 function LinearAlgebra.mul!(C::AbstractMatrix, X::AbstractMatrix, A::AbstractPermMatrix, alpha::Number, beta::Number)
     size(X, 2) == size(A, 1) || throw(DimensionMismatch())
     AC = PermMatrixCSC(A)
-    C .= C .* beta .+ reshape(AC.vals, 1, :) .* view(X, :, perm) .* alpha
+    C .= C .* beta .+ reshape(AC.vals, 1, :) .* view(X, :, AC.perm) .* alpha
 end
 
 # NOTE: this is just a temperory fix for v0.7. We should overload mul! in

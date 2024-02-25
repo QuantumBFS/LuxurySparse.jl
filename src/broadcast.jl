@@ -44,7 +44,7 @@ Broadcast.broadcasted(
 # specialize perm matrix
 function _broadcast_perm_prod(A::AbstractPermMatrix, B::AbstractMatrix)
     dest = similar(A, Base.promote_op(*, eltype(A), eltype(B)))
-    @inbounds for ((i, j), a) in IterNz(A)
+    @inbounds for (i, j, a) in IterNz(A)
         dest[i, j] = a * B[i, j]
     end
     return dest
@@ -71,7 +71,7 @@ Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::IMatrix, B::Abstr
     Diagonal(B)
 
 function _broadcast_diag_perm_prod(A::Diagonal, B::AbstractPermMatrix)
-    Diagonal(A.diag .* getindex.(Ref(B), 1:size(A, 1)))
+    Diagonal(A.diag .* getindex.(Ref(B), 1:size(A, 1), 1:size(A, 2)))
 end
 
 Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::AbstractPermMatrix, B::Diagonal) =

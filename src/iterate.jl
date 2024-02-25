@@ -47,12 +47,12 @@ end
 # PermMatrixCSC
 function Base.iterate(it::IterNz{<:PermMatrixCSC})
     0 == length(it) && return nothing
-    return ((@inbounds it.A.perm[1], 1), (@inbounds it.A.vals[1])), 1
+    return ((@inbounds it.A.perm[1]), 1, (@inbounds it.A.vals[1])), 1
 end
 function Base.iterate(it::IterNz{<:PermMatrixCSC}, state)
     state == length(it) && return nothing
     state += 1
-    return ((@inbounds it.A.perm[state], state), (@inbounds it.A.vals[state])), state
+    return ((@inbounds it.A.perm[state]), state, (@inbounds it.A.vals[state])), state
 end
 
 # AbstractMatrix
