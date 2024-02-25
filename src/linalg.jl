@@ -94,7 +94,7 @@ end
 function Base.:*(A::PermMatrixCSC, B::PermMatrixCSC)
     @assert basetype(A) == basetype(B)
     size(A, 1) == size(B, 1) || throw(DimensionMismatch())
-    basetype(A)(A.perm[B.perm], B.vals .* view(A.vals, B.perm))
+    basetype(A)(A.perm[B.perm], [B.vals[i] * A.vals[B.perm[i]] for i in 1:size(A, 1)])
 end
 
 # to matrix

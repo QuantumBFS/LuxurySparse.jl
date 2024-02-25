@@ -96,7 +96,7 @@ end
 function PermMatrixCSC{Tv,Ti}(A::AbstractMatrix) where {Tv,Ti}
     i, j, v = _findnz(A)
     j == collect(1:size(A, 2)) || throw(ArgumentError("This is not a PermMatrix"))
-    PermMatrix{Tv,Ti}(Vector{Ti}(i), Vector{Tv}(v))
+    PermMatrixCSC{Tv,Ti}(Vector{Ti}(i), Vector{Tv}(v))
 end
 
 for MT in [:PermMatrix, :PermMatrixCSC]

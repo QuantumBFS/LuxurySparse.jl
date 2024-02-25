@@ -14,6 +14,8 @@ v = [0.5, 0.3im, 0.2, 1.0]
 
 @testset "basic" begin
     @test p1 == copy(p1)
+    @test hash(p1) == hash(copy(p1))
+    @test hash(p1) != hash(p2)
     @test eltype(p1) == ComplexF64
     @test eltype(p2) == Float64
     @test eltype(p3) == Float64
@@ -29,6 +31,7 @@ v = [0.5, 0.3im, 0.2, 1.0]
     @test p1[1, 1] === 0.1 + 0.0im
     copyto!(p0, p1)
     @test p0 == p1
+    @test PermMatrix([0.0 -1.0im; 1.0im 0.0im]) ≈ [0.0 -1.0im; 1.0im 0.0im]
 end
 
 @testset "linalg" begin
