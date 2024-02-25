@@ -1,4 +1,4 @@
-abstract type AbstractPermMatrix{Tv} <: AbstractMatrix{Tv} end
+abstract type AbstractPermMatrix{Tv, Ti} <: AbstractMatrix{Tv} end
 """
     PermMatrix{Tv, Ti}(perm::AbstractVector{Ti}, vals::AbstractVector{Tv}) where {Tv, Ti<:Integer}
     PermMatrix(perm::Vector{Ti}, vals::Vector{Tv}) where {Tv, Ti}
@@ -25,7 +25,7 @@ julia> PermMatrix([2,1,4,3], rand(4))
 ```
 """
 struct PermMatrix{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} <:
-       AbstractPermMatrix{Tv}
+       AbstractPermMatrix{Tv,Ti}
     perm::Vi   # new orders
     vals::Vv   # multiplied values.
 
@@ -56,7 +56,7 @@ end
 
 # the column major version of `PermMatrix`
 struct PermMatrixCSC{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} <:
-       AbstractPermMatrix{Tv}
+       AbstractPermMatrix{Tv,Ti}
     perm::Vi   # new orders
     vals::Vv   # multiplied values.
 

@@ -31,12 +31,6 @@ LinearAlgebra.kron(A::IMatrix{Ta}, B::IMatrix{Tb}) where {Ta<:Number,Tb<:Number}
 LinearAlgebra.kron(A::IMatrix{<:Number}, B::Diagonal{<:Number}) = A.n == 1 ? B : Diagonal(orepeat(B.diag, A.n))
 LinearAlgebra.kron(B::Diagonal{<:Number}, A::IMatrix) = A.n == 1 ? B : Diagonal(irepeat(B.diag, A.n))
 
-####### diagonal kron ########
-LinearAlgebra.kron(A::StridedMatrix{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
-LinearAlgebra.kron(A::Diagonal{<:Number}, B::StridedMatrix{<:Number}) = kron(PermMatrix(A), B)
-LinearAlgebra.kron(A::Diagonal{<:Number}, B::SparseMatrixCSC{<:Number}) = kron(PermMatrix(A), B)
-LinearAlgebra.kron(A::SparseMatrixCSC{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
-
 function LinearAlgebra.kron(A::AbstractMatrix{Tv}, B::IMatrix) where {Tv<:Number}
     B.n == 1 && return A
     mA, nA = size(A)
@@ -127,7 +121,7 @@ function LinearAlgebra.kron(A::SparseMatrixCSC{T}, B::IMatrix) where {T<:Number}
     SparseMatrixCSC(mA * B.n, nA * B.n, colptr, rowval, nzval)
 end
 
-function LinearAlgebra.kron(A::PermMatrix{T}, B::IMatrix) where {T<:Number}
+function LinearAlgebra.kron(A::AbstractPermMatrix{T}, B::IMatrix) where {T<:Number}
     nA = size(A, 1)
     nB = size(B, 1)
     nB == 1 && return A
@@ -142,10 +136,10 @@ function LinearAlgebra.kron(A::PermMatrix{T}, B::IMatrix) where {T<:Number}
             vals[start+j] = val
         end
     end
-    PermMatrix(perm, vals)
+    basetype(A)(perm, vals)
 end
 
-function LinearAlgebra.kron(A::IMatrix, B::PermMatrix{Tv,Ti}) where {Tv<:Number,Ti<:Integer}
+function LinearAlgebra.kron(A::IMatrix, B::AbstractPermMatrix{Tv,Ti}) where {Tv<:Number,Ti<:Integer}
     nA = size(A, 1)
     nB = size(B, 1)
     nA == 1 && return B
@@ -158,14 +152,14 @@ function LinearAlgebra.kron(A::IMatrix, B::PermMatrix{Tv,Ti}) where {Tv<:Number,
             vals[start+j] = B.vals[j]
         end
     end
-    PermMatrix(perm, vals)
+    basetype(B)(perm, vals)
 end
 
-
-function LinearAlgebra.kron(A::StridedMatrix{Tv}, B::PermMatrix{Tb}) where {Tv<:Number,Tb<:Number}
+function LinearAlgebra.kron(A::StridedMatrix{Tv}, B::AbstractPermMatrix{Tb}) where {Tv<:Number,Tb<:Number}
     mA, nA = size(A)
     nB = size(B, 1)
-    perm = fast_invperm(B.perm)
+    BC = PermMatrixCSC(B)
+    perm, vals = BC.perm, BC.vals
     nzval = Vector{promote_type(Tv, Tb)}(undef, mA * nA * nB)
     rowval = Vector{Int}(undef, mA * nA * nB)
     colptr = collect(1:mA:nA*nB*mA+1)
@@ -173,7 +167,7 @@ function LinearAlgebra.kron(A::StridedMatrix{Tv}, B::PermMatrix{Tb}) where {Tv<:
     @inbounds for j = 1:nA
         @inbounds for j2 = 1:nB
             p2 = perm[j2]
-            val2 = B.vals[p2]
+            val2 = vals[j2]
             ir = p2
             @inbounds @simd for i = 1:mA
                 nzval[z] = A[i, j] * val2  # merge
@@ -186,18 +180,18 @@ function LinearAlgebra.kron(A::StridedMatrix{Tv}, B::PermMatrix{Tb}) where {Tv<:
     SparseMatrixCSC(mA * nB, nA * nB, colptr, rowval, nzval)
 end
 
-function LinearAlgebra.kron(A::PermMatrix{Ta}, B::StridedMatrix{Tb}) where {Tb<:Number,Ta<:Number}
+function LinearAlgebra.kron(A::AbstractPermMatrix{Ta}, B::StridedMatrix{Tb}) where {Tb<:Number,Ta<:Number}
     mB, nB = size(B)
     nA = size(A, 1)
-    perm = fast_invperm(A.perm)
+    AC = PermMatrixCSC(A)
+    perm, vals = AC.perm, AC.vals
     nzval = Vector{promote_type(Ta, Tb)}(undef, mB * nA * nB)
     rowval = Vector{Int}(undef, mB * nA * nB)
     colptr = collect(1:mB:nA*nB*mB+1)
     z = 0
     @inbounds for j = 1:nA
-        colbase = (j - 1) * nB
         p1 = perm[j]
-        val2 = A.vals[p1]
+        val2 = vals[j]
         ir = (p1 - 1) * mB
         for j2 = 1:nB
             @inbounds @simd for i2 = 1:mB
@@ -210,7 +204,8 @@ function LinearAlgebra.kron(A::PermMatrix{Ta}, B::StridedMatrix{Tb}) where {Tb<:
     SparseMatrixCSC(nA * mB, nA * nB, colptr, rowval, nzval)
 end
 
-function LinearAlgebra.kron(A::PermMatrix{<:Number}, B::PermMatrix{<:Number})
+function LinearAlgebra.kron(A::AbstractPermMatrix{<:Number}, B::AbstractPermMatrix{<:Number})
+    @assert basetype(A) == basetype(B)
     nA = size(A, 1)
     nB = size(B, 1)
     vals = kron(A.vals, B.vals)
@@ -222,17 +217,18 @@ function LinearAlgebra.kron(A::PermMatrix{<:Number}, B::PermMatrix{<:Number})
             perm[start+j] = permAi + B.perm[j]
         end
     end
-    PermMatrix(perm, vals)
+    basetype(A)(perm, vals)
 end
 
-LinearAlgebra.kron(A::PermMatrix{<:Number}, B::Diagonal{<:Number}) = kron(A, PermMatrix(B))
-LinearAlgebra.kron(A::Diagonal{<:Number}, B::PermMatrix{<:Number}) = kron(PermMatrix(A), B)
+LinearAlgebra.kron(A::AbstractPermMatrix{<:Number}, B::Diagonal{<:Number}) = kron(A, basetype(A)(B))
+LinearAlgebra.kron(A::Diagonal{<:Number}, B::AbstractPermMatrix{<:Number}) = kron(basetype(B)(A), B)
 
-function LinearAlgebra.kron(A::PermMatrix{Ta}, B::SparseMatrixCSC{Tb}) where {Ta<:Number,Tb<:Number}
+function LinearAlgebra.kron(A::AbstractPermMatrix{Ta}, B::SparseMatrixCSC{Tb}) where {Ta<:Number,Tb<:Number}
     nA = size(A, 1)
     mB, nB = size(B)
     nV = nnz(B)
-    perm = fast_invperm(A.perm)
+    AC = PermMatrixCSC(A)
+    perm, vals = AC.perm, AC.vals
     nzval = Vector{promote_type(Ta, Tb)}(undef, nA * nV)
     rowval = Vector{Int}(undef, nA * nV)
     colptr = Vector{Int}(undef, nA * nB + 1)
@@ -240,7 +236,7 @@ function LinearAlgebra.kron(A::PermMatrix{Ta}, B::SparseMatrixCSC{Tb}) where {Ta
     @inbounds @simd for i = 1:nA
         start_row = (i - 1) * nV
         start_ri = (perm[i] - 1) * mB
-        v0 = A.vals[perm[i]]
+        v0 = vals[i]
         @inbounds @simd for j = 1:nV
             nzval[start_row+j] = B.nzval[j] * v0
             rowval[start_row+j] = B.rowval[j] + start_ri
@@ -254,11 +250,12 @@ function LinearAlgebra.kron(A::PermMatrix{Ta}, B::SparseMatrixCSC{Tb}) where {Ta
     SparseMatrixCSC(mB * nA, nB * nA, colptr, rowval, nzval)
 end
 
-function LinearAlgebra.kron(A::SparseMatrixCSC{T}, B::PermMatrix{Tb}) where {T<:Number,Tb<:Number}
+function LinearAlgebra.kron(A::SparseMatrixCSC{T}, B::AbstractPermMatrix{Tb}) where {T<:Number,Tb<:Number}
     nB = size(B, 1)
     mA, nA = size(A)
     nV = nnz(A)
-    perm = fast_invperm(B.perm)
+    BC = PermMatrixCSC(B)
+    perm, vals = BC.perm, BC.vals
     rowval = Vector{Int}(undef, nB * nV)
     colptr = Vector{Int}(undef, nA * nB + 1)
     nzval = Vector{promote_type(T, Tb)}(undef, nB * nV)
@@ -269,7 +266,7 @@ function LinearAlgebra.kron(A::SparseMatrixCSC{T}, B::PermMatrix{Tb}) where {T<:
         rend = A.colptr[i+1] - 1
         @inbounds for k = 1:nB
             irow = perm[k]
-            bval = B.vals[irow]
+            bval = vals[k]
             irow_nB = irow - nB
             @inbounds @simd for r = rstart:rend
                 rowval[z] = A.rowval[r] * nB + irow_nB

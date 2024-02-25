@@ -16,14 +16,10 @@ SparseMatrixCSC{Tv,Ti}(A::IMatrix) where {Tv,Ti<:Integer} =
     SparseMatrixCSC{Tv,Ti}(I, A.n, A.n)
 SparseMatrixCSC{Tv}(A::IMatrix) where {Tv} = SparseMatrixCSC{Tv,Int}(A)
 SparseMatrixCSC(A::IMatrix{T}) where {T} = SparseMatrixCSC{T,Int}(I, A.n, A.n)
-function SparseMatrixCSC(M::PermMatrix)
+function SparseMatrixCSC(M::AbstractPermMatrix)
     n = size(M, 1)
-    order = invperm(M.perm)
-    SparseMatrixCSC(n, n, collect(1:n+1), order, M.vals[order])
-end
-function SparseMatrixCSC(M::PermMatrixCSC)
-    n = size(M, 1)
-    SparseMatrixCSC(n, n, collect(1:n+1), M.perm, M.vals[order])
+    MC = PermMatrixCSC(M)
+    SparseMatrixCSC(n, n, collect(1:n+1), MC.perm, MC.vals)
 end
 
 @static if VERSION < v"1.3-"
@@ -69,14 +65,20 @@ function Matrix(coo::SparseMatrixCOO{T}) where {T}
 end
 
 ################## To PermMatrix ######################
-PermMatrix(pc::PermMatrixCSC) = PermMatrix(invperm(pc.perm), pc.vals)
-PermMatrixCSC(pc::PermMatrix) = PermMatrixCSC(invperm(pc.perm), pc.vals)
+function PermMatrix(pc::PermMatrixCSC)
+    order = fast_invperm(pc.perm)
+    PermMatrix(order, pc.vals[order])
+end
+function PermMatrixCSC(pc::PermMatrix)
+    order = fast_invperm(pc.perm)
+    PermMatrixCSC(order, pc.vals[order])
+end
 for MT in [:PermMatrix, :PermMatrixCSC]
-    $MT{Tv,Ti}(A::IMatrix) where {Tv,Ti} =
+    @eval $MT{Tv,Ti}(A::IMatrix) where {Tv,Ti} =
         $MT{Tv,Ti}(Vector{Ti}(1:A.n), ones(Tv, A.n))
-    $MT{Tv}(X::IMatrix) where {Tv} = $MT{Tv,Int}(X)
-    $MT(X::IMatrix{T}) where {T} = $MT{T,Int}(X)
-    $MT{Tv,Ti}(A::$MT) where {Tv,Ti} =
+    @eval $MT{Tv}(X::IMatrix) where {Tv} = $MT{Tv,Int}(X)
+    @eval $MT(X::IMatrix{T}) where {T} = $MT{T,Int}(X)
+    @eval $MT{Tv,Ti}(A::$MT) where {Tv,Ti} =
         $MT(Vector{Ti}(A.perm), Vector{Tv}(A.vals))
 end
 
@@ -89,15 +91,12 @@ end
 _findnz(A::AbstractSparseArray) = findnz(A)
 
 function PermMatrix{Tv,Ti}(A::AbstractMatrix) where {Tv,Ti}
-    i, j, v = _findnz(A)
-    j == collect(1:size(A, 2)) || throw(ArgumentError("This is not a PermMatrix"))
-    order = invperm(i)
-    PermMatrix{Tv,Ti}(Vector{Ti}(order), Vector{Tv}(v[order]))
+    PermMatrix(PermMatrixCSC(A))
 end
 function PermMatrixCSC{Tv,Ti}(A::AbstractMatrix) where {Tv,Ti}
     i, j, v = _findnz(A)
     j == collect(1:size(A, 2)) || throw(ArgumentError("This is not a PermMatrix"))
-    PermMatrix{Tv,Ti}(Vector{Ti}(i), Vector{Tv}(v[order]))
+    PermMatrix{Tv,Ti}(Vector{Ti}(i), Vector{Tv}(v))
 end
 
 for MT in [:PermMatrix, :PermMatrixCSC]
