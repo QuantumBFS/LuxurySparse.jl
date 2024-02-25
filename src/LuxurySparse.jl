@@ -12,6 +12,7 @@ using Base.Broadcast:
 
 # static types
 export SDPermMatrix, SPermMatrix, PermMatrix, pmrand,
+    SDPermMatrixCSC, SPermMatrixCSC, PermMatrixCSC, pmcscrand,
     SDSparseMatrixCSC, SSparseMatrixCSC, SparseMatrixCSC, sprand,
     SparseMatrixCOO,
     SDMatrix, SDVector,

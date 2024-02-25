@@ -1,3 +1,4 @@
+abstract type AbstractPermMatrix{Tv} <: AbstractMatrix{Tv} end
 """
     PermMatrix{Tv, Ti}(perm::AbstractVector{Ti}, vals::AbstractVector{Tv}) where {Tv, Ti<:Integer}
     PermMatrix(perm::Vector{Ti}, vals::Vector{Tv}) where {Tv, Ti}
@@ -24,7 +25,7 @@ julia> PermMatrix([2,1,4,3], rand(4))
 ```
 """
 struct PermMatrix{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} <:
-       AbstractMatrix{Tv}
+       AbstractPermMatrix{Tv}
     perm::Vi   # new orders
     vals::Vv   # multiplied values.
 
@@ -42,34 +43,7 @@ struct PermMatrix{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} 
         new{Tv,Ti,Vv,Vi}(perm, vals)
     end
 end
-
-function PermMatrix{Tv,Ti}(perm, vals) where {Tv,Ti<:Integer}
-    PermMatrix{Tv,Ti,Vector{Tv},Vector{Ti}}(Vector{Ti}(perm), Vector{Tv}(vals))
-end
-
-function PermMatrix(
-    perm::Vi,
-    vals::Vv,
-) where {Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}}
-    PermMatrix{Tv,Ti,Vv,Vi}(perm, vals)
-end
-
-Base.:(==)(d1::PermMatrix, d2::PermMatrix) = SparseMatrixCSC(d1) == SparseMatrixCSC(d2)
-Base.isapprox(d1::PermMatrix, d2::PermMatrix; kwargs...) = isapprox(SparseMatrixCSC(d1), SparseMatrixCSC(d2); kwargs...)
-Base.zero(pm::PermMatrix) = PermMatrix(pm.perm, zero(pm.vals))
-
-################# Array Functions ##################
-
-Base.size(M::PermMatrix) = (length(M.perm), length(M.perm))
-function Base.size(A::PermMatrix, d::Integer)
-    if d < 1
-        throw(ArgumentError("dimension must be ≥ 1, got $d"))
-    elseif d <= 2
-        return length(A.perm)
-    else
-        return 1
-    end
-end
+basetype(pm::PermMatrix) = PermMatrix
 Base.getindex(M::PermMatrix{Tv}, i::Integer, j::Integer) where {Tv} =
     M.perm[i] == j ? M.vals[i] : zero(Tv)
 function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
@@ -80,8 +54,74 @@ function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
     end
 end
 
-Base.copyto!(A::PermMatrix, B::PermMatrix) =
+# the column major version of `PermMatrix`
+struct PermMatrixCSC{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}} <:
+       AbstractPermMatrix{Tv}
+    perm::Vi   # new orders
+    vals::Vv   # multiplied values.
+
+    function PermMatrixCSC{Tv,Ti,Vv,Vi}(
+        perm::Vi,
+        vals::Vv,
+    ) where {Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}}
+        if length(perm) != length(vals)
+            throw(
+                DimensionMismatch(
+                    "permutation ($(length(perm))) and multiply ($(length(vals))) length mismatch.",
+                ),
+            )
+        end
+        new{Tv,Ti,Vv,Vi}(perm, vals)
+    end
+end
+basetype(pm::PermMatrixCSC) = PermMatrixCSC
+function Base.getindex(M::PermMatrixCSC{Tv}, i::Integer, j::Integer) where {Tv}
+    @boundscheck 0 < j <= size(M, 2)
+    @inbounds M.perm[j] == i ? M.vals[j] : zero(Tv)
+end
+function Base.setindex!(M::PermMatrixCSC, val, i::Integer, j::Integer)
+    @boundscheck 0 < j <= size(M, 2) && M.perm[j] == i
+    @inbounds M.vals[j] = val
+end
+
+for MT in [:PermMatrix, :PermMatrixCSC]
+    @eval begin
+        function $MT{Tv,Ti}(perm, vals) where {Tv,Ti<:Integer}
+            $MT{Tv,Ti,Vector{Tv},Vector{Ti}}(Vector{Ti}(perm), Vector{Tv}(vals))
+        end
+
+        function $MT(
+            perm::Vi,
+            vals::Vv,
+        ) where {Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti}}
+            $MT{Tv,Ti,Vv,Vi}(perm, vals)
+        end
+    end
+end
+Base.zero(pm::AbstractPermMatrix) = basetype(pm)(pm.perm, zero(pm.vals))
+Base.similar(x::AbstractPermMatrix{Tv,Ti}) where {Tv,Ti} =
+    typeof(x)(copy(x.perm), similar(x.vals))
+Base.similar(x::AbstractPermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
+    basetype(x){T,Ti}(copy(x.perm), similar(x.vals, T))
+
+################# Comparison ##################
+Base.:(==)(d1::AbstractPermMatrix, d2::AbstractPermMatrix) = SparseMatrixCSC(d1) == SparseMatrixCSC(d2)
+Base.isapprox(d1::AbstractPermMatrix, d2::AbstractPermMatrix; kwargs...) = isapprox(SparseMatrixCSC(d1), SparseMatrixCSC(d2); kwargs...)
+Base.copyto!(A::AbstractPermMatrix, B::AbstractPermMatrix) =
     (copyto!(A.perm, B.perm); copyto!(A.vals, B.vals); A)
+
+################# Array Functions ##################
+
+Base.size(M::AbstractPermMatrix) = (length(M.perm), length(M.perm))
+function Base.size(A::AbstractPermMatrix, d::Integer)
+    if d < 1
+        throw(ArgumentError("dimension must be ≥ 1, got $d"))
+    elseif d <= 2
+        return length(A.perm)
+    else
+        return 1
+    end
+end
 
 """
     pmrand(T::Type, n::Int) -> PermMatrix
@@ -105,20 +145,19 @@ function pmrand end
 pmrand(::Type{T}, n::Int) where {T} = PermMatrix(randperm(n), randn(T, n))
 pmrand(n::Int) = pmrand(Float64, n)
 
-Base.similar(x::PermMatrix{Tv,Ti}) where {Tv,Ti} =
-    PermMatrix{Tv,Ti}(copy(x.perm), similar(x.vals))
-Base.similar(x::PermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =
-    PermMatrix{T,Ti}(copy(x.perm), similar(x.vals, T))
+pmcscrand(::Type{T}, n::Int) where {T} = PermMatrixCSC(randperm(n), randn(T, n))
+pmcscrand(n::Int) = pmcscrand(Float64, n)
 
-# TODO: rewrite this
-# function show(io::IO, M::PermMatrix)
-#     println("PermMatrix")
-#     for item in zip(M.perm, M.vals)
-#         i, p = item
-#         println("- ($i) * $p")
-#     end
-# end
+Base.show(io::IO, ::MIME"text/plain", M::AbstractPermMatrix) = show(io, M)
+function Base.show(io::IO, M::AbstractPermMatrix)
+    println(io, "PermMatrix")
+    for ((i, j), p) in IterNz(M)
+        print(io, "($i, $j) = $p")
+        i < length(M.perm) && println(io)
+    end
+end
 
 ######### sparse array interfaces  #########
-nnz(M::PermMatrix) = length(M.vals)
+nnz(M::AbstractPermMatrix) = length(M.vals)
 findnz(M::PermMatrix) = (collect(1:size(M, 1)), M.perm, M.vals)
+findnz(M::PermMatrixCSC) = (M.perm, collect(1:size(M, 1)), M.vals)

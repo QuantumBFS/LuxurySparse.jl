@@ -182,7 +182,7 @@ Base.:*(B::Int, A::SparseMatrixCOO) = lmul!(B, copy(A))
 Base.:/(A::SparseMatrixCOO, B::Int) = rdiv!(copy(A), B)
 
 Base.:-(ii::IMatrix) = (-1) * ii
-Base.:-(pm::PermMatrix) = (-1) * pm
+Base.:-(pm::AbstractPermMatrix) = (-1) * pm
 
 for FUNC in [:randn!, :rand!]
     @eval function Random.$FUNC(m::Diagonal)
@@ -195,7 +195,7 @@ for FUNC in [:randn!, :rand!]
         return m
     end
 
-    @eval function Random.$FUNC(m::PermMatrix)
+    @eval function Random.$FUNC(m::AbstractPermMatrix)
         $FUNC(m.vals)
         return m
     end
