@@ -32,7 +32,7 @@ IMatrix(n::Integer) = IMatrix{Bool}(n)
 
 Base.size(A::IMatrix, i::Int) = (@assert i == 1 || i == 2; A.n)
 Base.size(A::IMatrix) = (A.n, A.n)
-Base.getindex(::IMatrix{T}, i::Integer, j::Integer) where {T} = T(i == j)
+Base.getindex(::IMatrix{T}, i::Integer, j::Integer) where {T} = convert(T, i == j)
 
 Base.:(==)(d1::IMatrix, d2::IMatrix) = d1.n == d2.n
 Base.isapprox(d1::IMatrix, d2::IMatrix; kwargs...) = d1 == d2
