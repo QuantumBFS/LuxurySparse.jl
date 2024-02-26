@@ -1,8 +1,3 @@
-@static if VERSION < v"1.2"
-    Base.size(bc::Broadcasted) = map(length, axes(bc))
-    Base.length(bc::Broadcasted) = prod(size(bc))
-end
-
 # patches
 LinearAlgebra.fzero(S::IMatrix) = zero(eltype(S))
 

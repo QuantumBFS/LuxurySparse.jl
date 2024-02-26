@@ -165,6 +165,6 @@ end
 Base.hash(pm::AbstractPermMatrix) = hash((pm.perm, pm.vals))
 
 ######### sparse array interfaces  #########
-nnz(M::AbstractPermMatrix) = length(M.vals)
-findnz(M::PermMatrix) = (collect(1:size(M, 1)), M.perm, M.vals)
-findnz(M::PermMatrixCSC) = (M.perm, collect(1:size(M, 1)), M.vals)
+SparseArrays.nnz(M::AbstractPermMatrix) = length(M.vals)
+SparseArrays.findnz(M::PermMatrix) = (collect(1:size(M, 1)), M.perm, M.vals)
+SparseArrays.findnz(M::PermMatrixCSC) = (M.perm, collect(1:size(M, 1)), M.vals)

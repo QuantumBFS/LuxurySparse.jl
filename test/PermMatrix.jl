@@ -13,6 +13,10 @@ sp = sprand(4, 4, 0.3)
 v = [0.5, 0.3im, 0.2, 1.0]
 
 @testset "basic" begin
+    @test_throws DimensionMismatch PermMatrix([1, 4, 2, 3], [0.1, 0.2, 0.4im])
+    @test_throws ArgumentError size(p1, 0)
+    @test size(p1, 3) == 1
+    @test [zip(findnz(p1)...)...] == [IterNz(p1)...]
     @test p1 == copy(p1)
     @test hash(p1) == hash(copy(p1))
     @test hash(p1) != hash(p2)
