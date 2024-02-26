@@ -6,6 +6,7 @@ using SparseArrays: SparseMatrixCSC
 using SparseArrays.HigherOrderFns
 using Base: @propagate_inbounds
 using LinearAlgebra
+import SparseArrays: findnz, nnz
 using LinearAlgebra: StructuredMatrixStyle
 using Base.Broadcast:
     BroadcastStyle, AbstractArrayStyle, Broadcasted, DefaultArrayStyle, materialize!
