@@ -46,12 +46,9 @@ end
 basetype(pm::PermMatrix) = PermMatrix
 Base.getindex(M::PermMatrix{Tv}, i::Integer, j::Integer) where {Tv} =
     M.perm[i] == j ? M.vals[i] : zero(Tv)
-function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
-    if M.perm[i] == j
-        @inbounds M.vals[i] = val
-    else
-        throw(BoundsError(M, (i, j)))
-    end
+@propagate_inbounds function Base.setindex!(M::PermMatrix, val, i::Integer, j::Integer)
+    @assert M.perm[i] == j "Can not set index due to the absense of entry: ($i, $j)"
+    @inbounds M.vals[i] = val
 end
 
 # the column major version of `PermMatrix`
@@ -75,12 +72,12 @@ struct PermMatrixCSC{Tv,Ti<:Integer,Vv<:AbstractVector{Tv},Vi<:AbstractVector{Ti
     end
 end
 basetype(pm::PermMatrixCSC) = PermMatrixCSC
-function Base.getindex(M::PermMatrixCSC{Tv}, i::Integer, j::Integer) where {Tv}
+@propagate_inbounds function Base.getindex(M::PermMatrixCSC{Tv}, i::Integer, j::Integer) where {Tv}
     @boundscheck 0 < j <= size(M, 2)
     @inbounds M.perm[j] == i ? M.vals[j] : zero(Tv)
 end
-function Base.setindex!(M::PermMatrixCSC, val, i::Integer, j::Integer)
-    @boundscheck 0 < j <= size(M, 2) && M.perm[j] == i
+@propagate_inbounds function Base.setindex!(M::PermMatrixCSC, val, i::Integer, j::Integer)
+    @assert M.perm[j] == i "Can not set index due to the absense of entry: ($i, $j)"
     @inbounds M.vals[j] = val
 end
 
