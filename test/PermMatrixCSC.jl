@@ -97,7 +97,7 @@ end
 @testset "setindex" begin
     pm = PermMatrix([3, 2, 4, 1], [0.0, 0.0, 0.0, 0.0])
     pm[3, 4] = 1.0
-    @test_throws BoundsError pm[3, 1] = 1.0
+    @test_throws AssertionError pm[3, 1] = 1.0
     @test pm[3, 4] == 1.0
 end
 
