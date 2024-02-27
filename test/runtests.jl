@@ -8,6 +8,7 @@ end
 
 @testset "PermMatrix" begin
     include("PermMatrix.jl")
+    include("PermMatrixCSC.jl")
 end
 
 @testset "SparseMatrixCOO" begin

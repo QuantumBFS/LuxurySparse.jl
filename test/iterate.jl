@@ -3,6 +3,7 @@ using Test, LuxurySparse, SparseArrays, LinearAlgebra
 @testset "iterate" begin
     for M in Any[
         pmrand(10),
+        pmcscrand(10),
         Diagonal(randn(10)),
         IMatrix(10),
         randn(10, 10),

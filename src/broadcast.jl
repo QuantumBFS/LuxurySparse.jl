@@ -1,8 +1,3 @@
-@static if VERSION < v"1.2"
-    Base.size(bc::Broadcasted) = map(length, axes(bc))
-    Base.length(bc::Broadcasted) = prod(size(bc))
-end
-
 # patches
 LinearAlgebra.fzero(S::IMatrix) = zero(eltype(S))
 
@@ -42,12 +37,10 @@ Broadcast.broadcasted(
 ) = Diagonal(fill(a, b.n))
 
 # specialize perm matrix
-function _broadcast_perm_prod(A::PermMatrix, B::AbstractMatrix)
+function _broadcast_perm_prod(A::AbstractPermMatrix, B::AbstractMatrix)
     dest = similar(A, Base.promote_op(*, eltype(A), eltype(B)))
-    i = 1
-    @inbounds for j in dest.perm
-        dest[i, j] = A[i, j] * B[i, j]
-        i += 1
+    @inbounds for (i, j, a) in IterNz(A)
+        dest[i, j] = a * B[i, j]
     end
     return dest
 end
@@ -55,40 +48,30 @@ end
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),
-    A::PermMatrix,
+    A::AbstractPermMatrix,
     B::AbstractMatrix,
 ) = _broadcast_perm_prod(A, B)
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),
     A::AbstractMatrix,
-    B::PermMatrix,
+    B::AbstractPermMatrix,
 ) = _broadcast_perm_prod(B, A)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::PermMatrix) =
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::AbstractPermMatrix, B::AbstractPermMatrix) =
     _broadcast_perm_prod(A, B)
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::IMatrix) =
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::AbstractPermMatrix, B::IMatrix) =
     Diagonal(A)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::IMatrix, B::PermMatrix) =
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::IMatrix, B::AbstractPermMatrix) =
     Diagonal(B)
 
-function _broadcast_diag_perm_prod(A::Diagonal, B::PermMatrix)
-    dest = similar(A)
-    i = 1
-    @inbounds for j in B.perm
-        if i == j
-            dest[i, i] = A[i, i] * B[i, i]
-        else
-            dest[i, i] = 0
-        end
-        i += 1
-    end
-    return dest
+function _broadcast_diag_perm_prod(A::Diagonal, B::AbstractPermMatrix)
+    Diagonal(A.diag .* getindex.(Ref(B), 1:size(A, 1), 1:size(A, 2)))
 end
 
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::PermMatrix, B::Diagonal) =
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::AbstractPermMatrix, B::Diagonal) =
     _broadcast_diag_perm_prod(B, A)
-Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::PermMatrix) =
+Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::AbstractPermMatrix) =
     _broadcast_diag_perm_prod(A, B)
 
 # TODO: commit this upstream
@@ -110,13 +93,13 @@ Broadcast.broadcasted(
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),
-    a::PermMatrix,
+    a::AbstractPermMatrix,
     b::Number,
-) = PermMatrix(a.perm, a.vals .* b)
+) = basetype(a)(a.perm, a.vals .* b)
 
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},
     ::typeof(*),
     a::Number,
-    b::PermMatrix,
-) = PermMatrix(b.perm, a .* b.vals)
+    b::AbstractPermMatrix,
+) = basetype(b)(b.perm, a .* b.vals)

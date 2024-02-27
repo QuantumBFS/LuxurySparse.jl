@@ -4,6 +4,8 @@ const SDDiagonal{T} = Union{Diagonal{T},SDiagonal{N,T} where N}
 const SDVector{T} = Union{Vector{T},SVector{N,T} where N}
 const SDPermMatrix{Tv,Ti<:Integer} = PermMatrix{Tv,Ti,<:SDVector{Tv},<:SDVector{Ti}}
 const SPermMatrix{N,Tv,Ti<:Integer} = PermMatrix{Tv,Ti,<:SVector{N,Tv},<:SVector{N,Ti}}
+const SDPermMatrixCSC{Tv,Ti<:Integer} = PermMatrixCSC{Tv,Ti,<:SDVector{Tv},<:SDVector{Ti}}
+const SPermMatrixCSC{N,Tv,Ti<:Integer} = PermMatrixCSC{Tv,Ti,<:SVector{N,Tv},<:SVector{N,Ti}}
 const SDSparseMatrixCSC{Tv,Ti} = Union{SparseMatrixCSC{Tv,Ti},SSparseMatrixCSC{Tv,Ti}}
 
 ######### staticize ##########
@@ -20,6 +22,8 @@ staticize(A::AbstractVector) = SVector{length(A)}(A)
 staticize(A::Diagonal) = SDiagonal{size(A, 1)}((A.diag...,))
 staticize(A::PermMatrix) =
     PermMatrix(SVector{size(A, 1)}(A.perm), SVector{size(A, 1)}(A.vals))
+staticize(A::PermMatrixCSC) =
+    PermMatrixCSC(SVector{size(A, 1)}(A.perm), SVector{size(A, 1)}(A.vals))
 function staticize(A::SparseMatrixCSC)
     iszero(A) && return SSparseMatrixCSC(
         A.m,
@@ -48,6 +52,7 @@ dynamicize(A::SMatrix) = Matrix(A)
 dynamicize(A::SVector) = Vector(A)
 dynamicize(A::SDiagonal) = Diagonal(Vector(A.diag))
 dynamicize(A::PermMatrix) = PermMatrix(Vector(A.perm), Vector(A.vals))
+dynamicize(A::PermMatrixCSC) = PermMatrixCSC(Vector(A.perm), Vector(A.vals))
 function dynamicize(A::SSparseMatrixCSC)
     SparseMatrixCSC(A.m, A.n, Vector(A.colptr), Vector(A.rowval), Vector(A.nzval))
 end

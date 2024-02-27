@@ -9,6 +9,7 @@ using StaticArrays: SVector, SMatrix
 Random.seed!(2)
 
 @testset "staticize" begin
+    @test staticize(1) == 1
     # permmatrix
     m = pmrand(ComplexF64, 4)
     sm = m |> staticize
@@ -19,6 +20,22 @@ Random.seed!(2)
     @test sm.vals == m.vals
     dm = sm |> dynamicize
     @test dm isa PermMatrix{ComplexF64}
+    @test dm.perm isa Vector
+    @test dm.vals isa Vector
+    @test dm.perm == m.perm
+    @test dm.vals == m.vals
+
+   # permmatrixcsc
+    m = pmcscrand(ComplexF64, 4)
+    println(m)
+    sm = m |> staticize
+    @test sm isa SPermMatrixCSC{4,ComplexF64}
+    @test sm.perm isa SVector
+    @test sm.vals isa SVector
+    @test sm.perm == m.perm
+    @test sm.vals == m.vals
+    dm = sm |> dynamicize
+    @test dm isa PermMatrixCSC{ComplexF64}
     @test dm.perm isa Vector
     @test dm.vals isa Vector
     @test dm.perm == m.perm

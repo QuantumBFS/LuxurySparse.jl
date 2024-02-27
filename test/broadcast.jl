@@ -5,7 +5,7 @@ using SparseArrays
 
 @testset "broadcast *" begin
 
-    @testset "Diagonal .* $(nameof(typeof(M)))" for M in Any[pmrand(3)]
+    @testset "Diagonal .* $(nameof(typeof(M)))" for M in [[pmrand(3)]..., pmcscrand(3)]
         M1 = Diagonal(rand(3))
         out = M1 .* M
         @test typeof(out) <: Diagonal
@@ -29,11 +29,21 @@ using SparseArrays
         out = M .* M1
         @test typeof(out) <: PermMatrix
         @test out ≈ M .* Matrix(M1)
+
+        M1 = pmcscrand(3)
+        out = M1 .* M
+        @test typeof(out) <: PermMatrixCSC
+        @test out ≈ Matrix(M1) .* M
+
+        out = M .* M1
+        !(M isa PermMatrix) && @test typeof(out) <: PermMatrixCSC
+        @test out ≈ M .* Matrix(M1)
     end
 
     @testset "IMatrix .* $(nameof(typeof(M)))" for M in Any[
         rand(3, 3),
         pmrand(3),
+        pmcscrand(3),
         sprand(3, 3, 0.5),
     ]
         eye = IMatrix(3)
@@ -75,6 +85,10 @@ end
         sprand(3, 3, 0.5),
     ]
         M1 = pmrand(3)
+        @test M1 .- M ≈ Matrix(M1) .- M
+        @test M .- M1 ≈ M .- Matrix(M1)
+
+        M1 = pmcscrand(3)
         @test M1 .- M ≈ Matrix(M1) .- M
         @test M .- M1 ≈ M .- Matrix(M1)
     end
