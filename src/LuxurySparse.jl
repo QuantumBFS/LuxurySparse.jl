@@ -6,12 +6,14 @@ using SparseArrays: SparseMatrixCSC
 using SparseArrays.HigherOrderFns
 using Base: @propagate_inbounds
 using LinearAlgebra
+import SparseArrays: findnz, nnz
 using LinearAlgebra: StructuredMatrixStyle
 using Base.Broadcast:
     BroadcastStyle, AbstractArrayStyle, Broadcasted, DefaultArrayStyle, materialize!
 
 # static types
 export SDPermMatrix, SPermMatrix, PermMatrix, pmrand,
+    SDPermMatrixCSC, SPermMatrixCSC, PermMatrixCSC, pmcscrand,
     SDSparseMatrixCSC, SSparseMatrixCSC, SparseMatrixCSC, sprand,
     SparseMatrixCOO,
     SDMatrix, SDVector,

@@ -52,12 +52,6 @@ end
     end
     @test imag(p1) == zeros(4, 4)
     @test p1' == Matrix(I, 4, 4)
-
-    # This will be lazy evaluated in 0.7+
-    @static if VERSION < v"0.7-"
-        @test typeof(p1') == typeof(p1)
-    end
-
     @test ishermitian(p1)
 end
 

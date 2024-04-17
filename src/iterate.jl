@@ -7,7 +7,7 @@ Base.length(nz::IterNz{<:AbstractSparseMatrix}) = nnz(nz.A)
 Base.length(nz::IterNz{<:Adjoint}) = length(IterNz(nz.A.parent))
 Base.length(nz::IterNz{<:Transpose}) = length(IterNz(nz.A.parent))
 Base.length(nz::IterNz{<:Diagonal}) = size(nz.A, 1)
-Base.length(nz::IterNz{<:PermMatrix}) = size(nz.A, 1)
+Base.length(nz::IterNz{<:AbstractPermMatrix}) = size(nz.A, 1)
 Base.length(nz::IterNz{<:IMatrix}) = size(nz.A, 1)
 Base.eltype(nz::IterNz) = eltype(nz.A)
 
@@ -42,6 +42,17 @@ function Base.iterate(it::IterNz{<:PermMatrix}, state)
     state == length(it) && return nothing
     state += 1
     return (state, (@inbounds it.A.perm[state]), (@inbounds it.A.vals[state])), state
+end
+
+# PermMatrixCSC
+function Base.iterate(it::IterNz{<:PermMatrixCSC})
+    0 == length(it) && return nothing
+    return ((@inbounds it.A.perm[1]), 1, (@inbounds it.A.vals[1])), 1
+end
+function Base.iterate(it::IterNz{<:PermMatrixCSC}, state)
+    state == length(it) && return nothing
+    state += 1
+    return ((@inbounds it.A.perm[state]), state, (@inbounds it.A.vals[state])), state
 end
 
 # AbstractMatrix
