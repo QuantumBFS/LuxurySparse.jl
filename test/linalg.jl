@@ -92,10 +92,10 @@ end
     for m in Any[pmrand(T, 5), Diagonal(randn(T, 5))]
         zm = zero(m)
         @test zm ≈ zeros(T, 5, 5)
-        rand!(zm)
+        LuxurySparse.randomize!(zm)
         @test !(zm ≈ zeros(T, 5, 5))
         zm = zero(m)
-        randn!(zm)
+        LuxurySparse.randomize!(zm)
         @test !(zm ≈ zeros(T, 5, 5))
     end
 end
@@ -111,7 +111,7 @@ end
     for m in Any[p1, sp, ds, dv, pm]
         for _m in Any[m, staticize(m)]
             out = zeros(eltype(m), size(m)...)
-            for (i, j, v) in zip(LuxurySparse.findnz(_m)...)
+            for (i, j, v) in LuxurySparse.IterNz(_m)
                 out[i, j] = v
             end
             @test out ≈ m
@@ -129,4 +129,12 @@ end
     pop = sparse([2, 3], [4, 5], [1, √2], 5, 5)
     zop = Diagonal([0, 1 / 2, 1, -1 / 2, 0])
     @test (pop*zop)[2, 4] == -0.5
+end
+
+@testset "extra" begin
+    out = zeros(ComplexF64, 4, 4)
+    a = pmrand(4)
+    b = pmrand(4)
+    mul!(out, a, b, 1, 0)
+    @test out ≈ Matrix(a) * Matrix(b)
 end

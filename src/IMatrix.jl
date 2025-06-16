@@ -47,5 +47,5 @@ end
 LinearAlgebra.ishermitian(D::IMatrix) = true
 
 ####### sparse matrix ######
-nnz(M::IMatrix) = M.n
-findnz(M::IMatrix{T}) where {T} = (collect(1:M.n), collect(1:M.n), ones(T, M.n))
+SparseArrays.nnz(M::IMatrix) = M.n
+SparseArrays.findnz(M::IMatrix{T}) where {T} = (collect(1:M.n), collect(1:M.n), ones(T, M.n))

@@ -90,8 +90,8 @@ end
 
 @testset "identity sparse" begin
     p1 = Diagonal(randn(10))
-    @test LuxurySparse.nnz(p1) == 10
-    @test LuxurySparse.findnz(p1)[3] == p1.diag
+    @test length(LuxurySparse.IterNz(p1)) == 10
+    @test map(x -> x[3], LuxurySparse.IterNz(p1)) == p1.diag
 end
 
 @testset "setindex" begin

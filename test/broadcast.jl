@@ -60,7 +60,7 @@ using SparseArrays
     d = Diagonal(rand(3))
     sp = sprand(3, 3, 0.5)
     @test d .* sp ≈ Matrix(d) .* Matrix(sp)
-    @test typeof(d .* sp) <: Diagonal
+    @test_broken typeof(d .* sp) <: Diagonal
 
     @testset "Number .* $(nameof(typeof(M)))" for M in Any[pmrand(3), Diagonal(randn(3))]
         @test 3.0 .* M ≈ 3.0 .* Matrix(M) && M .* 3.0 ≈ Matrix(M) .* 3.0

@@ -3,7 +3,7 @@ struct IterNz{MT}
 end
 
 Base.length(nz::IterNz{<:AbstractMatrix}) = length(nz.A)
-Base.length(nz::IterNz{<:AbstractSparseMatrix}) = nnz(nz.A)
+Base.length(nz::IterNz{<:AbstractSparseMatrix}) = SparseArrays.nnz(nz.A)
 Base.length(nz::IterNz{<:Adjoint}) = length(IterNz(nz.A.parent))
 Base.length(nz::IterNz{<:Transpose}) = length(IterNz(nz.A.parent))
 Base.length(nz::IterNz{<:Diagonal}) = size(nz.A, 1)

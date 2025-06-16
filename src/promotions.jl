@@ -1,6 +1,6 @@
 # SparseMatrixCSC
-Base.promote_rule(::Type{SparseMatrixCSC{Tv,Ti}}, ::Type{Matrix{T}}) where {Tv,Ti,T} =
-    Matrix{promote_type(T, Tv)}
+#Base.promote_rule(::Type{SparseMatrixCSC{Tv,Ti}}, ::Type{Matrix{T}}) where {Tv,Ti,T} =
+#    Matrix{promote_type(T, Tv)}
 
 # IMatrix
 for MT in [:PermMatrix, :PermMatrixCSC]

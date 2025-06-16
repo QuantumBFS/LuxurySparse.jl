@@ -41,8 +41,7 @@ end
 
 @testset "sparse" begin
     @show p1
-    @test LuxurySparse.nnz(p1) == 4
-    @test length(LuxurySparse.findnz(p1)[3]) == 4
+    @test LuxurySparse.length(IterNz(p1)) == 4
 end
 
 @testset "linalg" begin
