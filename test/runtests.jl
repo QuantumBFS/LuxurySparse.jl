@@ -1,6 +1,10 @@
 using Test
-using LinearAlgebra, SparseArrays
+using Aqua
 using LuxurySparse
+
+@testset "Aqua" begin
+    Aqua.test_all(LuxurySparse)
+end
 
 @testset "IMatrix" begin
     include("IMatrix.jl")

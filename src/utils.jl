@@ -5,6 +5,3 @@ function fast_invperm(order)
     end
     v
 end
-
-findnz(M::Diagonal) = (collect(1:size(M, 1)), collect(1:size(M, 1)), M.diag)
-nnz(M::Diagonal) = length(M.diag)

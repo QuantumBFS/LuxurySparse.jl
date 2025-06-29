@@ -1,5 +1,5 @@
 using Test, Random, SparseArrays, LinearAlgebra
-import LuxurySparse: IMatrix, PermMatrix, PermMatrixCSC, basetype, AbstractPermMatrix
+import LuxurySparse: IMatrix, PermMatrix, PermMatrixCSC, basetype, AbstractPermMatrix, fastkron
 
 @testset "kron" begin
     Random.seed!(2)
@@ -17,10 +17,10 @@ import LuxurySparse: IMatrix, PermMatrix, PermMatrixCSC, basetype, AbstractPermM
         if source isa AbstractPermMatrix && target isa AbstractPermMatrix && basetype(source) != basetype(target)
             continue
         end
-        lres = kron(source, target)
-        rres = kron(target, source)
-        flres = kron(Matrix(source), Matrix(target))
-        frres = kron(Matrix(target), Matrix(source))
+        lres = fastkron(source, target)
+        rres = fastkron(target, source)
+        flres = fastkron(Matrix(source), Matrix(target))
+        frres = fastkron(Matrix(target), Matrix(source))
         @test lres == flres
         @test rres == frres
         @test eltype(lres) == eltype(flres)

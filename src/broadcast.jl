@@ -76,19 +76,19 @@ Broadcast.broadcasted(::AbstractArrayStyle{2}, ::typeof(*), A::Diagonal, B::Abst
 
 # TODO: commit this upstream
 # specialize Diagonal .* SparseMatrixCSC
-Broadcast.broadcasted(
-    ::AbstractArrayStyle{2},
-    ::typeof(*),
-    A::Diagonal,
-    B::SparseMatrixCSC,
-) = Broadcast.broadcasted(*, A, Diagonal(B))
+# Broadcast.broadcasted(
+#     ::AbstractArrayStyle{2},
+#     ::typeof(*),
+#     A::Diagonal,
+#     B::SparseMatrixCSC,
+# ) = Broadcast.broadcasted(*, A, Diagonal(B))
 
-Broadcast.broadcasted(
-    ::AbstractArrayStyle{2},
-    ::typeof(*),
-    A::SparseMatrixCSC,
-    B::Diagonal,
-) = Broadcast.broadcasted(*, Diagonal(A), B)
+# Broadcast.broadcasted(
+#     ::AbstractArrayStyle{2},
+#     ::typeof(*),
+#     A::SparseMatrixCSC,
+#     B::Diagonal,
+# ) = Broadcast.broadcasted(*, Diagonal(A), B)
 
 Broadcast.broadcasted(
     ::AbstractArrayStyle{2},

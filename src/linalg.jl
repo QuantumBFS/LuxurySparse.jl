@@ -108,6 +108,14 @@ function LinearAlgebra.mul!(C::AbstractMatrix, X::AbstractMatrix, A::AbstractPer
     AC = PermMatrixCSC(A)
     C .= C .* beta .+ reshape(AC.vals, 1, :) .* view(X, :, AC.perm) .* alpha
 end
+function LinearAlgebra.mul!(C::AbstractMatrix, A::AbstractPermMatrix, B::AbstractPermMatrix, alpha::Number, beta::Number)
+    size(C, 1) == size(C, 2) == size(A, 1) == size(B, 1) || throw(DimensionMismatch())
+    res = A * B
+    for (i, j, v) in IterNz(res)
+        C[i, j] = v * alpha + beta * C[i, j]
+    end
+    return C
+end
 
 # NOTE: this is just a temperory fix for v0.7. We should overload mul! in
 # the future (when we start to drop v0.6) to enable buildin lazy evaluation.
@@ -187,19 +195,18 @@ Base.:/(A::SparseMatrixCOO, B::Int) = rdiv!(copy(A), B)
 Base.:-(ii::IMatrix) = (-1) * ii
 Base.:-(pm::AbstractPermMatrix) = (-1) * pm
 
-for FUNC in [:randn!, :rand!]
-    @eval function Random.$FUNC(m::Diagonal)
-        $FUNC(m.diag)
-        return m
-    end
+randomize!(m::AbstractArray) = randn!(m)
+function randomize!(m::Diagonal)
+    randomize!(m.diag)
+    return m
+end
 
-    @eval function Random.$FUNC(m::SparseMatrixCSC)
-        $FUNC(m.nzval)
-        return m
-    end
+function randomize!(m::SparseMatrixCSC)
+    randomize!(m.nzval)
+    return m
+end
 
-    @eval function Random.$FUNC(m::AbstractPermMatrix)
-        $FUNC(m.vals)
-        return m
-    end
+function randomize!(m::AbstractPermMatrix)
+    randomize!(m.vals)
+    return m
 end
