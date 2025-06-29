@@ -19,21 +19,19 @@ Install with the package manager, `pkg> add LuxurySparse`.
 ## Usage
 
 ```julia
-using SparseArrays
-using LuxurySparse
-using BenchmarkTools
+using SparseArrays, LuxurySparse, BenchmarkTools
 
 pm = pmrand(7)  # a random permutation matrix
 id = IMatrix(3) # an identity matrix
-@benchmark kron(pm, id) # kronecker product
+@btime fastkron(pm, id)   # 96.606 ns
 
 Spm = pm |> SparseMatrixCSC  # convert to SparseMatrixCSC
 Sid = id |> SparseMatrixCSC
-@benchmark kron(Spm, Sid)    # compare the performance to the previous operation.
+@btime kron(Spm, Sid)     # 388.817 ns
 
 spm = pm |> staticize        # convert to static matrix, notice that `id` is already static.
-@benchmark kron(spm, spm)    # compare performance
-@benchmark kron(pm, pm) 
+@btime fastkron(spm, spm)    # 104.581 ns
+@btime fastkron(pm, pm)      # 146.484 ns
 ```
 
 For more information, please refer the latest [Documentation](https://quantumbfs.github.io/LuxurySparse.jl/latest/).
