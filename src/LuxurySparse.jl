@@ -20,7 +20,7 @@ export SDPermMatrix, SPermMatrix, PermMatrix, pmrand,
     SDDiagonal, Diagonal,
     IMatrix,
     staticize, dynamicize,
-    fast_invperm,
+    fast_invperm, fastkron,
     IterNz
 
 include("utils.jl")
