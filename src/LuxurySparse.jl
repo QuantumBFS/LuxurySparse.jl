@@ -2,8 +2,9 @@ module LuxurySparse
 
 using LinearAlgebra, SparseArrays, Random
 using StaticArrays: SVector, SMatrix, SDiagonal, SArray
-using SparseArrays: SparseMatrixCSC
+import SparseArrays: SparseMatrixCSC
 using SparseArrays.HigherOrderFns
+import Base: Matrix
 using Base: @propagate_inbounds
 using LinearAlgebra
 import LinearAlgebra: Diagonal
