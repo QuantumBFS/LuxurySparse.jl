@@ -159,7 +159,7 @@ function Base.show(io::IO, M::AbstractPermMatrix)
         end
     end
 end
-Base.hash(pm::AbstractPermMatrix) = hash((pm.perm, pm.vals))
+Base.hash(pm::AbstractPermMatrix, h::UInt) = hash((pm.perm, pm.vals), h)
 
 ######### sparse array interfaces  #########
 SparseArrays.nnz(M::AbstractPermMatrix) = length(M.vals)
