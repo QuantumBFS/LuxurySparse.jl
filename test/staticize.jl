@@ -91,3 +91,17 @@ Random.seed!(2)
     m = rand(2, 2)
     @test dynamicize(m) === m
 end
+
+@testset "one/zero preserve static containers" begin
+    for m in (staticize(pmrand(ComplexF64, 4)), staticize(pmcscrand(ComplexF64, 4)))
+        o = one(m)
+        @test o.perm isa SVector
+        @test o.vals isa SVector
+        @test Matrix(o) == Matrix{ComplexF64}(I, 4, 4)
+
+        z = zero(m)
+        @test z.perm isa SVector
+        @test z.vals isa SVector
+        @test Matrix(z) == zeros(ComplexF64, 4, 4)
+    end
+end

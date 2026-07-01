@@ -96,6 +96,8 @@ for MT in [:PermMatrix, :PermMatrixCSC]
     end
 end
 Base.zero(pm::AbstractPermMatrix) = basetype(pm)(pm.perm, zero(pm.vals))
+Base.one(pm::AbstractPermMatrix) =
+    basetype(pm)(typeof(pm.perm)(1:length(pm.perm)), one.(pm.vals))
 Base.similar(x::AbstractPermMatrix{Tv,Ti}) where {Tv,Ti} =
     typeof(x)(copy(x.perm), similar(x.vals))
 Base.similar(x::AbstractPermMatrix{Tv,Ti}, ::Type{T}) where {Tv,Ti,T} =

@@ -78,6 +78,16 @@ end
     @test v == [0.5, 0.3im, 0.2, 1.0]
 end
 
+@testset "one and zero" begin
+    z = zero(p1)
+    @test typeof(z) == typeof(p1)
+    @test Matrix(z) == zeros(ComplexF64, 4, 4)
+
+    o = one(p1)
+    @test typeof(o) == typeof(p1)
+    @test Matrix(o) == Matrix{ComplexF64}(I, 4, 4)
+end
+
 @testset "sparse" begin
     Random.seed!(2)
     pm = pmrand(10)
