@@ -65,6 +65,12 @@ end
     @test p1 / 2.0 == Matrix(p1) / 2.0
 end
 
+@testset "one" begin
+    @test one(IMatrix(4)) === IMatrix{Bool}(4)
+    @test one(IMatrix{Float64}(4)) === IMatrix{Float64}(4)
+    @test Matrix(one(IMatrix{Float64}(4))) == Matrix{Float64}(I, 4, 4)
+end
+
 @testset "push coverage" begin
     @test SparseMatrixCSC(IMatrix(3)) ≈ Diagonal(ones(3))
     @test Diagonal(IMatrix(3)) ≈ Diagonal(ones(3))
