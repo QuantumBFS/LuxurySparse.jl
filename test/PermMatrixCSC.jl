@@ -1,7 +1,7 @@
 using Test, Random
-import LuxurySparse: PermMatrixCSC, pmcscrand
+import LuxurySparse: IterNz, PermMatrix, PermMatrixCSC, pmcscrand, pmrand
 import LuxurySparse
-using SparseArrays: sprand, SparseMatrixCSC
+using SparseArrays: findnz, sprand, SparseMatrixCSC
 using LinearAlgebra
 
 Random.seed!(2)
